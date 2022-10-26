@@ -1,3 +1,6 @@
 import {NativeModules} from 'react-native';
 
-module.exports = NativeModules.AppListModule;
+module.exports = {
+  AppListModule: NativeModules.AppListModule,
+  CurAppModule: NativeModules.CurAppModule,
+};

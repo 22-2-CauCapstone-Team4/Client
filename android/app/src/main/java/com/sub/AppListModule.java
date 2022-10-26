@@ -6,14 +6,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Base64;
 
-import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -74,7 +71,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
             map.putArray("nameList", name);
             map.putArray("iconList", icon);
             promise.resolve(map);
-        } catch(Exception e) {
+        } catch (Exception e) {
             promise.reject("error", e);
         }
     }
