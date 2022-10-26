@@ -19,10 +19,6 @@ function LogInScreen({navigation}) {
   const {signIn} = useAuth();
 
   const onPressSignIn = async () => {
-    // validation 코드 필요
-    // - 이메일 형식
-    // - 비밀번호 8자 이상
-
     try {
       await signIn(email, password);
       navigation.navigate('Detail');
@@ -43,7 +39,7 @@ function LogInScreen({navigation}) {
   return (
     <NativeBaseProvider>
       <Center flex={1}>
-        <Circle size="100px" bg="secondary.400" m="2" />
+        <Circle size="100px" bg="secondary.400" mb="10" />
         <Box>
           <Input
             onChangeText={setEmail}
@@ -55,9 +51,11 @@ function LogInScreen({navigation}) {
           />
           <Input
             onChangeText={text => setPassword(text)}
-            value={password} // 입력하면, 입력 이메일 안 보이게 수정하기
+            value={password}
+            secureTextEntry={true} // 입력하면, 입력 이메일 안 보이게 수정하기
             w="200px"
             m="1"
+            mb="4"
             size="md"
             placeholder="비밀번호"
           />

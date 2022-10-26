@@ -21,9 +21,21 @@ function App() {
               alignSelf: 'center',
             },
           }}>
-          <Stack.Screen name="로그인" component={LogInScreen} />
-          <Stack.Screen name="계정 만들기" component={CreateAccountScreen} />
-          <Stack.Screen name="Detail" component={Detail} />
+          <Stack.Screen
+            name="로그인"
+            component={LogInScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="계정 만들기"
+            component={CreateAccountScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Detail"
+            component={Detail}
+            // options={{headerShown: false}} <- 헤더 숨김
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
