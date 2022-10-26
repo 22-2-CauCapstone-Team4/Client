@@ -21,7 +21,11 @@ function App() {
         }}>
         <Stack.Screen name="로그인" component={LogInScreen} />
         <Stack.Screen name="계정 만들기" component={CreateAccountScreen} />
-        <Stack.Screen name="Detail" component={Detail} />
+        <Stack.Screen
+          name="Detail"
+          component={Detail}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
