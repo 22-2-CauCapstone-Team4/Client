@@ -1,42 +1,30 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import {Text} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import HomeTab from './HomeTab';
+import AddBtn from './AddBtn';
+import GoalTab from './GoalTab';
+import StatisticsTab from './StatisticsTab';
+import RecordTab from './RecordTab';
 const Container = styled.View`
-  align-items: center;
-  justify-content: center;
   height: 100%;
 `;
 const StyledText = styled.Text`
   font-size: 30px;
 `;
 export const Home = () => {
-  return (
-    <Container>
-      <StyledText>홈</StyledText>
-    </Container>
-  );
+  return <HomeTab />;
 };
 export const Goal = () => {
-  return (
-    <Container>
-      <StyledText>목표</StyledText>
-    </Container>
-  );
+  return <GoalTab />;
 };
 export const Record = () => {
-  return (
-    <Container>
-      <StyledText>기록</StyledText>
-    </Container>
-  );
+  return <RecordTab />;
 };
 export const Statistics = () => {
-  return (
-    <Container>
-      <StyledText>통계</StyledText>
-    </Container>
-  );
+  return <StatisticsTab />;
 };
 export const Friends = () => {
   return (
