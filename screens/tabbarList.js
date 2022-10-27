@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Container = styled.View`
   align-items: center;
