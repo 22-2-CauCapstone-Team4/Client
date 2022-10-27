@@ -1,23 +1,21 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NativeBaseProvider, Center, Button} from 'native-base';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import styled from 'styled-components/native';
+import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
+const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
   return (
-    <NativeBaseProvider style={styles.v}>
-      <Center flex={1}>
-        <Button onPress={() => {}}>BLANK</Button>
-      </Center>
-    </NativeBaseProvider>
+    <Tab.Navigator>
+      <Tab.Screen name="홈" component={Home} />
+      <Tab.Screen name="목표" component={Goal} />
+      <Tab.Screen name="기록" component={Record} />
+      <Tab.Screen name="통계" component={Statistics} />
+      <Tab.Screen name="친구" component={Friends} />
+    </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  v: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default Detail;
