@@ -7,16 +7,13 @@ const MissionList = styled.Text`
 `;
 const GoalList = styled.View`
   width: 100%;
-  height: 40px;
   background-color: #fcfcfc;
   flex-direction: row;
 `;
 const OverallGoal = styled.TouchableOpacity`
-  width: 20%;
   background-color: #0891b2;
-  border-radius: 5;
-  height: 25px;
-  margin: 10px;
+  border-radius: 600;
+  padding: 10px;
 `;
 
 const Categories = () => {
