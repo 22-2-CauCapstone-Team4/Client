@@ -2,9 +2,9 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {AuthProvider} from './providers/AuthProvider';
-import LogInScreen from './screens/LogInScreen';
-import CreateAccountScreen from './screens/CreateAccountScreen';
-import Detail from './screens/Detail';
+import LogInScreen from './components/LogInScreen';
+import CreateAccountScreen from './components/CreateAccountScreen';
+import Detail from './components/Detail';
 
 const Stack = createStackNavigator();
 

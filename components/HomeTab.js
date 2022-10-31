@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {TouchableOpacity, Text, ScrollView} from 'react-native';
 import AddBtn from './AddBtn';
+import MissionBox from './box/MissionBox';
 import Categories from './Categories';
 
 const Container = styled.View`
@@ -31,11 +32,10 @@ const MainText = styled.Text`
   color: #373737;
   font-size: 20px;
   font-weight: bold;
+  margin: 15px 0;
 `;
 const MissionList = styled.View`
-  background-color: #fcfcfc;
-  border-radius: 10px;
-  border: 1px solid #ededed;
+  background-color: #ffffff;
 `;
 const HomeTab = () => {
   const [mission, setMission] = useState(false);
@@ -43,12 +43,9 @@ const HomeTab = () => {
   const clickMission2 = () => setMission(true);
   const [list, setList] = useState({});
   return (
+    // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <Container>
-      <Icon name={'log-out'} size={30} color={'black'} />
       <Categories />
-      <AddMissionBtn>
-        <Icon name="play-outline" size={40} color={'white'}></Icon>
-      </AddMissionBtn>
 
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
@@ -60,9 +57,19 @@ const HomeTab = () => {
       </AboutMission>
       <MainText>{mission ? '완료 미션 | 0' : '예정 미션 | 0'}</MainText>
       {/* 미션 | 뒤에 0은 나중에 데이터를 받아서 count 값을 넣어주면 될듯 */}
+
+      {/* 디비 데이터 받아와서 카테고리, 미션 이름을 뿌려주면 될 것 같다? */}
       <ScrollView>
-        <MissionList></MissionList>
+        <MissionList>
+          <MissionBox category="✏️수업" missionName="그만듣고싶다"></MissionBox>
+          <MissionBox category="🏫과제" missionName="캡스톤"></MissionBox>
+          <MissionBox category="💪운동" missionName="하체하는 날"></MissionBox>
+          <MissionBox category="🐕산책" missionName="휴식휴식"></MissionBox>
+        </MissionList>
       </ScrollView>
+      <AddMissionBtn>
+        <Icon name="play-outline" size={40} color={'white'}></Icon>
+      </AddMissionBtn>
     </Container>
   );
 };

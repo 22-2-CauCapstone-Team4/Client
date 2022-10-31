@@ -2,7 +2,6 @@ import * as React from 'react';
 import {useAuth} from '../providers/AuthProvider';
 import {
   Text,
-  Circle,
   Box,
   NativeBaseProvider,
   Center,

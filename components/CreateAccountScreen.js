@@ -71,11 +71,6 @@ function CreateAccountScreen({navigation}) {
                 회원 가입
               </Text>
             </VStack>
-            {/* <Divider
-            mb="10"
-            _light={{
-              bg: 'muted.400',
-            }}></Divider> */}
           </Box>
 
           <Box w="300px" justifyItems="center" mb="6">
@@ -123,7 +118,7 @@ function CreateAccountScreen({navigation}) {
                     setPasswordValid(' ');
                   }
                 }}
-                value={password} // 입력하면, 입력 이메일 안 보이게 수정하기
+                value={password}
                 w="300px"
                 size="md"
                 placeholder="비밀번호"
@@ -141,7 +136,7 @@ function CreateAccountScreen({navigation}) {
                     setConfirmValid(' ');
                   }
                 }}
-                value={confirm} // 입력하면, 입력 이메일 안 보이게 수정하기
+                value={confirm}
                 w="300px"
                 size="md"
                 placeholder="비밀번호 확인"

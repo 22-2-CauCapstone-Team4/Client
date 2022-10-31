@@ -1,9 +1,12 @@
 import AddBtn from './AddBtn';
 import React, {useState} from 'react';
-import Categories from './Categories';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {TouchableOpacity, Text, ScrollView} from 'react-native';
+
+import Categories from './Categories';
+import GoalBox from './box/GoalBox';
+import SpaceBox from './box/SpaceBox';
 
 const AboutMission = styled.View`
   border: 1px solid #f1f1f1;
@@ -23,18 +26,17 @@ const AddMissionBtn = styled.TouchableOpacity`
 `;
 const Container = styled.View`
   height: 100%;
-  background-color: white;
+  background-color: #ffffff;
   padding: 20px;
 `;
 const MainText = styled.Text`
   color: #373737;
   font-size: 20px;
   font-weight: bold;
+  margin: 15px 0;
 `;
-const MissionList = styled.View`
-  background-color: #fcfcfc;
-  border-radius: 10px;
-  border: 1px solid #ededed;
+const GoalList = styled.View`
+  background-color: #ffffff;
 `;
 const GoalTab = () => {
   const [mission, setMission] = useState(false);
@@ -42,9 +44,6 @@ const GoalTab = () => {
   const clickMission2 = () => setMission(true);
   return (
     <Container>
-      <AddMissionBtn>
-        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
-      </AddMissionBtn>
       <Categories />
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
@@ -56,8 +55,14 @@ const GoalTab = () => {
       </AboutMission>
       <MainText>{mission ? '미션 공간 | 0' : '예정 미션 | 0'}</MainText>
       <ScrollView>
-        <MissionList></MissionList>
+        <GoalList>
+          <GoalBox category="✏️수업" missionName="그만듣고싶다"></GoalBox>
+          <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox>
+        </GoalList>
       </ScrollView>
+      <AddMissionBtn>
+        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
+      </AddMissionBtn>
     </Container>
   );
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import {TouchableOpacity, Text} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,7 +18,7 @@ function Detail({navigation}) {
           } else if (route.name === '목표') {
             iconName = focused ? 'paper-plane' : 'paper-plane-outline';
           } else if (route.name === '기록') {
-            iconName = focused ? 'settings' : 'settings-outline';
+            iconName = focused ? 'trophy' : 'trophy-outline';
           } else if (route.name === '통계') {
             iconName = focused ? 'podium' : 'podium-outline';
           } else if (route.name === '친구') {
@@ -27,8 +28,19 @@ function Detail({navigation}) {
         },
         tabBarActiveTintColor: Color.MAIN_COLOR,
         tabBarInactiveTintColor: 'gray',
+        headerStyle: {
+          borderBottomWidth: 1,
+        },
+        headerRight: () => (
+          <TouchableOpacity
+            style={{flexDirection: 'row', marginRight: 20}}
+            onPress={() => navigation.navigate('로그인')}>
+            <Text style={{color: 'black'}}>로그아웃</Text>
+            <Icon name={'log-out'} size={30} color={'black'} />
+          </TouchableOpacity>
+        ),
       })}>
-      {/* 홈 -> tabBarBadge 현재 미션 개수를 띄워두는건 어떨까? */}
+      {/* 홈 -> tabBarBadge: 현재 진행 중인 미션 개수를 띄워두기(?) */}
       <Tab.Screen name="홈" component={Home} options={{tabBarBadge: 0}} />
       <Tab.Screen name="목표" component={Goal} />
       <Tab.Screen name="기록" component={Record} />

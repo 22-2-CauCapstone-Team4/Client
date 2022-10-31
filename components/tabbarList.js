@@ -8,6 +8,7 @@ import AddBtn from './AddBtn';
 import GoalTab from './GoalTab';
 import StatisticsTab from './StatisticsTab';
 import RecordTab from './RecordTab';
+import FriendTab from './FriendTab';
 const Container = styled.View`
   height: 100%;
 `;
@@ -27,9 +28,5 @@ export const Statistics = () => {
   return <StatisticsTab />;
 };
 export const Friends = () => {
-  return (
-    <Container>
-      <StyledText>친구</StyledText>
-    </Container>
-  );
+  return <FriendTab />;
 };
