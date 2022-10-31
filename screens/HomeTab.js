@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {TouchableOpacity, Text, ScrollView} from 'react-native';
 import AddBtn from './AddBtn';
 import Categories from './Categories';
@@ -15,11 +15,11 @@ const AddMissionBtn = styled.TouchableOpacity`
   bottom: 6%;
   right: 6.7%;
   background-color: #0891b2;
-  border-radius: 600;
+  border-radius: 600px;
 `;
 const AboutMission = styled.View`
   border: 1px solid #f1f1f1;
-  border-radius: 600;
+  border-radius: 600px;
   margin: 10px 0;
   flex-direction: row;
   align-items: center;
@@ -34,7 +34,7 @@ const MainText = styled.Text`
 `;
 const MissionList = styled.View`
   background-color: #fcfcfc;
-  border-radius: 10;
+  border-radius: 10px;
   border: 1px solid #ededed;
 `;
 const HomeTab = () => {
@@ -44,9 +44,10 @@ const HomeTab = () => {
   const [list, setList] = useState({});
   return (
     <Container>
+      <Icon name={'log-out'} size={30} color={'black'} />
       <Categories />
       <AddMissionBtn>
-        <Ionicons name="play-outline" size={40} color={'white'}></Ionicons>
+        <Icon name="play-outline" size={40} color={'white'}></Icon>
       </AddMissionBtn>
 
       <AboutMission>

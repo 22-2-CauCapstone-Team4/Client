@@ -12,7 +12,7 @@ const GoalList = styled.View`
 `;
 const OverallGoal = styled.TouchableOpacity`
   background-color: #0891b2;
-  border-radius: 600;
+  border-radius: 600px;
   padding: 10px;
 `;
 

@@ -12,15 +12,7 @@ function App() {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="로그인"
-          screenOptions={{
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              textAlign: 'center',
-              alignSelf: 'center',
-            },
-          }}>
+        <Stack.Navigator initialRouteName="로그인">
           <Stack.Screen
             name="로그인"
             component={LogInScreen}
@@ -34,7 +26,7 @@ function App() {
           <Stack.Screen
             name="Detail"
             component={Detail}
-            // options={{headerShown: false}} <- 헤더 숨김
+            options={{headerShown: false}}
           />
         </Stack.Navigator>
       </NavigationContainer>

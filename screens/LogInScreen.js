@@ -37,7 +37,6 @@ function LogInScreen({navigation}) {
   return (
     <NativeBaseProvider>
       <Center flex={1}>
-        {/* <Circle size="100px" bg="secondary.400" mb="10" /> */}
         <Text alignSelf="center" fontSize="3xl" fontWeight="700" mb="8">
           로그인
         </Text>

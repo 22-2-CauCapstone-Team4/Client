@@ -7,7 +7,7 @@ import {TouchableOpacity, Text, ScrollView} from 'react-native';
 
 const AboutMission = styled.View`
   border: 1px solid #f1f1f1;
-  border-radius: 600;
+  border-radius: 600px;
   margin: 10px 0;
   flex-direction: row;
   align-items: center;
@@ -19,7 +19,7 @@ const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
   right: 5%;
-  border-radius: 600;
+  border-radius: 600px;
 `;
 const Container = styled.View`
   height: 100%;
@@ -33,7 +33,7 @@ const MainText = styled.Text`
 `;
 const MissionList = styled.View`
   background-color: #fcfcfc;
-  border-radius: 10;
+  border-radius: 10px;
   border: 1px solid #ededed;
 `;
 const GoalTab = () => {
