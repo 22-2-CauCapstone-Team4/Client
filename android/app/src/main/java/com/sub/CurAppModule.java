@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 
 import com.facebook.react.bridge.Arguments;
@@ -15,7 +16,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 
 public class CurAppModule extends ReactContextBaseJavaModule {
-    boolean isPaused = false, isStarted = false, isAllowed;
+    boolean isAllowed;
 
     CurAppModule(ReactApplicationContext context) {
         super(context);
@@ -49,6 +50,17 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             promise.resolve(map);
         } catch (Exception e) {
             promise.reject("error", e);
+        }
+    }
+
+    @ReactMethod
+    public void startService() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, CheckAppService.class));
+        } else {
+            context.startService(new Intent(context, CheckAppService.class));
         }
     }
 

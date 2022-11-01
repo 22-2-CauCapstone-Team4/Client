@@ -37,6 +37,7 @@ function Detail({navigation}) {
       <Center flex={1}>
         <Button onPress={onPressAppList}>App List</Button>
         <Button onPress={onPressCheckPermission}>Check Permission</Button>
+        <Button onPress={CurAppModule.startService()}>Start Service</Button>
       </Center>
     </NativeBaseProvider>
   );
