@@ -26,7 +26,7 @@ const AddMissionBtn = styled.TouchableOpacity`
 `;
 const Container = styled.View`
   height: 100%;
-  background-color: #ffffff;
+  background-color: white;
   padding: 20px;
 `;
 const MainText = styled.Text`
