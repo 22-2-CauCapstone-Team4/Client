@@ -11,10 +11,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.util.LongSparseArray;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
@@ -25,6 +29,27 @@ public class CheckAppService extends Service {
 
     NotificationManager notificationManager;
     Notification notification;
+
+    private Handler handler = new Handler();
+    private Runnable runnableCode = new Runnable() {
+        @Override
+        public void run() {
+            Context context = getApplicationContext();
+
+            Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
+            Bundle bundle = new Bundle();
+
+            String appName = getPackageName(context);
+            bundle.putString("appPackageName", appName);
+            checkAppIntent.putExtras(bundle);
+
+            Log.i("CheckAppService", "JS쪽으로 전송");
+            context.startService(checkAppIntent);
+
+            HeadlessJsTaskService.acquireWakeLockNow(context);
+            handler.postDelayed(this, 2000); // 2초에 한 번
+        }
+    };
 
     @Nullable
     @Override
@@ -50,16 +75,15 @@ public class CheckAppService extends Service {
         startForeground(SERVICE_NOTIFICATION_ID, notification);
 
         // 스레드 생성해서 이 위치에서 시작시켜야 함
-        // intent 하나 보내보기
-        Intent checkAppIntent = new Intent(getApplicationContext(), CheckAppEventService.class);
-        Bundle bundle = new Bundle();
-
-        bundle.putString("msg", "안녕하세요!");
-        checkAppIntent.putExtras(bundle);
-
-        getApplicationContext().startService(checkAppIntent);
+        this.handler.post(this.runnableCode);
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.handler.removeCallbacks(this.runnableCode);
     }
 
     private void createNotificationChannel() {
@@ -71,5 +95,47 @@ public class CheckAppService extends Service {
             notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    private static String getPackageName(@NonNull Context context) {
+        UsageStatsManager usageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+
+        long lastRunAppTimeStamp = 0L;
+
+        final long INTERVAL = 10000; // 1분 전에 켠 앱부터 확인
+        final long end = System.currentTimeMillis();
+        final long begin = end - INTERVAL;
+
+        LongSparseArray packageNameMap = new LongSparseArray<>();
+
+        final UsageEvents usageEvents = usageStatsManager.queryEvents(begin, end);
+
+        while (usageEvents.hasNextEvent()) {
+
+            UsageEvents.Event event = new UsageEvents.Event();
+            usageEvents.getNextEvent(event);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (isForeGroundEvent(event)) {
+                    packageNameMap.put(event.getTimeStamp(), event.getPackageName());
+                    if (event.getTimeStamp() > lastRunAppTimeStamp) {
+                        lastRunAppTimeStamp = event.getTimeStamp();
+                    }
+                }
+            }
+        }
+
+        return packageNameMap.get(lastRunAppTimeStamp, "").toString();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private static boolean isForeGroundEvent(UsageEvents.Event event) {
+
+        if (event == null) return false;
+
+        if (BuildConfig.VERSION_CODE >= 29)
+            return event.getEventType() == UsageEvents.Event.ACTIVITY_RESUMED;
+
+        return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
     }
 }

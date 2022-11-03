@@ -35,13 +35,10 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
             WritableMap map = Arguments.createMap();
 
-            if (!checkPermission(context)) {
-                Intent permissionIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
-                permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(permissionIntent);
+            allowPermission();
 
-                map.putBoolean("alreadyAllowed", false);
-            } else {
+            if (!checkPermission(context)) map.putBoolean("alreadyAllowed", false);
+            else {
                 // 권한 이미 허용된 경우
                 isAllowed = true;
                 map.putBoolean("alreadyAllowed", true);
@@ -53,9 +50,24 @@ public class CurAppModule extends ReactContextBaseJavaModule {
         }
     }
 
+    private void allowPermission() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        if (!checkPermission(context)) {
+            Intent permissionIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+            permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(permissionIntent);
+        }
+    }
+
     @ReactMethod
     public void startService() {
         ReactApplicationContext context = getReactApplicationContext();
+
+        if (checkPermission(context)) {
+            allowPermission();
+            return;
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(new Intent(context, CheckAppService.class));
