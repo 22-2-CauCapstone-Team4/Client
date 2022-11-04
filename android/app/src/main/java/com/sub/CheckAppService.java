@@ -1,6 +1,5 @@
 package com.sub;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,8 +7,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStatsManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,8 +35,11 @@ public class CheckAppService extends Service {
     private boolean isProhibitedApp = true; // 처음에는 일단 JS쪽에 신호 보내야 함
     private ArrayList<String> prohibitedAppList = null;
 
-    NotificationManager notificationManager;
-    Notification notification;
+    private NotificationManager notificationManager;
+    private Notification notification;
+
+    private BroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     private Handler handler = new Handler();
     private Runnable runnableCode = new Runnable() {
@@ -52,19 +56,9 @@ public class CheckAppService extends Service {
             // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
             if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
                 // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
-                if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp)) {
-                    Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
-                    Bundle bundle = new Bundle();
-
-                    bundle.putString("appPackageName", nowAppPackageName);
-                    bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
-                    checkAppIntent.putExtras(bundle);
-
-                    Log.i("CheckAppService", "JS쪽으로 전송");
-                    context.startService(checkAppIntent);
-
-                    HeadlessJsTaskService.acquireWakeLockNow(context);
-                }
+                // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
+                if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
+                    sendAppPackageNameToJS(context, nowAppPackageName, nowIsProhibitedApp);
 
                 appPackageName = nowAppPackageName;
                 isProhibitedApp = nowIsProhibitedApp;
@@ -106,7 +100,37 @@ public class CheckAppService extends Service {
                 .build();
 
         startForeground(SERVICE_NOTIFICATION_ID, notification);
-        this.handler.post(this.runnableCode);
+        handler.post(runnableCode);
+
+        // 화면 꺼지고 켜지는 상황 대응하기
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    Log.i("CheckAppService", "화면 꺼짐");
+
+                    // 화면 끈 경우, 코드가 반복될 필요 없음 (켜졌을 때 다시 반복을 시작해주면 됨)
+                    handler.removeCallbacks(runnableCode);
+
+                    // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
+                    if (isProhibitedApp)
+                        sendAppPackageNameToJS(context, "", false);
+
+                    appPackageName = "";
+                    isProhibitedApp = false;
+                } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    Log.i("CheckAppService", "화면 켜짐");
+
+                    // 화면 켠 경우, 다시 반복 시작
+                    handler.post(runnableCode);
+                }
+            }
+        };
+        registerReceiver(receiver, intentFilter);
 
         return START_STICKY;
     }
@@ -114,7 +138,7 @@ public class CheckAppService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.handler.removeCallbacks(this.runnableCode);
+        handler.removeCallbacks(runnableCode);
     }
 
     private void createNotificationChannel() {
@@ -167,5 +191,19 @@ public class CheckAppService extends Service {
             return event.getEventType() == UsageEvents.Event.ACTIVITY_RESUMED;
 
         return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
+    }
+
+    private void sendAppPackageNameToJS(Context context, String nowAppPackageName, boolean nowIsProhibitedApp) {
+        Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
+        Bundle bundle = new Bundle();
+
+        bundle.putString("appPackageName", nowAppPackageName);
+        bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
+        checkAppIntent.putExtras(bundle);
+
+        Log.i("CheckAppService", "JS쪽으로 전송");
+        context.startService(checkAppIntent);
+
+        HeadlessJsTaskService.acquireWakeLockNow(context);
     }
 }
