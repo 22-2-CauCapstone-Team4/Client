@@ -23,9 +23,14 @@ import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
 
+import java.util.ArrayList;
+
 public class CheckAppService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 0315;
     private static final String CHANNEL_ID = "PHONELOCK";
+
+    private String curAppPackageName = "";
+    private ArrayList<String> appArrList = null;
 
     NotificationManager notificationManager;
     Notification notification;
@@ -36,17 +41,24 @@ public class CheckAppService extends Service {
         public void run() {
             Context context = getApplicationContext();
 
-            Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
-            Bundle bundle = new Bundle();
+            // 현재 foreground 앱의 패키지 이름 확인
+            String tempAppPackageName = getPackageName(context);
+            
+            // ""이 오는 경우, 폰 잠근 상황 또는 같은 화면 유지 중인 상황 (즉, RN 쪽으로 신호 보낼 필요 없음)
+            if (!tempAppPackageName.equals("") || !tempAppPackageName.equals(curAppPackageName)) {
+                Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
+                Bundle bundle = new Bundle();
 
-            String appName = getPackageName(context);
-            bundle.putString("appPackageName", appName);
-            checkAppIntent.putExtras(bundle);
+                curAppPackageName = tempAppPackageName;
+                bundle.putString("appPackageName", curAppPackageName);
+                checkAppIntent.putExtras(bundle);
 
-            Log.i("CheckAppService", "JS쪽으로 전송");
-            context.startService(checkAppIntent);
+                Log.i("CheckAppService", "JS쪽으로 전송");
+                context.startService(checkAppIntent);
 
-            HeadlessJsTaskService.acquireWakeLockNow(context);
+                HeadlessJsTaskService.acquireWakeLockNow(context);
+            }
+
             handler.postDelayed(this, 2000); // 2초에 한 번
         }
     };
@@ -59,6 +71,16 @@ public class CheckAppService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // 번들의 내용 받아오기
+        if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
+            ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
+            if (appArrList != null)
+                this.appArrList = appArrList;
+
+            for (String appName : appArrList)
+                Log.i("CheckAppService", appName);
+        }
+
         createNotificationChannel(); // Creating channel for API 26+
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -73,8 +95,6 @@ public class CheckAppService extends Service {
                 .build();
 
         startForeground(SERVICE_NOTIFICATION_ID, notification);
-
-        // 스레드 생성해서 이 위치에서 시작시켜야 함
         this.handler.post(this.runnableCode);
 
         return START_STICKY;
@@ -130,7 +150,6 @@ public class CheckAppService extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean isForeGroundEvent(UsageEvents.Event event) {
-
         if (event == null) return false;
 
         if (BuildConfig.VERSION_CODE >= 29)

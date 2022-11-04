@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 
 import com.facebook.react.bridge.Arguments;
@@ -13,7 +14,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
+
+import java.util.ArrayList;
 
 public class CurAppModule extends ReactContextBaseJavaModule {
     boolean isAllowed;
@@ -61,7 +65,7 @@ public class CurAppModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startService() {
+    public void startService(ReadableArray appList) {
         ReactApplicationContext context = getReactApplicationContext();
 
         if (checkPermission(context)) {
@@ -69,11 +73,18 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, CheckAppService.class));
-        } else {
-            context.startService(new Intent(context, CheckAppService.class));
-        }
+        Intent checkAppServiceintent = new Intent(context, CheckAppService.class);
+        Bundle bundle = new Bundle();
+
+        // 번들에 내용 담아서 넣어주기
+        ArrayList<String> appArrList = Arguments.toList(appList);
+        bundle.putStringArrayList("appList", appArrList);
+        checkAppServiceintent.putExtras(bundle);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            context.startForegroundService(checkAppServiceintent);
+        else
+            context.startService(checkAppServiceintent);
     }
 
     // 권한 체크 함수

@@ -32,12 +32,23 @@ function Detail({navigation}) {
     }
   };
 
+  const onPressStartService = async () => {
+    try {
+      await CurAppModule.startService([
+        'com.github.android',
+        'com.android.chrome',
+      ]);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   return (
     <NativeBaseProvider style={styles.v}>
       <Center flex={1}>
         <Button onPress={onPressAppList}>App List</Button>
         <Button onPress={onPressCheckPermission}>Check Permission</Button>
-        <Button onPress={CurAppModule.startService()}>Start Service</Button>
+        <Button onPress={onPressStartService}>Start Service</Button>
       </Center>
     </NativeBaseProvider>
   );
