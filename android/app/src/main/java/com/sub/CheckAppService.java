@@ -1,5 +1,6 @@
 package com.sub;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,11 +27,12 @@ import com.facebook.react.HeadlessJsTaskService;
 import java.util.ArrayList;
 
 public class CheckAppService extends Service {
-    private static final int SERVICE_NOTIFICATION_ID = 0315;
+    private static final int SERVICE_NOTIFICATION_ID = 315;
     private static final String CHANNEL_ID = "PHONELOCK";
 
-    private String curAppPackageName = "";
-    private ArrayList<String> appArrList = null;
+    private String appPackageName = "";
+    private boolean isProhibitedApp = true; // 처음에는 일단 JS쪽에 신호 보내야 함
+    private ArrayList<String> prohibitedAppList = null;
 
     NotificationManager notificationManager;
     Notification notification;
@@ -42,21 +44,30 @@ public class CheckAppService extends Service {
             Context context = getApplicationContext();
 
             // 현재 foreground 앱의 패키지 이름 확인
-            String tempAppPackageName = getPackageName(context);
-            
-            // ""이 오는 경우, 폰 잠근 상황 또는 같은 화면 유지 중인 상황 (즉, RN 쪽으로 신호 보낼 필요 없음)
-            if (!tempAppPackageName.equals("") || !tempAppPackageName.equals(curAppPackageName)) {
-                Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
-                Bundle bundle = new Bundle();
+            String nowAppPackageName = getPackageName(context);
+            boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
 
-                curAppPackageName = tempAppPackageName;
-                bundle.putString("appPackageName", curAppPackageName);
-                checkAppIntent.putExtras(bundle);
+            Log.i("CheckAppService", "AppName = " + nowAppPackageName);
 
-                Log.i("CheckAppService", "JS쪽으로 전송");
-                context.startService(checkAppIntent);
+            // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
+            if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
+                // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
+                if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp)) {
+                    Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
+                    Bundle bundle = new Bundle();
 
-                HeadlessJsTaskService.acquireWakeLockNow(context);
+                    bundle.putString("appPackageName", nowAppPackageName);
+                    bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
+                    checkAppIntent.putExtras(bundle);
+
+                    Log.i("CheckAppService", "JS쪽으로 전송");
+                    context.startService(checkAppIntent);
+
+                    HeadlessJsTaskService.acquireWakeLockNow(context);
+                }
+
+                appPackageName = nowAppPackageName;
+                isProhibitedApp = nowIsProhibitedApp;
             }
 
             handler.postDelayed(this, 2000); // 2초에 한 번
@@ -75,7 +86,7 @@ public class CheckAppService extends Service {
         if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
             ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
             if (appArrList != null)
-                this.appArrList = appArrList;
+                prohibitedAppList = appArrList;
 
             for (String appName : appArrList)
                 Log.i("CheckAppService", appName);

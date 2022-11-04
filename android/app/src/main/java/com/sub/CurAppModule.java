@@ -68,23 +68,23 @@ public class CurAppModule extends ReactContextBaseJavaModule {
     public void startService(ReadableArray appList) {
         ReactApplicationContext context = getReactApplicationContext();
 
-        if (checkPermission(context)) {
+        if (!checkPermission(context)) {
             allowPermission();
             return;
         }
 
-        Intent checkAppServiceintent = new Intent(context, CheckAppService.class);
+        Intent checkAppServiceIntent = new Intent(context, CheckAppService.class);
         Bundle bundle = new Bundle();
 
         // 번들에 내용 담아서 넣어주기
         ArrayList<String> appArrList = Arguments.toList(appList);
         bundle.putStringArrayList("appList", appArrList);
-        checkAppServiceintent.putExtras(bundle);
+        checkAppServiceIntent.putExtras(bundle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            context.startForegroundService(checkAppServiceintent);
+            context.startForegroundService(checkAppServiceIntent);
         else
-            context.startService(checkAppServiceintent);
+            context.startService(checkAppServiceIntent);
     }
 
     // 권한 체크 함수
