@@ -43,12 +43,12 @@ public class AppListModule extends ReactContextBaseJavaModule {
             // js에서 사용 가능한 arr, map
             WritableMap map = Arguments.createMap();
             WritableArray name = Arguments.createArray();
-
-            // icon의 경우, drawble을 전송하는 방법에 대해서는 알지 못함
+            WritableArray packageName = Arguments.createArray();
             WritableArray icon = Arguments.createArray();
 
             for (PackageInfo info : infoList) {
                 name.pushString(info.applicationInfo.loadLabel(pm) + "");
+                packageName.pushString(info.packageName);
 
                 // icon img
                 // 1. drawble -> bitmap
@@ -69,6 +69,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
             }
 
             map.putArray("nameList", name);
+            map.putArray("packageNameList", packageName);
             map.putArray("iconList", icon);
             promise.resolve(map);
         } catch (Exception e) {
