@@ -41,32 +41,47 @@ public class CheckAppService extends Service {
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
 
-    private Handler handler = new Handler();
+    private boolean isThreadRunning = false;
+    // private Handler handler = new Handler();
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
             Context context = getApplicationContext();
 
-            // 현재 foreground 앱의 패키지 이름 확인
-            String nowAppPackageName = getPackageName(context);
-            boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
+            if (isThreadRunning) return;
+            isThreadRunning = true;
 
-            Log.i("CheckAppService", "AppName = " + nowAppPackageName);
+            while (isThreadRunning) {
+                // 현재 foreground 앱의 패키지 이름 확인
+                String nowAppPackageName = getPackageName(context);
+                boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
 
-            // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
-            if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
-                // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
-                // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
-                if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
-                    sendAppPackageNameToJS(context, nowAppPackageName, nowIsProhibitedApp);
+                Log.i("CheckAppService", "AppName = " + nowAppPackageName);
 
-                appPackageName = nowAppPackageName;
-                isProhibitedApp = nowIsProhibitedApp;
+                // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
+                if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
+                    // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
+                    // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
+                    if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
+                        sendAppPackageNameToJS(context, nowAppPackageName, nowIsProhibitedApp);
+
+                    appPackageName = nowAppPackageName;
+                    isProhibitedApp = nowIsProhibitedApp;
+                }
+
+                try {
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
             }
 
-            handler.postDelayed(this, 2000); // 2초에 한 번
+            // handler.postDelayed(this, 2000); // 2초에 한 번
         }
     };
+
+    private Thread thread;
 
     @Nullable
     @Override
@@ -100,7 +115,9 @@ public class CheckAppService extends Service {
                 .build();
 
         startForeground(SERVICE_NOTIFICATION_ID, notification);
-        handler.post(runnableCode);
+
+        thread = new Thread(runnableCode);
+        thread.start();
 
         // 화면 꺼지고 켜지는 상황 대응하기
         intentFilter = new IntentFilter();
@@ -114,7 +131,8 @@ public class CheckAppService extends Service {
                     Log.i("CheckAppService", "화면 꺼짐");
 
                     // 화면 끈 경우, 코드가 반복될 필요 없음 (켜졌을 때 다시 반복을 시작해주면 됨)
-                    handler.removeCallbacks(runnableCode);
+                    // handler.removeCallbacks(runnableCode);
+                    isThreadRunning = false;
 
                     // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
                     if (isProhibitedApp)
@@ -126,7 +144,9 @@ public class CheckAppService extends Service {
                     Log.i("CheckAppService", "화면 켜짐");
 
                     // 화면 켠 경우, 다시 반복 시작
-                    handler.post(runnableCode);
+                    // handler.post(runnableCode);
+                    thread = new Thread(runnableCode);
+                    thread.start();
                 }
             }
         };
@@ -138,7 +158,8 @@ public class CheckAppService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(runnableCode);
+        // handler.removeCallbacks(runnableCode);
+        isThreadRunning = false;
     }
 
     private void createNotificationChannel() {
