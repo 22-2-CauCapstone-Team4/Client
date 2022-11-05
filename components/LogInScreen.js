@@ -16,7 +16,13 @@ function LogInScreen({navigation}) {
   const [password, setPassword] = React.useState('');
   const [loginValid, setLoginValid] = React.useState(' ');
 
-  const {signIn} = useAuth();
+  const {user, signIn} = useAuth();
+
+  React.useEffect(() => {
+    if (user != null) {
+      navigation.navigate('Detail');
+    }
+  }, [navigation, user]);
 
   const onPressSignIn = async () => {
     try {
