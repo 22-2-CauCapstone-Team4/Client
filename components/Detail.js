@@ -4,9 +4,18 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Color from '../utils/Colors';
+import {useAuth} from '../providers/AuthProvider';
+
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
+  const {user, signOut} = useAuth();
+
+  const onPressLogOut = () => {
+    navigation.navigate('로그인');
+    signOut();
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -34,7 +43,7 @@ function Detail({navigation}) {
         headerRight: () => (
           <TouchableOpacity
             style={{flexDirection: 'row', marginRight: 20}}
-            onPress={() => navigation.navigate('로그인')}>
+            onPress={onPressLogOut}>
             <Text style={{color: 'black'}}>로그아웃</Text>
             <Icon name={'log-out'} size={30} color={'black'} />
           </TouchableOpacity>
