@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NativeBaseProvider, Center, Button} from 'native-base';
 
-import {AppListModule, CurAppModule} from '../wrap_module';
+import {AppListModule, CurAppModule, LockAppModule} from '../wrap_module';
 import SnackBar from 'react-native-snackbar';
 
 function Detail({navigation}) {
@@ -43,12 +43,28 @@ function Detail({navigation}) {
     }
   };
 
+  const onPressCheckPermission2 = async () => {
+    try {
+      const {alreadyAllowed} = await LockAppModule.allowPermission();
+
+      if (alreadyAllowed) {
+        SnackBar.show({
+          text: '이미 권한이 허용되었습니다. ',
+          duration: SnackBar.LENGTH_SHORT,
+        });
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   return (
     <NativeBaseProvider style={styles.v}>
       <Center flex={1}>
         <Button onPress={onPressAppList}>App List</Button>
         <Button onPress={onPressCheckPermission}>Check Permission</Button>
         <Button onPress={onPressStartService}>Start Service</Button>
+        <Button onPress={onPressCheckPermission2}>Check Permission 2</Button>
       </Center>
     </NativeBaseProvider>
   );
