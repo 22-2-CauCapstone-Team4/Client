@@ -1,11 +1,19 @@
 import React, {useState} from 'react';
-import {Text, ScrollView, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  Pressable,
+  TextInput,
+  Modal,
+} from 'react-native';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../utils/Colors';
 import FriendBox from './box/FriendBox';
-
+import {StyleSheet} from 'react-native';
 const Container = styled.View`
   height: 100%;
   background-color: #ffffff;
@@ -42,6 +50,7 @@ const StyledText = styled.Text`
 `;
 export default function () {
   const [friendState, setFriendState] = useState('whole');
+  const [modalVisible, setModalVisible] = useState(false);
   const whole = () => setFriendState('whole');
   const locked = () => setFriendState('lock');
   const giveUp = () => setFriendState('quit');
@@ -92,9 +101,85 @@ export default function () {
         <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
         <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
       </ScrollView>
-      <AddFriendBtn>
+      <AddFriendBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
       </AddFriendBtn>
+      {/* modal */}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <View>
+                <TextInput />
+                <TextInput />
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>확인</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>취소</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
     </Container>
   );
 }
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    margin: 5,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
