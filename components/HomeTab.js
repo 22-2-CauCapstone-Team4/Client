@@ -1,7 +1,15 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity, Text, ScrollView} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  Modal,
+  View,
+  Pressable,
+  TextInput,
+} from 'react-native';
 import AddBtn from './AddBtn';
 import MissionBox from './box/MissionBox';
 import Categories from './Categories';
@@ -14,9 +22,8 @@ const Container = styled.View`
 `;
 const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
-  bottom: 6%;
-  right: 6.7%;
-  background-color: #0891b2;
+  bottom: 5%;
+  right: 5%;
   border-radius: 600px;
 `;
 const AboutMission = styled.View`
@@ -40,14 +47,13 @@ const MissionList = styled.View`
 const ScrollViews = styled.ScrollView``;
 const HomeTab = () => {
   const [mission, setMission] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
-  const [list, setList] = useState({});
   return (
     // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <Container>
       <Categories />
-
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
           <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
@@ -76,12 +82,86 @@ const HomeTab = () => {
           </MissionList>
         </ScrollViews>
       )}
-
-      <AddMissionBtn>
-        <Icon name="play-outline" size={40} color={'white'}></Icon>
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              {/* <Text style={styles.modalText}>asd</Text */}
+              <View>
+                <TextInput />
+                <TextInput />
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>확인</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>취소</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+      <AddMissionBtn onPress={() => setModalVisible(true)}>
+        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
       </AddMissionBtn>
     </Container>
   );
 };
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    margin: 5,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
 export default HomeTab;

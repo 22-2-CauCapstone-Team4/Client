@@ -71,9 +71,7 @@ const GoalTab = () => {
           <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox>
         </GoalList>
       </ScrollView>
-      <AddMissionBtn onPress={() => setModalVisible(true)}>
-        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
-      </AddMissionBtn>
+
       {/* modal */}
       <View style={styles.centeredView}>
         <Modal
@@ -107,9 +105,9 @@ const GoalTab = () => {
           </View>
         </Modal>
       </View>
-      {/* <AddMissionBtn>
+      <AddMissionBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
-      </AddMissionBtn> */}
+      </AddMissionBtn>
     </Container>
   );
 };

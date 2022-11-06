@@ -34,18 +34,17 @@ const StatisticsTab = () => {
     <Container>
       <Categories />
       <ScrollView>
-        <Text>StackedBar chart</Text>
+        <Text>chart1</Text>
         <StackedBarChart
           data={data}
           width={screenWidth}
           height={220}
           chartConfig={{
-            backgroundColor: '#e26a00',
-            backgroundGradientFrom: '#fb8c00',
-            backgroundGradientTo: '#ffa726',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
             decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            color: (opacity = 1) => `grey`,
+            labelColor: (opacity = 1) => `black`,
             style: {
               borderRadius: 16,
             },
