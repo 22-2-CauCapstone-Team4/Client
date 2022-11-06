@@ -10,11 +10,11 @@ import {
   HStack,
   VStack,
   Pressable,
-  Divider,
-  FormControl,
 } from 'native-base';
 import SnackBar from 'react-native-snackbar';
-import {enableScreens} from 'react-native-screens';
+
+import Realm from 'realm';
+import {CurState} from '../schema';
 
 function CreateAccountScreen({navigation}) {
   const [email, setEmail] = React.useState('');
@@ -30,19 +30,33 @@ function CreateAccountScreen({navigation}) {
   const regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
 
   const comparePasswords = text => {
-    if (text != confirm) {
+    if (text !== confirm) {
       setConfirmValid('비밀번호가 동일하지 않습니다.');
     } else {
-      setConfirmValid(' ');
+      setConfirmValid('');
     }
   };
 
   const onPressSignUp = async () => {
-    if (emailValid === ' ' && passwordValid === ' ' && confirmValid === ' ') {
+    if (emailValid === '' && passwordValid === '' && confirmValid === '') {
       setCreateValid('');
+
       try {
         await signUp(email, password);
         await signIn(email, password);
+
+        // ** TODO : 유저 부가 정보 추가
+        // 유저 상태 생성
+        console.log('회원가입, 로그인 완료');
+        const realm = await Realm.open({
+          schema: [CurState.schema],
+        });
+
+        realm.write(() => {
+          realm.create('CurState', new CurState({}));
+        });
+        realm.close();
+
         navigation.navigate('Detail');
 
         SnackBar.show({
@@ -97,7 +111,7 @@ function CreateAccountScreen({navigation}) {
                   if (!regexEmail.test(email)) {
                     setEmailValid('올바른 형식이 아닙니다.');
                   } else {
-                    setEmailValid(' ');
+                    setEmailValid('');
                   }
                 }}>
                 확인
@@ -115,7 +129,7 @@ function CreateAccountScreen({navigation}) {
                   if (text.length < 8) {
                     setPasswordValid('비밀번호는 8자리 이상이어야 합니다.');
                   } else {
-                    setPasswordValid(' ');
+                    setPasswordValid('');
                   }
                 }}
                 value={password}
@@ -133,7 +147,7 @@ function CreateAccountScreen({navigation}) {
                   if (text !== password) {
                     setConfirmValid('비밀번호가 동일하지 않습니다.');
                   } else {
-                    setConfirmValid(' ');
+                    setConfirmValid('');
                   }
                 }}
                 value={confirm}

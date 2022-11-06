@@ -10,6 +10,7 @@ import {
   Pressable,
 } from 'native-base';
 import SnackBar from 'react-native-snackbar';
+import {CurAppModule, LockAppModule} from '../wrap_module';
 
 function LogInScreen({navigation}) {
   const [email, setEmail] = React.useState('');
@@ -29,6 +30,28 @@ function LogInScreen({navigation}) {
       await signIn(email, password);
       setLoginValid(' ');
       navigation.navigate('Detail');
+
+      // 서비스 실행
+      try {
+        let isAlreadyAllowed;
+        do {
+          ({isAlreadyAllowed} = await CurAppModule.allowPermission());
+        } while (isAlreadyAllowed);
+        do {
+          ({isAlreadyAllowed} = await LockAppModule.allowPermission());
+        } while (isAlreadyAllowed);
+
+        await CurAppModule.startService([
+          // 서비스 실행 시점
+          // ** TODO: 1. 금지 앱 리스트 바뀔 때 (기존 것 삭제 + 실행)
+          // ** TODO : 2. 부팅 시 (이때 앱에서 금지 앱 리스트 읽어올 수 있도록 코드 수정해야 할 듯)
+          'com.github.android',
+          'com.android.chrome',
+        ]);
+      } catch (err) {
+        console.error(err.message);
+      }
+
       SnackBar.show({
         text: '로그인이 완료되었습니다. ',
         duration: SnackBar.LENGTH_SHORT,
