@@ -5,21 +5,23 @@ import {AuthProvider} from './providers/AuthProvider';
 import LogInScreen from './components/LogInScreen';
 import CreateAccountScreen from './components/CreateAccountScreen';
 import Detail from './components/Detail';
+import {LogBox} from 'react-native';
 
 const Stack = createStackNavigator();
 
 function App() {
+  LogBox.ignoreLogs(['Warning: Internal React error']); // 화면 전환 WARNING 생략
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="로그인">
+        <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
-            name="로그인"
+            name="Login"
             component={LogInScreen}
             options={{headerShown: false}}
           />
           <Stack.Screen
-            name="계정 만들기"
+            name="CreateAccount"
             component={CreateAccountScreen}
             options={{headerShown: false}}
           />

@@ -66,7 +66,7 @@ function LogInScreen({navigation}) {
           />
           <Pressable
             w="300px"
-            onPress={() => navigation.navigate('계정 만들기')}>
+            onPress={() => navigation.navigate('CreateAccount')}>
             <Text textAlign="right">가입하기</Text>
           </Pressable>
         </Box>

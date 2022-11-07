@@ -1,10 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Text} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import HomeTab from './HomeTab';
-import AddBtn from './AddBtn';
 import GoalTab from './GoalTab';
 import StatisticsTab from './StatisticsTab';
 import RecordTab from './RecordTab';

@@ -1,8 +1,9 @@
-import React from 'react';
-import {TouchableOpacity, Text} from 'react-native';
+import React, {useEffect} from 'react';
+import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
 import Color from '../utils/Colors';
 import {useAuth} from '../providers/AuthProvider';
 
@@ -12,9 +13,29 @@ function Detail({navigation}) {
   const {user, signOut} = useAuth();
 
   const onPressLogOut = () => {
-    navigation.navigate('로그인');
+    navigation.navigate('Login');
     signOut();
   };
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('종료', '앱을 종료하시겠습니까?', [
+        {
+          text: '취소',
+          onPress: () => null,
+        },
+        {text: '확인', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <Tab.Navigator
@@ -40,14 +61,22 @@ function Detail({navigation}) {
         headerStyle: {
           borderBottomWidth: 1,
         },
-        headerRight: () => (
-          <TouchableOpacity
-            style={{flexDirection: 'row', marginRight: 20}}
-            onPress={onPressLogOut}>
-            <Text style={{color: 'black'}}>로그아웃</Text>
-            <Icon name={'log-out'} size={30} color={'black'} />
-          </TouchableOpacity>
-        ),
+        headerRight: () => {
+          if (route.name === '홈') {
+            return (
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  marginRight: 20,
+                  alignItems: 'center',
+                }}
+                onPress={onPressLogOut}>
+                <Text style={{color: 'black'}}>로그아웃</Text>
+                <Icon name={'log-out'} size={30} color={'black'} />
+              </TouchableOpacity>
+            );
+          }
+        },
       })}>
       {/* 홈 -> tabBarBadge: 현재 진행 중인 미션 개수를 띄워두기(?) */}
       <Tab.Screen name="홈" component={Home} options={{tabBarBadge: 0}} />
