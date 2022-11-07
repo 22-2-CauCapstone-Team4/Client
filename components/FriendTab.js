@@ -7,13 +7,14 @@ import {
   Pressable,
   TextInput,
   Modal,
+  StyleSheet,
 } from 'react-native';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../utils/Colors';
 import FriendBox from './box/FriendBox';
-import {StyleSheet} from 'react-native';
+import FriendModal from './modal/FriendModal';
 const Container = styled.View`
   height: 100%;
   background-color: #ffffff;
@@ -93,7 +94,7 @@ export default function () {
           </Text>
         </TouchableOpacity>
       </FriendState>
-      <StateText>전체 | 15</StateText>
+      <StateText>전체 | 5</StateText>
       <ScrollView>
         <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
         <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
@@ -106,35 +107,9 @@ export default function () {
       </AddFriendBtn>
       {/* modal */}
       <View style={styles.centeredView}>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View>
-                <TextInput />
-                <TextInput />
-              </View>
-              <View style={{flexDirection: 'row'}}>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={styles.textStyle}>확인</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={styles.textStyle}>취소</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        <FriendModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}></FriendModal>
       </View>
     </Container>
   );

@@ -9,12 +9,14 @@ import {
   View,
   Pressable,
   TextInput,
+  Alert,
+  StyleSheet,
 } from 'react-native';
 import AddBtn from './AddBtn';
 import MissionBox from './box/MissionBox';
 import Categories from './Categories';
-import {StyleSheet} from 'react-native';
 import OngoingBox from './box/OngoingBox';
+import CreateMissionModal from './modal/CreateMissionModal';
 const Container = styled.View`
   height: 100%;
   background-color: white;
@@ -83,36 +85,9 @@ const HomeTab = () => {
         </ScrollViews>
       )}
       <View style={styles.centeredView}>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              {/* <Text style={styles.modalText}>asd</Text */}
-              <View>
-                <TextInput />
-                <TextInput />
-              </View>
-              <View style={{flexDirection: 'row'}}>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={styles.textStyle}>확인</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={styles.textStyle}>취소</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        <CreateMissionModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}></CreateMissionModal>
       </View>
       <AddMissionBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
