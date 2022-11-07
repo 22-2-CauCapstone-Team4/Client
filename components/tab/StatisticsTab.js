@@ -1,8 +1,9 @@
-import Categories from './Categories';
+import Categories from '../Categories';
 import React from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, TouchableOpacity, View} from 'react-native';
 import {Dimensions} from 'react-native';
+import Colors from '../../utils/Colors';
 import {
   LineChart,
   BarChart,
@@ -22,7 +23,6 @@ const StatisticsTab = () => {
 
   const data = {
     labels: ['미션 중', '포기 중', '평소'],
-    legend: ['Dataset1', 'Dataset2'],
     data: [
       [60, 60],
       [30, 30],
@@ -37,20 +37,20 @@ const StatisticsTab = () => {
         <Text>chart1</Text>
         <StackedBarChart
           data={data}
-          width={screenWidth}
+          width={screenWidth * 0.95}
           height={220}
           chartConfig={{
             backgroundGradientFrom: '#ffffff',
             backgroundGradientTo: '#ffffff',
             decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `grey`,
-            labelColor: (opacity = 1) => `black`,
+            color: (opacity = 1) => Colors.MAIN_COLOR,
+            labelColor: (opacity = 1) => Colors.MAIN_COLOR,
             style: {
               borderRadius: 16,
             },
             propsForDots: {
               r: '6',
-              strokeWidth: '2',
+              strokeWidth: '12',
               stroke: '#ffa726',
             },
           }}

@@ -12,16 +12,12 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
-import AddBtn from './AddBtn';
-import MissionBox from './box/MissionBox';
-import Categories from './Categories';
-import OngoingBox from './box/OngoingBox';
-import CreateMissionModal from './modal/CreateMissionModal';
-const Container = styled.View`
-  height: 100%;
-  background-color: white;
-  padding: 20px;
-`;
+import AddBtn from '../AddBtn';
+import MissionBox from '../box/MissionBox';
+import Categories from '../Categories';
+import OngoingBox from '../box/OngoingBox';
+import CreateMissionModal from '../modal/CreateMissionModal';
+import {styles} from '../../utils/styles';
 const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
@@ -47,14 +43,15 @@ const MissionList = styled.View`
   background-color: #ffffff;
 `;
 const ScrollViews = styled.ScrollView``;
-const HomeTab = () => {
+const HomeTab = ({navigation}) => {
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
+  console.log(navigation);
   return (
     // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
-    <Container>
+    <View style={styles.tabContainer}>
       <Categories />
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
@@ -92,51 +89,8 @@ const HomeTab = () => {
       <AddMissionBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
       </AddMissionBtn>
-    </Container>
+    </View>
   );
 };
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 15,
-    elevation: 2,
-    margin: 5,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});
+
 export default HomeTab;

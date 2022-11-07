@@ -1,4 +1,3 @@
-import AddBtn from './AddBtn';
 import React, {useState} from 'react';
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -12,10 +11,10 @@ import {
   TextInput,
 } from 'react-native';
 import {StyleSheet} from 'react-native';
-import Categories from './Categories';
-import GoalBox from './box/GoalBox';
-import SpaceBox from './box/SpaceBox';
-import CreateMissionModal from './modal/CreateMissionModal';
+import Categories from '../Categories';
+import GoalBox from '../box/GoalBox';
+import SpaceBox from '../box/SpaceBox';
+import CreateMissionModal from '../modal/CreateMissionModal';
 
 const AboutMission = styled.View`
   border: 1px solid #f1f1f1;

@@ -1,14 +1,13 @@
 import React from 'react';
-import {
-  Text,
-  Modal,
-  View,
-  Pressable,
-  TextInput,
-  StyleSheet,
-} from 'react-native';
-
-export default function CreateMissionModal({modalVisible, setModalVisible}) {
+import {Text, Modal, View, Pressable, TextInput} from 'react-native';
+import {styles} from '../../utils/styles';
+import {useNavigation} from '@react-navigation/native';
+export default function CreateMissionModal({
+  navigation,
+  modalVisible,
+  setModalVisible,
+}) {
+  // console.log(navigation);
   return (
     <>
       {modalVisible ? (
@@ -17,7 +16,8 @@ export default function CreateMissionModal({modalVisible, setModalVisible}) {
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
+            console.log(navigation);
+            navigation.navigate('Login');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
@@ -30,7 +30,9 @@ export default function CreateMissionModal({modalVisible, setModalVisible}) {
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
                 <Pressable
@@ -46,48 +48,3 @@ export default function CreateMissionModal({modalVisible, setModalVisible}) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 15,
-    elevation: 2,
-    margin: 5,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});

@@ -12,9 +12,9 @@ import {
 import styled from 'styled-components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Colors from '../utils/Colors';
-import FriendBox from './box/FriendBox';
-import FriendModal from './modal/FriendModal';
+import Colors from '../../utils/Colors';
+import FriendBox from '../box/FriendBox';
+import FriendModal from '../modal/FriendModal';
 const Container = styled.View`
   height: 100%;
   background-color: #ffffff;

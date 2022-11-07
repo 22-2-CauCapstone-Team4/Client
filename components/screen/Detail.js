@@ -3,9 +3,11 @@ import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
-import Color from '../utils/Colors';
-import {useAuth} from '../providers/AuthProvider';
+import {Goal, Record, Statistics, Friends} from '../tab/tabbarList';
+import HomeTab from '../tab/HomeTab';
+import Color from '../../utils/Colors';
+import {styles} from '../../utils/styles';
+import {useAuth} from '../../providers/AuthProvider';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +38,6 @@ function Detail({navigation}) {
 
     return () => backHandler.remove();
   }, []);
-
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -65,21 +66,26 @@ function Detail({navigation}) {
           if (route.name === '홈') {
             return (
               <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  marginRight: 20,
-                  alignItems: 'center',
-                }}
+                style={styles.tabButtonStyle}
                 onPress={onPressLogOut}>
                 <Text style={{color: 'black'}}>로그아웃</Text>
                 <Icon name={'log-out'} size={30} color={'black'} />
+              </TouchableOpacity>
+            );
+          } else if (route.name === '목표') {
+            return (
+              <TouchableOpacity
+                style={styles.tabButtonStyle}
+                onPress={() => {}}>
+                <Text style={{color: 'black'}}>공간 추가</Text>
+                <Icon name={'compass'} size={30} color={'black'} />
               </TouchableOpacity>
             );
           }
         },
       })}>
       {/* 홈 -> tabBarBadge: 현재 진행 중인 미션 개수를 띄워두기(?) */}
-      <Tab.Screen name="홈" component={Home} options={{tabBarBadge: 0}} />
+      <Tab.Screen name="홈" component={HomeTab} options={{tabBarBadge: 0}} />
       <Tab.Screen name="목표" component={Goal} />
       <Tab.Screen name="기록" component={Record} />
       <Tab.Screen name="통계" component={Statistics} />

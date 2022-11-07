@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useAuth} from '../providers/AuthProvider';
+import {useAuth} from '../../providers/AuthProvider';
 import {
   Text,
   Box,
@@ -20,7 +20,7 @@ function LogInScreen({navigation}) {
 
   React.useEffect(() => {
     if (user != null) {
-      navigation.navigate('Detail');
+      navigation.navigate('Menu');
     }
   }, [navigation, user]);
 
@@ -28,7 +28,7 @@ function LogInScreen({navigation}) {
     try {
       await signIn(email, password);
       setLoginValid(' ');
-      navigation.navigate('Detail');
+      navigation.navigate('Menu');
       SnackBar.show({
         text: '로그인이 완료되었습니다. ',
         duration: SnackBar.LENGTH_SHORT,
