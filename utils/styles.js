@@ -66,8 +66,19 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  // 모달 텍스트
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
   },
+
+  // 텍스트 검은색
+  blackText: {
+    color: 'black',
+    fontSize: 20,
+    paddingTop: 40,
+  },
+
+  // 금지 앱 설정 화면에서 앱 목록 컨테이너 스타일
+  appListStyle: {},
 });

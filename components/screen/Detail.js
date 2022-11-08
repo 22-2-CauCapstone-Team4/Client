@@ -20,7 +20,7 @@ function Detail({navigation}) {
     navigation.navigate('Login');
     signOut();
   };
-
+  // 뒤로가기 -> 앱 종료 Alert
   useEffect(() => {
     const backAction = () => {
       Alert.alert('종료', '앱을 종료하시겠습니까?', [
@@ -37,9 +37,9 @@ function Detail({navigation}) {
       'hardwareBackPress',
       backAction,
     );
-
+    console.log('render');
     return () => backHandler.remove();
-  }, []);
+  }, [Detail, HomeTab, GoalTab, FriendTab]);
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
