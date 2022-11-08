@@ -9,6 +9,9 @@ import CreateAccountScreen from './components/screen/CreateAccountScreen';
 import CreateMission from './components/screen/CreateMissionScreen';
 import Detail from './components/screen/Detail';
 import MenuDrawer from './components/screen/MenuDrawer';
+import FriendScreen from './components/screen/FriendScreen';
+import DirectCreateMissionScreen from './components/screen/DirectCreateMissionScreen';
+import CreateMissionScreen from './components/screen/CreateMissionScreen';
 
 const Stack = createStackNavigator();
 
@@ -33,14 +36,19 @@ function App() {
             component={MenuDrawer}
             options={{headerShown: false}}
           />
-          {/* <Stack.Screen
-            name="Detail"
-            component={Detail}
-            options={{headerShown: false}}
-          /> */}
           <Stack.Screen
-            name="Mission"
-            component={CreateMission}
+            name="DirectCreateMission"
+            component={DirectCreateMissionScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="CreateMission"
+            component={CreateMissionScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Friend"
+            component={FriendScreen}
             options={{headerShown: false}}
           />
         </Stack.Navigator>

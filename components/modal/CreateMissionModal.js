@@ -7,7 +7,6 @@ export default function CreateMissionModal({
   modalVisible,
   setModalVisible,
 }) {
-  // console.log(navigation);
   return (
     <>
       {modalVisible ? (
@@ -16,13 +15,10 @@ export default function CreateMissionModal({
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
-            console.log(navigation);
-            navigation.navigate('Login');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {/* <Text style={styles.modalText}>asd</Text */}
               <View>
                 <TextInput />
                 <TextInput />
@@ -31,6 +27,7 @@ export default function CreateMissionModal({
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
+                    navigation.navigate('CreateMission');
                     setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>확인</Text>

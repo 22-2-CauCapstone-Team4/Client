@@ -48,7 +48,6 @@ const HomeTab = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
-  console.log(navigation);
   return (
     // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <View style={styles.tabContainer}>
@@ -83,6 +82,7 @@ const HomeTab = ({navigation}) => {
       )}
       <View style={styles.centeredView}>
         <CreateMissionModal
+          navigation={navigation}
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></CreateMissionModal>
       </View>

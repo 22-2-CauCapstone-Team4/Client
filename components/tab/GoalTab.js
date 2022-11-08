@@ -46,7 +46,7 @@ const MainText = styled.Text`
 const GoalList = styled.View`
   background-color: #ffffff;
 `;
-const GoalTab = () => {
+const GoalTab = ({navigation}) => {
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
@@ -75,6 +75,7 @@ const GoalTab = () => {
       {/* modal */}
       <View style={styles.centeredView}>
         <CreateMissionModal
+          navigation={navigation}
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></CreateMissionModal>
       </View>

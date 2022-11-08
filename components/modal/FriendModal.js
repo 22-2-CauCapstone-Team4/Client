@@ -8,7 +8,11 @@ import {
   StyleSheet,
 } from 'react-native';
 
-export default function FriendModal({modalVisible, setModalVisible}) {
+export default function FriendModal({
+  navigation,
+  modalVisible,
+  setModalVisible,
+}) {
   return (
     <>
       {modalVisible ? (
@@ -17,12 +21,10 @@ export default function FriendModal({modalVisible, setModalVisible}) {
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {/* <Text style={styles.modalText}>asd</Text */}
               <View>
                 <TextInput />
                 <TextInput />
@@ -30,12 +32,17 @@ export default function FriendModal({modalVisible, setModalVisible}) {
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
+                  onPress={() => {
+                    navigation.navigate('Friend');
+                    setModalVisible(!modalVisible);
+                  }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}>
                   <Text style={styles.textStyle}>취소</Text>
                 </Pressable>
               </View>

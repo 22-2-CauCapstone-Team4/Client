@@ -3,8 +3,10 @@ import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import {Goal, Record, Statistics, Friends} from '../tab/tabbarList';
+import {Record, Statistics} from '../tab/tabbarList';
 import HomeTab from '../tab/HomeTab';
+import GoalTab from '../tab/GoalTab';
+import FriendTab from '../tab/FriendTab';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
@@ -86,10 +88,10 @@ function Detail({navigation}) {
       })}>
       {/* 홈 -> tabBarBadge: 현재 진행 중인 미션 개수를 띄워두기(?) */}
       <Tab.Screen name="홈" component={HomeTab} options={{tabBarBadge: 0}} />
-      <Tab.Screen name="목표" component={Goal} />
+      <Tab.Screen name="목표" component={GoalTab} />
       <Tab.Screen name="기록" component={Record} />
       <Tab.Screen name="통계" component={Statistics} />
-      <Tab.Screen name="친구" component={Friends} />
+      <Tab.Screen name="친구" component={FriendTab} />
     </Tab.Navigator>
   );
 }

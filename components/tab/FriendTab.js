@@ -49,7 +49,7 @@ const AddFriendBtn = styled.TouchableOpacity`
 const StyledText = styled.Text`
   font-size: 30px;
 `;
-export default function () {
+export default function FriendTab({navigation}) {
   const [friendState, setFriendState] = useState('whole');
   const [modalVisible, setModalVisible] = useState(false);
   const whole = () => setFriendState('whole');
@@ -108,6 +108,7 @@ export default function () {
       {/* modal */}
       <View style={styles.centeredView}>
         <FriendModal
+          navigation={navigation}
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></FriendModal>
       </View>
