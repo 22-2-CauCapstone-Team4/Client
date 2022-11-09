@@ -25,7 +25,7 @@ function CreateAccountScreen({navigation}) {
   const [confirmValid, setConfirmValid] = React.useState('');
   const [createValid, setCreateValid] = React.useState('');
 
-  const {signUp, signIn} = useAuth();
+  const {signUp} = useAuth();
 
   const regexEmail = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
 
@@ -42,10 +42,8 @@ function CreateAccountScreen({navigation}) {
       setCreateValid('');
 
       try {
-        await signUp(email, password);
-        await signIn(email, password);
+        await signUp(email, password, nickname);
 
-        // ** TODO : 유저 부가 정보 추가
         // 유저 상태 생성
         console.log('회원가입, 로그인 완료');
         const realm = await Realm.open({

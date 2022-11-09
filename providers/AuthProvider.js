@@ -19,11 +19,21 @@ const AuthProvider = ({children}) => {
     const creds = Realm.Credentials.emailPassword(email, password);
     const newUser = await app.logIn(creds); // 자격 증명 완료
     setUser(newUser);
+
+    return newUser;
   };
 
   // 회원가입
-  const signUp = async (email, password) => {
+  const signUp = async (email, password, nickname) => {
     await app.emailPasswordAuth.registerUser({email, password});
+    const newUser = await signIn(email, password);
+
+    // 부가 유저 정보는 서버쪽에 생성한 함수 호출하도록 수정
+    await newUser.callFunction('createUserInfo', {
+      id: newUser.id,
+      email,
+      nickname,
+    });
   };
 
   // 로그아웃
