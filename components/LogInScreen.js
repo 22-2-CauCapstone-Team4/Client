@@ -13,20 +13,33 @@ import SnackBar from 'react-native-snackbar';
 // import {CurAppModule, LockAppModule} from '../wrap_module';
 
 function LogInScreen({navigation}) {
+  const Status = {
+    NOT_CHECKED_YET: 0,
+    NOW_CHECKING: 1,
+    ERROR: 2,
+    OK: 3,
+  };
+  Object.freeze(Status);
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loginValid, setLoginValid] = React.useState(' ');
+  const [checkSignInStatus, setCheckSignInStatus] = React.useState(
+    Status.NOT_CHECKED_YET,
+  );
 
   const {user, signIn} = useAuth();
 
   React.useEffect(() => {
-    if (user != null) {
-      navigation.navigate('Detail');
-    }
+    // if (user != null) {
+    //   navigation.navigate('Detail');
+    // }
   }, [navigation, user]);
 
   const onPressSignIn = async () => {
     try {
+      setCheckSignInStatus(Status.NOW_CHECKING);
+
       await signIn(email, password);
       setLoginValid(' ');
       navigation.navigate('Detail');
@@ -59,6 +72,8 @@ function LogInScreen({navigation}) {
         duration: SnackBar.LENGTH_SHORT,
       });
     } catch (err) {
+      setCheckSignInStatus(Status.NOT_CHECKED_YET);
+
       console.error(err.message);
       setLoginValid('이메일 또는 비밀번호를 다시 확인해주세요.');
     }
@@ -96,7 +111,12 @@ function LogInScreen({navigation}) {
           </Pressable>
         </Box>
 
-        <Button w="300px" mt="2" mb="2" onPress={onPressSignIn}>
+        <Button
+          w="300px"
+          mt="2"
+          mb="2"
+          isLoading={checkSignInStatus === Status.NOW_CHECKING}
+          onPress={onPressSignIn}>
           로그인
         </Button>
         <Text fontSize="sm" color="#DD0000" alignSelf="center">
