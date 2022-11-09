@@ -2,6 +2,32 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import styled from 'styled-components/native';
 
+function MissionBox(props) {
+  return (
+    <Container>
+      <ContentContainer>
+        <View>
+          <ContentView>
+            <Category>{props.category}</Category>
+            <Category>|</Category>
+            <MissionName>{props.missionName}</MissionName>
+          </ContentView>
+        </View>
+        <LeftView>
+          <LeftCondition>3시간 24분 남음</LeftCondition>
+        </LeftView>
+      </ContentContainer>
+      <ConditionView>
+        <Text style={{color: 'black'}}>-</Text>
+        <Text style={{color: 'black'}}>-</Text>
+        <Text style={{color: 'black'}}>-</Text>
+      </ConditionView>
+    </Container>
+  );
+}
+
+export default MissionBox;
+
 const ContentContainer = styled.View`
   width: 100%;
   margin-top: 5px;
@@ -57,29 +83,3 @@ const LeftCondition = styled.Text`
   color: #0891b2;
   font-size: 12px;
 `;
-
-function MissionBox(props) {
-  return (
-    <Container>
-      <ContentContainer>
-        <View>
-          <ContentView>
-            <Category>{props.category}</Category>
-            <Category>|</Category>
-            <MissionName>{props.missionName}</MissionName>
-          </ContentView>
-        </View>
-        <LeftView>
-          <LeftCondition>3시간 24분 남음</LeftCondition>
-        </LeftView>
-      </ContentContainer>
-      <ConditionView>
-        <Text style={{color: 'black'}}>-</Text>
-        <Text style={{color: 'black'}}>-</Text>
-        <Text style={{color: 'black'}}>-</Text>
-      </ConditionView>
-    </Container>
-  );
-}
-
-export default MissionBox;

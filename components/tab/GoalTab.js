@@ -46,6 +46,7 @@ const MainText = styled.Text`
 const GoalList = styled.View`
   background-color: #ffffff;
 `;
+
 const GoalTab = ({navigation}) => {
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -55,19 +56,13 @@ const GoalTab = ({navigation}) => {
   return (
     <Container>
       <Categories />
-      {/* <AboutMission>
-        <TouchableOpacity onPress={clickMission1}>
-          <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={clickMission2}>
-          <Text style={{color: mission ? '#38a6c0' : 'black'}}>미션 공간</Text>
-        </TouchableOpacity>
-      </AboutMission>
-      <MainText>{mission ? '미션 공간 | 0' : '예정 미션 | 0'}</MainText> */}
-
       <ScrollView>
         <GoalList>
-          <GoalBox category="✏️수업" missionName="그만듣고싶다"></GoalBox>
+          <GoalBox
+            category="✏️수업"
+            missionName="그만듣고싶다"
+            type="time"></GoalBox>
+          <GoalCategoryBox category="✏️수업" number="20"></GoalCategoryBox>
           {/* <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox> */}
         </GoalList>
       </ScrollView>

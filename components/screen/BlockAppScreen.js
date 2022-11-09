@@ -102,6 +102,7 @@ export default function BlockApp({navigation}) {
       </View>
     );
   };
+  // 현재 잠금 앱 목록 Log
   console.log(blockedApps);
   return (
     <>
