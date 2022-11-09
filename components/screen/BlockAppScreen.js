@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
@@ -7,6 +7,7 @@ import {
   View,
   FlatList,
   StyleSheet,
+  BackHandler,
 } from 'react-native';
 
 import {styles} from '../../utils/styles';
@@ -39,6 +40,22 @@ export const apps = [
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
 
 export default function BlockApp({navigation}) {
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation?.canGoBack()) {
+        navigation.goBack();
+        return true;
+      }
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   const [blockedApps, setBlockedApps] = useState([
     // 사용자가 설정해 둔 금지 어플 여기다가 저장
     {id: 0, appName: 'Chrome'},

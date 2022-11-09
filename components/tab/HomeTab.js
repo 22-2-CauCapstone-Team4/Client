@@ -18,6 +18,7 @@ import Categories from '../Categories';
 import OngoingBox from '../box/OngoingBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
 import {styles} from '../../utils/styles';
+import {useAuth} from '../../providers/AuthProvider';
 const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
@@ -48,16 +49,36 @@ const HomeTab = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
+
+  const {user, signOut} = useAuth();
+
+  const onPressLogOut = () => {
+    navigation.navigate('Login');
+    signOut();
+  };
+
   return (
     // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <View style={styles.tabContainer}>
+      {/* <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}>
+        <Text style={{color: 'black', marginTop: 4}}>카테고리</Text>
+        <TouchableOpacity style={styles.tabButtonStyle} onPress={onPressLogOut}>
+          <Ionicons name={'log-out'} size={30} color={'black'} />
+          <Text style={{color: 'black'}}>로그아웃</Text>
+        </TouchableOpacity>
+      </View> */}
       <Categories />
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
           <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={clickMission2}>
-          <Text style={{color: mission ? '#38a6c0' : 'black'}}>진행중</Text>
+          <Text style={{color: mission ? '#38a6c0' : 'black'}}>진행 중</Text>
         </TouchableOpacity>
       </AboutMission>
       <MainText>{mission ? '진행중 | 0' : '예정 미션 | 0'}</MainText>

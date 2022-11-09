@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {StyleSheet} from 'react-native';
 import Categories from '../Categories';
+import GoalCategoryBox from '../box/GoalCategoryBox';
 import GoalBox from '../box/GoalBox';
 import SpaceBox from '../box/SpaceBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
@@ -19,7 +20,6 @@ import CreateMissionModal from '../modal/CreateMissionModal';
 const AboutMission = styled.View`
   border: 1px solid #f1f1f1;
   border-radius: 600px;
-  margin: 10px 0;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
@@ -55,7 +55,7 @@ const GoalTab = ({navigation}) => {
   return (
     <Container>
       <Categories />
-      <AboutMission>
+      {/* <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
           <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
         </TouchableOpacity>
@@ -63,12 +63,12 @@ const GoalTab = ({navigation}) => {
           <Text style={{color: mission ? '#38a6c0' : 'black'}}>미션 공간</Text>
         </TouchableOpacity>
       </AboutMission>
-      <MainText>{mission ? '미션 공간 | 0' : '예정 미션 | 0'}</MainText>
+      <MainText>{mission ? '미션 공간 | 0' : '예정 미션 | 0'}</MainText> */}
 
       <ScrollView>
         <GoalList>
           <GoalBox category="✏️수업" missionName="그만듣고싶다"></GoalBox>
-          <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox>
+          {/* <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox> */}
         </GoalList>
       </ScrollView>
 

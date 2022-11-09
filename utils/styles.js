@@ -10,8 +10,8 @@ export const styles = StyleSheet.create({
   // 탭에 있는 버튼 스타일(로그아웃, 공간 추가)
   tabButtonStyle: {
     flexDirection: 'row',
-    marginRight: 20,
     alignItems: 'center',
+    marginRight: 20,
   },
 
   // 탭 전체 화면 스타일

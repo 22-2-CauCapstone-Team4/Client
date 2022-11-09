@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import {useIsFocused} from '@react-navigation/native';
 import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -14,32 +15,38 @@ import {useAuth} from '../../providers/AuthProvider';
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
+  //로그아웃
   const {user, signOut} = useAuth();
 
   const onPressLogOut = () => {
     navigation.navigate('Login');
     signOut();
   };
+
   // 뒤로가기 -> 앱 종료 Alert
+  const isFocused = useIsFocused(); // 포커싱 감지
   useEffect(() => {
     const backAction = () => {
-      Alert.alert('종료', '앱을 종료하시겠습니까?', [
-        {
-          text: '취소',
-          onPress: () => null,
-        },
-        {text: '확인', onPress: () => BackHandler.exitApp()},
-      ]);
-      return true;
+      if (isFocused) {
+        //console.log('Is Focused');
+        Alert.alert('종료', '앱을 종료하시겠습니까?', [
+          {
+            text: '취소',
+            onPress: () => null,
+          },
+          {text: '확인', onPress: () => BackHandler.exitApp()},
+        ]);
+        return true;
+      }
     };
 
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
     );
-    console.log('render');
     return () => backHandler.remove();
-  }, [Detail, HomeTab, GoalTab, FriendTab]);
+  }, [isFocused]);
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
