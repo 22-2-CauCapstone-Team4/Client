@@ -5,11 +5,21 @@ import {Home, Goal, Record, Statistics, Friends} from './tabbarList';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Color from '../utils/Colors';
 import {useAuth} from '../providers/AuthProvider';
+import Realm from 'realm';
 
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
   const {user, signOut} = useAuth();
+
+  React.useEffect(() => {
+    const innerFunc = async () => {
+      const customUserData = await user.refreshCustomData();
+      console.log(user, customUserData);
+    };
+
+    innerFunc();
+  }, [user]);
 
   const onPressLogOut = () => {
     navigation.navigate('로그인');

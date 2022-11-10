@@ -23,7 +23,7 @@ function LogInScreen({navigation}) {
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [loginValid, setLoginValid] = React.useState(' ');
+  const [loginValid, setLoginValid] = React.useState('');
   const [checkSignInStatus, setCheckSignInStatus] = React.useState(
     Status.NOT_CHECKED_YET,
   );
@@ -31,9 +31,9 @@ function LogInScreen({navigation}) {
   const {user, signIn} = useAuth();
 
   React.useEffect(() => {
-    // if (user != null) {
-    //   navigation.navigate('Detail');
-    // }
+    if (user !== null && user.providerType === 'local-userpass') {
+      navigation.navigate('Detail');
+    }
   }, [navigation, user]);
 
   const onPressSignIn = async () => {
@@ -74,8 +74,8 @@ function LogInScreen({navigation}) {
     } catch (err) {
       setCheckSignInStatus(Status.NOT_CHECKED_YET);
 
-      console.error(err.message);
-      setLoginValid('이메일 또는 비밀번호를 다시 확인해주세요.');
+      console.log(err.message);
+      setLoginValid('이메일 또는 비밀번호를 다시 확인해주세요. ');
     }
   };
 
@@ -95,7 +95,7 @@ function LogInScreen({navigation}) {
             placeholder="이메일"
           />
           <Input
-            onChangeText={text => setPassword(text)}
+            onChangeText={setPassword}
             value={password}
             secureTextEntry={true} // 입력하면, 입력 이메일 안 보이게 수정하기
             w="300px"

@@ -3,7 +3,7 @@ import Realm from 'realm';
 let app;
 export function getRealmApp() {
   if (app === undefined) {
-    const id = 'realm-ugdee';
+    const id = 'app-lohxv';
     const config = {
       id,
       timeout: 10000,

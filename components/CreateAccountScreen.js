@@ -45,15 +45,17 @@ function CreateAccountScreen({navigation}) {
     Status.NOT_CHECKED_YET,
   );
 
-  const {signUp, tempSignIn, user, deleteUser} = useAuth();
+  const {signUp, tempSignIn, user} = useAuth();
 
   React.useEffect(() => {
     const innerFunc = async () => {
       if (user !== null && typeof user !== 'undefined') {
         setTempUser(user);
+        console.log('user 존재');
       } else {
         const temp = await tempSignIn();
         setTempUser(temp);
+        console.log('user 존재 X');
       }
     };
 
@@ -108,10 +110,10 @@ function CreateAccountScreen({navigation}) {
       // 중복 유무 확인 시작
       setCheckEmailStatus(Status.NOW_CHECKING);
 
-      if (tempUser === null || typeof tempUser === 'undefined') {
-        const temp = await tempSignIn();
-        setTempUser(temp);
-      }
+      // if (tempUser === null || typeof tempUser === 'undefined') {
+      //   const temp = await tempSignIn();
+      //   setTempUser(temp);
+      // }
 
       const {success, isExisted, err} = await tempUser.callFunction(
         'user/checkEmailExisted',
@@ -132,7 +134,7 @@ function CreateAccountScreen({navigation}) {
     } catch (err) {
       setEmailValid('문제가 발생했습니다. 다시 한 번 시도해주세요. ');
       setCheckEmailStatus(Status.ERROR);
-      console.error(err.message);
+      console.log(err.message);
     }
   };
 
@@ -145,10 +147,10 @@ function CreateAccountScreen({navigation}) {
       // 확인 시작
       setCheckNicknameStatus(Status.NOW_CHECKING);
 
-      if (tempUser === null || typeof tempUser === 'undefined') {
-        const temp = await tempSignIn();
-        setTempUser(temp);
-      }
+      // if (tempUser === null || typeof tempUser === 'undefined') {
+      //   const temp = await tempSignIn();
+      //   setTempUser(temp);
+      // }
 
       const {success, isExisted, err} = await tempUser.callFunction(
         'user/checkNicknameExisted',
@@ -169,7 +171,7 @@ function CreateAccountScreen({navigation}) {
     } catch (err) {
       setEmailValid('문제가 발생했습니다. 다시 한 번 시도해주세요. ');
       setCheckNicknameStatus(Status.ERROR);
-      console.error(err.message);
+      console.log(err.message);
     }
   };
 
@@ -182,9 +184,16 @@ function CreateAccountScreen({navigation}) {
       passwordValid !== ' ' ||
       confirmValid !== ' '
     ) {
-      if (emailValid === ' ' && checkEmailStatus === Status.NOT_CHECKED_YET) {
+      if (
+        passwordValid === ' ' &&
+        confirmValid === ' ' &&
+        emailValid === ' ' &&
+        checkEmailStatus === Status.NOT_CHECKED_YET
+      ) {
         setCreateValid('이메일 확인 버튼으로 중복을 확인해주세요. ');
       } else if (
+        passwordValid === ' ' &&
+        confirmValid === ' ' &&
         nicknameValid === ' ' &&
         checkNicknameStatus === Status.NOT_CHECKED_YET
       ) {
@@ -223,7 +232,7 @@ function CreateAccountScreen({navigation}) {
     } catch (err) {
       setCheckSignUpStatus(Status.NOT_CHECKED_YET);
 
-      console.error(err.message);
+      console.log(err.message);
       SnackBar.show({
         text: `계정 생성을 실패했습니다. : ${err.message}`,
         duration: SnackBar.LENGTH_SHORT,
@@ -347,11 +356,7 @@ function CreateAccountScreen({navigation}) {
             </Text>
           </Box>
           <Box>
-            <Pressable
-              onPress={() => {
-                deleteUser(tempUser);
-                navigation.pop();
-              }}>
+            <Pressable onPress={() => navigation.pop()}>
               <Text textAlign="right" mb="2">
                 로그인하기
               </Text>
