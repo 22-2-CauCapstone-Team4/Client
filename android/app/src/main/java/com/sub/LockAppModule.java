@@ -34,6 +34,26 @@ public class LockAppModule extends ReactContextBaseJavaModule {
         return "LockAppModule";
     }
 
+    // 권한 확인 함수
+    @ReactMethod
+    public void checkPermission(Promise promise) {
+        try {
+            ReactApplicationContext context = getReactApplicationContext();
+            WritableMap map = Arguments.createMap();
+
+            if (!checkPermission(context)) map.putBoolean("alreadyAllowed", false);
+            else {
+                // 권한 이미 허용된 경우
+                isAllowed = true;
+                map.putBoolean("alreadyAllowed", true);
+            }
+
+            promise.resolve(map);
+        } catch (Exception e) {
+            promise.reject("error", e);
+        }
+    }
+
     // 권한 허용 함수
     @ReactMethod
     public void allowPermission(Promise promise) {

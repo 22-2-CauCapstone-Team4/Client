@@ -11,11 +11,70 @@ import FriendTab from '../tab/FriendTab';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
+import {CurAppModule, LockAppModule} from '../../wrap_module';
 
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
   const {user, signOut} = useAuth();
+
+  // 화면 추가 코드
+  React.useEffect(() => {
+    const innerFunc = async () => {
+      let allowCnt = 0;
+      const {
+        checkPermission: checkCurAppPermission,
+        allowPermission: allowCurAppPermission,
+      } = CurAppModule;
+      const {
+        checkPermission: checkLockAppPermission,
+        allowPermission: allowLockAppPermission,
+      } = LockAppModule;
+
+      let [isCurAppPermissionAllowed, isLockAppPermissionAllowed] =
+        await Promise.all([checkCurAppPermission(), checkLockAppPermission()]);
+
+      isCurAppPermissionAllowed = isCurAppPermissionAllowed.alreadyAllowed;
+      isLockAppPermissionAllowed = isLockAppPermissionAllowed.alreadyAllowed;
+
+      if (isCurAppPermissionAllowed) allowCnt++;
+      if (isLockAppPermissionAllowed) allowCnt++;
+
+      console.log(allowCnt);
+
+      if (allowCnt === 2) return;
+      try {
+        Alert.alert(
+          '권한 허용 필요',
+          `원활한 애플리케이션 사용을 위해 ${
+            2 - allowCnt
+          }개의 권한 허용이 필요합니다.\n\n${
+            !isCurAppPermissionAllowed ? '- 권한이름 1\n' : ''
+          }${!isLockAppPermissionAllowed ? '- 권한이름 2\n' : ''}
+      `,
+          [
+            {
+              text: '취소',
+              onPress: () => {},
+            },
+            {
+              text: '설정으로 이동',
+              onPress: async () => {
+                if (!isCurAppPermissionAllowed) await allowCurAppPermission();
+                else if (!isLockAppPermissionAllowed)
+                  await allowLockAppPermission();
+              },
+            },
+          ],
+        );
+      } catch (err) {
+        console.log(err.message);
+      }
+      return true;
+    };
+
+    innerFunc();
+  }, []);
 
   // React.useEffect(() => {
   //   const innerFunc = async () => {

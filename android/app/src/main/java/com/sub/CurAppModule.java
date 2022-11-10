@@ -32,6 +32,27 @@ public class CurAppModule extends ReactContextBaseJavaModule {
         return "CurAppModule";
     }
 
+
+    // 권한 확인 함수
+    @ReactMethod
+    public void checkPermission(Promise promise) {
+        try {
+            ReactApplicationContext context = getReactApplicationContext();
+            WritableMap map = Arguments.createMap();
+
+            if (!checkPermission(context)) map.putBoolean("alreadyAllowed", false);
+            else {
+                // 권한 이미 허용된 경우
+                isAllowed = true;
+                map.putBoolean("alreadyAllowed", true);
+            }
+
+            promise.resolve(map);
+        } catch (Exception e) {
+            promise.reject("error", e);
+        }
+    }
+
     // 권한 허용 함수
     @ReactMethod
     public void allowPermission(Promise promise) {
@@ -51,16 +72,6 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             promise.resolve(map);
         } catch (Exception e) {
             promise.reject("error", e);
-        }
-    }
-
-    private void allowPermission() {
-        ReactApplicationContext context = getReactApplicationContext();
-
-        if (!checkPermission(context)) {
-            Intent permissionIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
-            permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(permissionIntent);
         }
     }
 
@@ -85,6 +96,16 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             context.startForegroundService(checkAppServiceIntent);
         else
             context.startService(checkAppServiceIntent);
+    }
+
+    private void allowPermission() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        if (!checkPermission(context)) {
+            Intent permissionIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+            permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(permissionIntent);
+        }
     }
 
     // 권한 체크 함수
