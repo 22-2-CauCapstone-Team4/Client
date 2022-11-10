@@ -6,7 +6,6 @@ import {LogBox} from 'react-native';
 import {AuthProvider} from './providers/AuthProvider';
 import LogInScreen from './components/screen/LogInScreen';
 import CreateAccountScreen from './components/screen/CreateAccountScreen';
-import CreateMission from './components/screen/CreateMissionScreen';
 import Detail from './components/screen/Detail';
 import MenuDrawer from './components/screen/MenuDrawer';
 import FriendScreen from './components/screen/FriendScreen';

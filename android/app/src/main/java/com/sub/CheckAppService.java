@@ -32,7 +32,7 @@ public class CheckAppService extends Service {
     private static final String CHANNEL_ID = "PHONELOCK";
 
     private String appPackageName = "";
-    private boolean isProhibitedApp = true; // 처음에는 일단 JS쪽에 신호 보내야 함
+    private boolean isProhibitedApp = false;
     private ArrayList<String> prohibitedAppList = null;
 
     private NotificationManager notificationManager;
@@ -70,7 +70,7 @@ public class CheckAppService extends Service {
                 }
 
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;

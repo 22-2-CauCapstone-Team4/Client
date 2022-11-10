@@ -15,8 +15,16 @@ import {useAuth} from '../../providers/AuthProvider';
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
-  //로그아웃
   const {user, signOut} = useAuth();
+
+  // React.useEffect(() => {
+  //   const innerFunc = async () => {
+  //     const customUserData = await user.refreshCustomData();
+  //     console.log(user, customUserData);
+  //   };
+
+  //   innerFunc();
+  // }, [user]);
 
   const onPressLogOut = () => {
     navigation.navigate('Login');
