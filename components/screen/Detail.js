@@ -27,7 +27,7 @@ function Detail({navigation}) {
   // }, [user]);
 
   const onPressLogOut = () => {
-    navigation.navigate('Login');
+    navigation.replace('Login');
     signOut();
   };
 

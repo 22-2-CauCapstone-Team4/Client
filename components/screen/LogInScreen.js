@@ -32,7 +32,7 @@ function LogInScreen({navigation}) {
 
   React.useEffect(() => {
     if (user !== null && user.providerType === 'local-userpass') {
-      navigation.navigate('Menu');
+      navigation.replace('Menu');
     }
   }, [navigation, user]);
 
@@ -42,7 +42,7 @@ function LogInScreen({navigation}) {
 
       await signIn(email, password);
       setLoginValid(' ');
-      navigation.navigate('Menu');
+      navigation.replace('Menu');
 
       // 서비스 실행
       // ** TODO : 금지 앱 CRUD 이후 아래 코드 추가하기

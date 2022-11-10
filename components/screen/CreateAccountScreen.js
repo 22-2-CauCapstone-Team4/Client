@@ -223,7 +223,8 @@ function CreateAccountScreen({navigation}) {
       });
       realm.close();
 
-      navigation.navigate('Detail');
+      navigation.pop();
+      navigation.replace('Menu');
 
       SnackBar.show({
         text: '계정 생성이 완료되었습니다. ',
