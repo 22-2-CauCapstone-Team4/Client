@@ -46,7 +46,7 @@ function CreateAccountScreen({navigation}) {
 
   React.useEffect(() => {
     const innerFunc = async () => {
-      if (user !== null && typeof user !== 'undefined') {
+      if (user !== null) {
         setTempUser(user);
         console.log('user 존재');
       } else {
@@ -209,8 +209,6 @@ function CreateAccountScreen({navigation}) {
     try {
       await signUp({email, password, nickname});
       console.log('회원가입, 로그인 완료');
-
-      navigation.reset('Menu');
 
       SnackBar.show({
         text: '계정 생성이 완료되었습니다. ',

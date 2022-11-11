@@ -21,6 +21,7 @@ const AuthProvider = ({children}) => {
       return user;
     }
 
+    console.log('임시 유저 생성');
     const creds = Realm.Credentials.anonymous();
     const newUser = await app.logIn(creds);
     setUser(newUser);
@@ -32,21 +33,6 @@ const AuthProvider = ({children}) => {
   const signIn = async ({email, password}) => {
     const creds = Realm.Credentials.emailPassword(email, password);
     const newUser = await app.logIn(creds); // 자격 증명 완료
-
-    // 현재 유저 정보, 금지 앱 정보 렐름에서 받아오기
-    const realm = await Realm.open({
-      schema: [CurState.schema],
-      sync: {
-        user: app.currentUser,
-        flexible: true,
-      },
-    });
-
-    realm.write(() => {
-      realm.create('CurState', new CurState({}));
-    });
-
-    realm.close();
 
     setUser(newUser);
     return newUser;
@@ -62,7 +48,7 @@ const AuthProvider = ({children}) => {
       // 임시 유저 -> 새 유저
       // user id 이미 알고 있음
       console.log('임시 유저 삭제');
-      deleteUser(user);
+      await app.deleteUser(user);
     }
 
     // 가능성은 거의 없겠지만, 혹시 몰라 추가
@@ -112,7 +98,6 @@ const AuthProvider = ({children}) => {
     // );
 
     console.log('쓰기 시작');
-    console.log(realm.subscriptions.state);
     realm.write(() => {
       realm.create('CurState', new CurState({owner_id: newUser.id}));
     });
