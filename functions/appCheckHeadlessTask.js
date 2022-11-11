@@ -4,7 +4,7 @@ import Realm from 'realm';
 import {AppUsageRecord, CurState} from '../schema';
 import moment from 'moment';
 
-const AppCheckHeadlessTask = async taskData => {
+const appCheckHeadlessTask = async taskData => {
   // 지금 날짜, 시간
   let realm,
     isOpened = false;
@@ -226,4 +226,4 @@ const AppCheckHeadlessTask = async taskData => {
   }
 };
 
-export {AppCheckHeadlessTask};
+export {appCheckHeadlessTask};

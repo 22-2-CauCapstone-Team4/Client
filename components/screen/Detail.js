@@ -13,6 +13,8 @@ import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
 import {CurAppModule, LockAppModule} from '../../wrap_module';
+import Realm from 'realm';
+import {ProhibitedApp} from '../../schema';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,21 +26,64 @@ function Detail({navigation}) {
   Object.freeze(Status);
 
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
-  const {signOut} = useAuth();
+  const {user, signOut} = useAuth();
 
-  // 화면 추가 코드
   React.useEffect(() => {
     if (checkStatus !== Status.OK) checkPermissionAlert();
-  }, [Status.OK, checkPermissionAlert, checkStatus]);
 
-  // React.useEffect(() => {
-  //   const innerFunc = async () => {
-  //     const customUserData = await user.refreshCustomData();
-  //     console.log(user, customUserData);
-  //   };
+    // 금지 앱 리스트 추가 코드
+    const addProhibitedApp = async () => {
+      console.log(user.id, user.providerType);
 
-  //   innerFunc();
-  // }, [user]);
+      // 렐름 컨피그 설정
+      const openRealmBehaviorConfig = {
+        type: 'openImmediately',
+      };
+      const config = {
+        schema: [ProhibitedApp.schema],
+        sync: {
+          user,
+          flexible: true,
+          newRealmFileBehavior: openRealmBehaviorConfig,
+          // existingRealmFileBehavior: openRealmBehaviorConfig,
+          // initialSubscriptions: {
+          //   update: (subs, realm) => {
+          //     subs.add(realm.objects('ProhibitedApp'));
+          //   },
+          // },
+        },
+      };
+
+      console.log('렐름 열기');
+      const realm = await Realm.open(config);
+
+      // 이 코드가 안정성이 더 있는듯
+      const prohibitedApps = realm.objects('ProhibitedApp');
+      await realm.subscriptions.update(mutableSubs => {
+        mutableSubs.add(prohibitedApps, {
+          name: 'prohibitedAppSubscription',
+        });
+      });
+
+      console.log('쓰기 시작');
+      realm.write(() => {
+        realm.create(
+          'ProhibitedApp',
+          new ProhibitedApp({
+            owner_id: user.id,
+            packageName: 'com.android.chrome',
+            name: 'chrome',
+            icon: 'test',
+          }),
+        );
+      });
+
+      console.log('닫기');
+      realm.close();
+    };
+
+    addProhibitedApp();
+  }, [Status.OK, checkPermissionAlert, checkStatus, user]);
 
   // const finishAllPermissionAlert = () => {
   //   Alert.alert('완료', '모든 권한 설정이 완료되었습니다. ', [
