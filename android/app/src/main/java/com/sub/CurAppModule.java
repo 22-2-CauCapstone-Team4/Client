@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -20,11 +21,8 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.ArrayList;
 
 public class CurAppModule extends ReactContextBaseJavaModule {
-    boolean isAllowed;
-
     CurAppModule(ReactApplicationContext context) {
         super(context);
-        isAllowed = checkPermission(context);
     }
 
     @Override
@@ -40,11 +38,10 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
             WritableMap map = Arguments.createMap();
 
-            if (!checkPermission(context)) map.putBoolean("alreadyAllowed", false);
+            if (!checkPermission(context)) map.putBoolean("isAllowed", false);
             else {
                 // 권한 이미 허용된 경우
-                isAllowed = true;
-                map.putBoolean("alreadyAllowed", true);
+                map.putBoolean("isAllowed", true);
             }
 
             promise.resolve(map);
@@ -60,13 +57,12 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
             WritableMap map = Arguments.createMap();
 
+            Log.i("CurAppModule",  "허용 함수 호출");
             allowPermission();
-
-            if (!checkPermission(context)) map.putBoolean("alreadyAllowed", false);
+            if (!checkPermission(context)) map.putBoolean("isAllowed", false);
             else {
                 // 권한 이미 허용된 경우
-                isAllowed = true;
-                map.putBoolean("alreadyAllowed", true);
+                map.putBoolean("isAllowed", true);
             }
 
             promise.resolve(map);
