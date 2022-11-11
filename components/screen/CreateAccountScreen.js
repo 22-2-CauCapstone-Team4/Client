@@ -13,9 +13,6 @@ import {
 } from 'native-base';
 import SnackBar from 'react-native-snackbar';
 
-import Realm from 'realm';
-import {CurState} from '../../schema';
-
 function CreateAccountScreen({navigation}) {
   const Status = {
     NOT_CHECKED_YET: 0,
@@ -210,21 +207,10 @@ function CreateAccountScreen({navigation}) {
     setCreateValid('');
 
     try {
-      await signUp(email, password, nickname);
-
-      // 유저 상태 생성
+      await signUp({email, password, nickname});
       console.log('회원가입, 로그인 완료');
-      const realm = await Realm.open({
-        schema: [CurState.schema],
-      });
 
-      realm.write(() => {
-        realm.create('CurState', new CurState({}));
-      });
-      realm.close();
-
-      navigation.pop();
-      navigation.replace('Menu');
+      navigation.reset('Menu');
 
       SnackBar.show({
         text: '계정 생성이 완료되었습니다. ',

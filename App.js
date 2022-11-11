@@ -16,6 +16,12 @@ const Stack = createStackNavigator();
 
 function App() {
   LogBox.ignoreLogs(['Warning: Internal React error']); // 화면 전환 WARNING 생략
+  LogBox.ignoreLogs([
+    'BSON: For React Native please polyfill crypto.getRandomValues, e.g. using: https://www.npmjs.com/package/react-native-get-random-values.',
+  ]); // crypto WARN 생략
+  LogBox.ignoreLogs([
+    'Tried to show an alert while not attached to an Activity',
+  ]); // 나도 아니까 쉿...
   return (
     <AuthProvider>
       <NavigationContainer>
