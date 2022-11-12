@@ -1,5 +1,8 @@
-import {AppCheckHeadlessTask} from './AppCheckHeadlessTask';
+import {readProhibitedApps, updateProhibitedApps} from './crud';
+import {appCheckHeadlessTask} from './task';
 
 module.exports = {
-  AppCheckHeadlessTask,
+  appCheckHeadlessTask,
+  readProhibitedApps,
+  updateProhibitedApps,
 };

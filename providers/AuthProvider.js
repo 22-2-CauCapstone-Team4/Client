@@ -40,6 +40,7 @@ const AuthProvider = ({children}) => {
 
   // 회원가입
   const signUp = async ({email, password, nickname}) => {
+    // 트랜섹션 처리 안 함... 나중에 시간이 난다면 하는 게 좋을 듯 (가입 중간에 끊길 수 있으니 ㅠㅠ)
     // 유저 생성
     await app.emailPasswordAuth.registerUser({email, password});
     const creds = Realm.Credentials.emailPassword(email, password);

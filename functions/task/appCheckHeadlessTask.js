@@ -1,7 +1,7 @@
 // import {LockAppModule} from './wrap_module';
 
 import Realm from 'realm';
-import {AppUsageRecord, CurState} from '../schema';
+import {AppUsageRecord, CurState} from '../../schema';
 import moment from 'moment';
 
 const appCheckHeadlessTask = async taskData => {
@@ -220,6 +220,7 @@ const appCheckHeadlessTask = async taskData => {
     console.log('AppCheckHeadlessTask 완료');
   } catch (err) {
     console.error(err.message);
+
     if (isOpened) {
       realm.close();
     }
