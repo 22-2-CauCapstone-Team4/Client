@@ -1,8 +1,10 @@
 import React, {useContext, useState, useEffect} from 'react';
+import {AppRegistry} from 'react-native';
 import Realm from 'realm';
 import {CurState} from '../schema';
 import {getRealmApp} from '../getRealmApp';
 import {mkConfigWithSubscriptions} from '../functions';
+import {appCheckHeadlessTask} from '../functions';
 
 const app = getRealmApp();
 const AuthContext = React.createContext(null);
@@ -38,6 +40,10 @@ const AuthProvider = ({children}) => {
     console.log('렐름 열어 구독 추가');
     const realm = await Realm.open(mkConfigWithSubscriptions(newUser));
     realm.close();
+
+    AppRegistry.registerHeadlessTask('CheckApp', () =>
+      appCheckHeadlessTask.bind(null, newUser),
+    );
 
     setUser(newUser);
     return newUser;
@@ -97,6 +103,10 @@ const AuthProvider = ({children}) => {
     //   console.log(`There was ${transferable} total transferable bytes`);
     //   console.log(`${transferred} bytes were transferred`);
     // });
+
+    AppRegistry.registerHeadlessTask('CheckApp', () =>
+      appCheckHeadlessTask.bind(null, newUser),
+    );
 
     console.log('닫기');
     realm.close();

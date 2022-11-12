@@ -7,7 +7,7 @@ class AppUsageRecord {
     appPackageName,
     date,
     hour,
-    usageTime,
+    usageSec,
     clickCnt,
   }) {
     this._id = id;
@@ -15,7 +15,7 @@ class AppUsageRecord {
     this.appPackageName = appPackageName;
     this.date = date;
     this.hour = hour;
-    this.usageTime = usageTime;
+    this.usageSec = usageSec;
     this.clickCnt = clickCnt;
   }
 
