@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import React, {useState, useEffect, useContext} from 'react';
-=======
 /* eslint-disable curly */
 import React, {useEffect} from 'react';
->>>>>>> 0f2f161098a46d553fdb89dcb8c32ca2e301f71c
 import {useIsFocused} from '@react-navigation/native';
 import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
