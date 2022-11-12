@@ -8,8 +8,8 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import {StackedBarChart} from 'react-native-chart-kit';
-
+import {useDispatch, useSelector} from 'react-redux';
+import {addCategory, deleteCategory, selectCategory} from '../store/action';
 const MissionList = styled.Text`
   color: white;
 `;
@@ -33,55 +33,74 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
   },
+
+  blackText: {
+    color: 'black',
+  },
+  scrollViewContainer: {
+    height: 37,
+    marginVertical: 15,
+  },
+
+  inputStyle: {
+    color: 'white',
+    height: 47,
+  },
 });
 
-export default function Categories(props) {
-  // 카테고리 더미 데이터
-  const [category, setCategory] = useState([
-    {id: 0, name: '✏️공부'},
-    {id: 1, name: '💪운동'},
-    {id: 2, name: '🏫수업'},
-    {id: 3, name: '💻과제'},
-  ]);
+export default function Categories() {
+  const dispatch = useDispatch();
+  const data = useSelector(store => store.categoryReducer.data); // 카테고리 데이터
+  const now = useSelector(store => store.categoryReducer.filter);
   const [categoryText, setCategoryText] = useState('+ 추가');
-  const [currentCategory, setCurrentCategory] = useState('⭐전체목표');
-  const nextId = useRef(category.length);
-
-  // TextInput 입력 제출 시 카테고리 생성
+  const [currentCategory, setCurrentCategory] = useState(now);
   const createCategory = () => {
     if (categoryText !== '') {
-      setCategory(category.concat({id: nextId.current, name: categoryText}));
-      nextId.current++;
+      dispatch(addCategory({id: categoryText, name: categoryText}));
       setCategoryText('+ 추가');
+      setCurrentCategory('⭐전체목표');
     }
   };
-
-  const removeCategory = () => {};
-  //console.log(category);
-
+  // console.log('now' + now + '    currentCategory' + currentCategory);
   return (
     <>
-      <Text style={{color: 'black'}}>카테고리</Text>
-      <View style={{height: 37, marginVertical: 15}}>
+      <Text style={styles.blackText}>카테고리</Text>
+      <View style={styles.scrollViewContainer}>
         <ScrollView horizontal={true} style={styles.scroll}>
-          <OverallGoal>
+          <OverallGoal
+            style={{
+              backgroundColor: now === '⭐전체목표' ? '#0891b2' : '#777',
+            }}
+            onPress={() => {
+              dispatch(selectCategory('⭐전체목표'));
+            }}>
             <MissionList>⭐전체목표</MissionList>
           </OverallGoal>
-          {category.map(item => (
+          {/* 삭제 */}
+          {data.map(item => (
             <OverallGoal
+              style={{
+                backgroundColor: now === item.name ? '#0891b2' : '#777',
+              }}
               key={item.id}
+              onPress={() => {
+                dispatch(selectCategory(item.name));
+              }}
               onLongPress={() => {
-                setCategory(category.filter(el => el.name !== item.name));
+                cd = data.filter(el => el.id !== item.id);
+                dispatch(deleteCategory(cd));
+                dispatch(selectCategory('⭐전체목표'));
               }}>
               <MissionList>{item.name}</MissionList>
             </OverallGoal>
           ))}
+          {/* 추가 */}
           <OverallGoal>
             <TextInput
-              style={{color: 'white', height: 47}}
+              placeholder="+ 추가"
+              style={styles.inputStyle}
               onChangeText={text => setCategoryText(text)}
               onPressIn={() => setCategoryText('')}
-              // 입력 시 카테고리 UPDATE
               onSubmitEditing={createCategory}>
               {categoryText}
             </TextInput>

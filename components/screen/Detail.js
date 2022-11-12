@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -31,12 +31,10 @@ function Detail({navigation}) {
     signOut();
   };
 
-  // 뒤로가기 -> 앱 종료 Alert
-  const isFocused = useIsFocused(); // 포커싱 감지
+  const isFocused = useIsFocused();
   useEffect(() => {
     const backAction = () => {
       if (isFocused) {
-        //console.log('Is Focused');
         Alert.alert('종료', '앱을 종료하시겠습니까?', [
           {
             text: '취소',
@@ -93,7 +91,9 @@ function Detail({navigation}) {
             return (
               <TouchableOpacity
                 style={styles.tabButtonStyle}
-                onPress={() => {}}>
+                onPress={() => {
+                  navigation.navigate('CreateSpace');
+                }}>
                 <Text style={{color: 'black'}}>공간 추가</Text>
                 <Icon name={'compass'} size={30} color={'black'} />
               </TouchableOpacity>

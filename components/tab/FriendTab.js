@@ -96,11 +96,11 @@ export default function FriendTab({navigation}) {
       </FriendState>
       <StateText>전체 | 5</StateText>
       <ScrollView>
-        <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
-        <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
-        <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
-        <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
-        <FriendBox category="✏️수업" missionName="그만듣고싶다"></FriendBox>
+        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
+        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
+        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
+        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
+        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
       </ScrollView>
       <AddFriendBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
