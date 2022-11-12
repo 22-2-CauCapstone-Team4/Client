@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -36,6 +37,8 @@ public class ForegroundService extends Service {
 
     private NotificationManager notificationManager;
     private Notification notification;
+
+    private Thread thread;
 
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
@@ -80,8 +83,6 @@ public class ForegroundService extends Service {
         }
     };
 
-    private Thread thread;
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -104,6 +105,36 @@ public class ForegroundService extends Service {
                 .build();
 
         startForeground(SERVICE_NOTIFICATION_ID, notification);
+
+        // 화면 꺼지고 켜지는 상황 대응하기
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    Log.i("CheckAppService", "화면 꺼짐");
+
+                    // 화면 끈 경우, 코드가 반복될 필요 없음 (켜졌을 때 다시 반복을 시작해주면 됨)
+                    isThreadRunning = false;
+
+                    // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
+                    if (isProhibitedApp)
+                        sendAppPackageNameToJS(context, "", false);
+
+                    appPackageName = "";
+                    isProhibitedApp = false;
+                } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    Log.i("CheckAppService", "화면 켜짐");
+                    // 화면 켠 경우, 다시 반복 시작
+                    thread = new Thread(checkCurApp);
+                    thread.start();
+                }
+            }
+        };
+        registerReceiver(receiver, intentFilter);
     }
 
     @Override
