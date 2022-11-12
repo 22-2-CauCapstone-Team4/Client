@@ -73,11 +73,11 @@ const updateProhibitedApps = async (user, newList) => {
       .objects('ProhibitedApp')
       .filtered(`owner_id == "${user.id}"`);
 
-    await realm.subscriptions.update(mutableSubs => {
-      mutableSubs.add(list, {
-        name: 'myProhibitedApp',
-      });
-    });
+    // await realm.subscriptions.update(mutableSubs => {
+    //   mutableSubs.add(list, {
+    //     name: 'myProhibitedApp',
+    //   });
+    // });
 
     console.log('읽기 결과', list);
     const oldPackageNameList = list.map(app => app.packageName),

@@ -2,6 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import Realm from 'realm';
 import {CurState} from '../schema';
 import {getRealmApp} from '../getRealmApp';
+import {mkConfigWithSubscriptions} from '../functions';
 
 const app = getRealmApp();
 const AuthContext = React.createContext(null);
@@ -25,7 +26,6 @@ const AuthProvider = ({children}) => {
     const creds = Realm.Credentials.anonymous();
     const newUser = await app.logIn(creds);
     setUser(newUser);
-
     return newUser;
   };
 
@@ -33,6 +33,11 @@ const AuthProvider = ({children}) => {
   const signIn = async ({email, password}) => {
     const creds = Realm.Credentials.emailPassword(email, password);
     const newUser = await app.logIn(creds); // 자격 증명 완료
+
+    // 새 구독 추가
+    console.log('렐름 열어 구독 추가');
+    const realm = await Realm.open(mkConfigWithSubscriptions(newUser));
+    realm.close();
 
     setUser(newUser);
     return newUser;
@@ -56,35 +61,19 @@ const AuthProvider = ({children}) => {
     console.log('새 유저 로그인');
     const newUser = await app.logIn(creds);
 
-    // 렐름 컨피그 설정
-    const openRealmBehaviorConfig = {
-      type: 'openImmediately',
-    };
-    const config = {
-      schema: [CurState.schema],
-      sync: {
-        user: app.currentUser,
-        flexible: true,
-        newRealmFileBehavior: openRealmBehaviorConfig,
-        // existingRealmFileBehavior: openRealmBehaviorConfig,
-        initialSubscriptions: {
-          update: (subs, realm) => {
-            subs.add(realm.objects('CurState'));
-          },
-        },
-      },
-    };
-
-    console.log('렐름 열기');
     // 렐름 열면서 유저 데이터 추가
+    console.log('렐름 열기');
     const [realm] = await Promise.all([
-      Realm.open(config),
+      Realm.open(mkConfigWithSubscriptions(newUser)),
       newUser.callFunction('user/createUserInfo', {
         owner_id: newUser.id,
         email,
         nickname,
       }),
     ]);
+
+    // // 커스텀 데이터 동기화
+    await newUser.refreshCustomData();
 
     // const syncSession = realm.syncSession;
     // syncSession.addProgressNotification(
@@ -112,8 +101,8 @@ const AuthProvider = ({children}) => {
     console.log('닫기');
     realm.close();
 
-    setUser(app.currentUser);
-    return user;
+    setUser(newUser);
+    return newUser;
   };
 
   // 로그아웃
@@ -122,17 +111,19 @@ const AuthProvider = ({children}) => {
       console.log("not logged in, can't log out. ");
       return;
     }
+
     user.logOut();
     setUser(null);
   };
 
   // 탈퇴
-  const deleteUser = async userToBeDeleted => {
-    if (userToBeDeleted === null) {
+  const deleteUser = async () => {
+    if (user === null) {
       return;
     }
 
-    await app.deleteUser(userToBeDeleted);
+    // 다른 유저 데이터도 함께 삭제해야 함
+    await app.deleteUser(user);
     setUser(null);
   };
 

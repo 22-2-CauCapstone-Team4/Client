@@ -54,7 +54,7 @@ export default function BlockApp({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [navigation]);
 
   const [blockedApps, setBlockedApps] = useState([
     // 사용자가 설정해 둔 금지 어플 여기다가 저장
