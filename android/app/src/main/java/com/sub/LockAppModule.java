@@ -23,7 +23,6 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
         return "LockAppModule";
     }
 
-    // 권한 확인 함수
     @ReactMethod
     public void checkPermission(Promise promise) {
         try {
@@ -86,7 +85,7 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
     }
 
     // 권한 체크 함수
-    private boolean checkPermission(ReactApplicationContext context) {
+    static boolean checkPermission(ReactApplicationContext context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             return Settings.canDrawOverlays(context);
         else return true;

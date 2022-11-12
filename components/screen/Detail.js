@@ -12,8 +12,8 @@ import FriendTab from '../tab/FriendTab';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
-import {CurAppModule, LockAppModule} from '../../wrap_module';
-import {readProhibitedApps, updateProhibitedApps} from '../../functions';
+import {ForegroundServiceModule, LockAppModule} from '../../wrap_module';
+// import {readProhibitedApps, updateProhibitedApps} from '../../functions';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,35 +28,29 @@ function Detail({navigation}) {
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
-    // if (checkStatus !== Status.OK) checkPermissionAlert();
+    const innerFunc = async () => {
+      Alert.alert('테스트', '테스트할 함수를 선택하세요.', [
+        {
+          text: 'start service 1',
+          onPress: async () => {
+            await ForegroundServiceModule.startService(['com.github.android']);
+          },
+        },
+        {
+          text: '2',
+          onPress: async () => {
+            await ForegroundServiceModule.startService([
+              'com.github.android',
+              'com.android.chrome',
+            ]);
+          },
+        },
+      ]);
+    };
+
+    if (checkStatus !== Status.OK) checkPermissionAlert();
     // test용 alert 띄우기
-    Alert.alert('테스트', '테스트할 함수를 선택하세요.', [
-      {
-        text: 'read prohibited apps',
-        onPress: () => {
-          const list = readProhibitedApps(user);
-          console.log(list);
-        },
-      },
-      {
-        text: 'write prohibited apps',
-        onPress: () => {
-          const list = updateProhibitedApps(user, [
-            {
-              packageName: 'test3',
-              name: 'test3',
-              icon: 'test3',
-            },
-            {
-              packageName: 'test2',
-              name: 'test2',
-              icon: 'test2',
-            },
-          ]);
-          console.log(list);
-        },
-      },
-    ]);
+    else innerFunc();
   }, [Status.OK, checkPermissionAlert, checkStatus, user]);
 
   // const finishAllPermissionAlert = () => {
@@ -95,7 +89,7 @@ function Detail({navigation}) {
     const {
       checkPermission: checkCurAppPermission,
       allowPermission: allowCurAppPermission,
-    } = CurAppModule;
+    } = ForegroundServiceModule;
     const {
       checkPermission: checkLockAppPermission,
       allowPermission: allowLockAppPermission,

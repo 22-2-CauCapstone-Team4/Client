@@ -3,6 +3,7 @@
 import Realm from 'realm';
 import {AppUsageRecord, CurState} from '../../schema';
 import moment from 'moment';
+import {mkConfig} from '../mkConfig';
 
 const appCheckHeadlessTask = async taskData => {
   // 지금 날짜, 시간
