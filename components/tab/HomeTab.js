@@ -1,24 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {
-  TouchableOpacity,
-  Text,
-  ScrollView,
-  Modal,
-  View,
-  Pressable,
-  TextInput,
-  Alert,
-  StyleSheet,
-} from 'react-native';
-import AddBtn from '../AddBtn';
+import {TouchableOpacity, Text, View} from 'react-native';
 import MissionBox from '../box/MissionBox';
 import Categories from '../Categories';
 import OngoingBox from '../box/OngoingBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
 import {styles} from '../../utils/styles';
-import {useAuth} from '../../providers/AuthProvider';
 const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
@@ -44,35 +32,16 @@ const MissionList = styled.View`
   background-color: #ffffff;
 `;
 const ScrollViews = styled.ScrollView``;
+
 const HomeTab = ({navigation}) => {
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
 
-  const {user, signOut} = useAuth();
-
-  const onPressLogOut = () => {
-    navigation.navigate('Login');
-    signOut();
-  };
-
   return (
     // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <View style={styles.tabContainer}>
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}>
-        <Text style={{color: 'black', marginTop: 4}}>카테고리</Text>
-        <TouchableOpacity style={styles.tabButtonStyle} onPress={onPressLogOut}>
-          <Ionicons name={'log-out'} size={30} color={'black'} />
-          <Text style={{color: 'black'}}>로그아웃</Text>
-        </TouchableOpacity>
-      </View> */}
-      <Categories />
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
           <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
@@ -90,9 +59,7 @@ const HomeTab = ({navigation}) => {
       ) : (
         <ScrollViews>
           <MissionList>
-            <MissionBox
-              category="✏️수업"
-              missionName="그만듣고싶다"></MissionBox>
+            <MissionBox category="✏️수업" missionName="모바일 앱"></MissionBox>
             <MissionBox category="🏫과제" missionName="캡스톤"></MissionBox>
             <MissionBox
               category="💪운동"

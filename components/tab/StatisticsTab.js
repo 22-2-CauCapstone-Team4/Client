@@ -32,7 +32,6 @@ const StatisticsTab = () => {
   };
   return (
     <Container>
-      <Categories />
       <ScrollView>
         <Text>chart1</Text>
         <StackedBarChart

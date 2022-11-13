@@ -18,11 +18,7 @@ const Container = styled.View`
   padding: 20px;
 `;
 const RecordTab = () => {
-  return (
-    <Container>
-      <Categories />
-    </Container>
-  );
+  return <Container></Container>;
 };
 
 export default RecordTab;

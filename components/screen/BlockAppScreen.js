@@ -12,8 +12,6 @@ import {
 
 import {styles} from '../../utils/styles';
 import Colors from '../../utils/Colors';
-
-const numColumns = 3;
 export const apps = [
   {id: 0, appName: 'Chrome'},
   {id: 1, appName: 'YouTube'},
@@ -40,6 +38,7 @@ export const apps = [
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
 
 export default function BlockApp({navigation}) {
+  const numColumns = 3;
   useEffect(() => {
     const backAction = () => {
       if (navigation?.canGoBack()) {
