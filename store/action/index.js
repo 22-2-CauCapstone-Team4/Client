@@ -41,3 +41,25 @@ export const selectMission = item => {
     payload: item,
   };
 };
+
+//친구
+export const addFriend = item => {
+  return {
+    type: 'ADD_FRIEND',
+    payload: item,
+  };
+};
+
+export const deleteFriend = items => {
+  return {
+    type: 'DELETE_FRIEND',
+    payload: items,
+  };
+};
+
+export const selectFriend = item => {
+  return {
+    type: 'SELECT_FRIEND',
+    payload: item,
+  };
+};
