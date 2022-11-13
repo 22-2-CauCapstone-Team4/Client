@@ -12,11 +12,13 @@ const INITIAL_STATE = {
 };
 
 const missionReducer = (state = INITIAL_STATE, action) => {
+  // console.log('반영된 데이터');
+  // console.log(action.payload);
   switch (action.type) {
     case 'ADD_MISSION':
-      return {...state, data: [...state.data, action.payload]};
+      return {...state, missionData: [...state.data, action.payload]};
     case 'DELETE_MISSION':
-      return {...state, data: action.payload};
+      return {...state, missionData: action.payload};
     case 'SELECT_MISSION':
       return {...state, filter: action.payload};
     default:

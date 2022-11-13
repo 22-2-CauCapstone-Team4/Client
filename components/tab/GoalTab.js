@@ -26,7 +26,6 @@ const GoalTab = ({navigation}) => {
   const categoryFilter = useSelector(store => store.categoryReducer.filter);
   const missionNumber = missionData.length;
   const [modalVisible, setModalVisible] = useState(false);
-
   return (
     <Container>
       <Categories />

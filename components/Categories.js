@@ -9,7 +9,12 @@ import {
   Modal,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {addCategory, deleteCategory, selectCategory} from '../store/action';
+import {
+  addCategory,
+  deleteCategory,
+  selectCategory,
+  deleteMission,
+} from '../store/action';
 const MissionList = styled.Text`
   color: white;
 `;
@@ -52,16 +57,14 @@ export default function Categories() {
   const dispatch = useDispatch();
   const data = useSelector(store => store.categoryReducer.data); // 카테고리 데이터
   const now = useSelector(store => store.categoryReducer.filter);
+  const mission = useSelector(store => store.missionReducer.missionData);
   const [categoryText, setCategoryText] = useState('+ 추가');
-  const [currentCategory, setCurrentCategory] = useState(now);
   const createCategory = () => {
     if (categoryText !== '') {
       dispatch(addCategory({id: categoryText, name: categoryText}));
       setCategoryText('+ 추가');
-      setCurrentCategory('⭐전체목표');
     }
   };
-  // console.log('now' + now + '    currentCategory' + currentCategory);
   return (
     <>
       <Text style={styles.blackText}>카테고리</Text>
@@ -87,9 +90,15 @@ export default function Categories() {
                 dispatch(selectCategory(item.name));
               }}
               onLongPress={() => {
-                cd = data.filter(el => el.id !== item.id);
-                dispatch(deleteCategory(cd));
+                dispatch(
+                  deleteMission(mission.filter(el => el.category !== item.id)),
+                );
+                dispatch(
+                  deleteCategory(data.filter(el => el.name !== item.id)),
+                );
                 dispatch(selectCategory('⭐전체목표'));
+
+                // 삭제된 카테고리 관련 미션도 삭제
               }}>
               <MissionList>{item.name}</MissionList>
             </OverallGoal>
