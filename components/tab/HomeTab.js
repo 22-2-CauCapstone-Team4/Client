@@ -7,6 +7,7 @@ import Categories from '../Categories';
 import OngoingBox from '../box/OngoingBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
 import {styles} from '../../utils/styles';
+import {useSelector, useDispatch} from 'react-redux';
 const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
@@ -34,6 +35,8 @@ const MissionList = styled.View`
 const ScrollViews = styled.ScrollView``;
 
 const HomeTab = ({navigation}) => {
+  const dispatch = useDispatch();
+  const missionData = useSelector(store => store.missionReducer.missionData);
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
@@ -44,13 +47,13 @@ const HomeTab = ({navigation}) => {
     <View style={styles.tabContainer}>
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
-          <Text style={{color: mission ? 'black' : '#38a6c0'}}>예정 미션</Text>
+          <Text style={{color: mission ? 'black' : '#38a6c0'}}>오늘 미션</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={clickMission2}>
           <Text style={{color: mission ? '#38a6c0' : 'black'}}>진행 중</Text>
         </TouchableOpacity>
       </AboutMission>
-      <MainText>{mission ? '진행중 | 0' : '예정 미션 | 0'}</MainText>
+      <MainText>{mission ? '진행중 | 0' : '오늘 미션 | 0'}</MainText>
       {/* 미션 | 뒤에 0은 나중에 데이터를 받아서 count 값을 넣어주면 될듯 */}
 
       {/* 디비 데이터 받아와서 카테고리, 미션 이름을 뿌려주면 될 것 같다? */}

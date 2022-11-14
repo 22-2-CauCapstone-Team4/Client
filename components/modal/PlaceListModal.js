@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {styles} from '../../utils/styles';
+import {deleteSpace} from '../../store/action/index';
 
 export default function PlaceListModal({
   navigation,
@@ -19,6 +20,7 @@ export default function PlaceListModal({
 }) {
   const dispatch = useDispatch();
   const place = useSelector(store => store.spaceReducer.data);
+  // console.log(place);
   return (
     <>
       {modalVisible ? (
@@ -31,15 +33,28 @@ export default function PlaceListModal({
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={style.placeText}>장소 목록</Text>
-              <View style={{height: 150, marginBottom: 20}}>
-                <ScrollView style={style.scrollView}>
-                  {place.map(item => (
-                    <TouchableOpacity key={item.id} style={style.place}>
-                      <Text style={{color: 'white'}}>{item.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+              <View style={style.scrollView}>
+                <Text style={style.placeText}>장소 목록</Text>
+                <View style={{height: 150, marginBottom: 20}}>
+                  <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+                    {place.map(item => (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={style.place}
+                        onLongPress={() => {
+                          dispatch(
+                            deleteSpace(
+                              place.filter(el => el.name !== item.name),
+                            ),
+                          );
+                          // console.log('place');
+                          // console.log(place);
+                        }}>
+                        <Text style={{color: 'white'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
               </View>
 
               <View style={{flexDirection: 'row'}}>
@@ -82,11 +97,12 @@ const style = StyleSheet.create({
     marginVertical: 5,
   },
   scrollView: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    alignItems: 'center',
+    width: 180,
+    borderRadius: 20,
     borderColor: 'grey',
     borderWidth: 0.5,
     padding: 10,
-    borderBottomColor: '#fff',
+    marginBottom: 5,
   },
 });

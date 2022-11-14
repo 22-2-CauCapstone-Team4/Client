@@ -194,7 +194,13 @@ function Detail({navigation}) {
             );
           } else if (route.name === '목표') {
             return (
-              <View>
+              <View style={{flexDirection: 'row'}}>
+                <View style={styles.centeredView}>
+                  <PlaceListModal
+                    navigation={navigation}
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}></PlaceListModal>
+                </View>
                 <TouchableOpacity
                   style={styles.tabButtonStyle}
                   onPress={() => {
@@ -203,12 +209,6 @@ function Detail({navigation}) {
                   <Text style={{color: 'black'}}>공간 추가</Text>
                   <Icon name={'compass'} size={30} color={'black'} />
                 </TouchableOpacity>
-                <View style={styles.centeredView}>
-                  <PlaceListModal
-                    navigation={navigation}
-                    modalVisible={modalVisible}
-                    setModalVisible={setModalVisible}></PlaceListModal>
-                </View>
               </View>
             );
           }
