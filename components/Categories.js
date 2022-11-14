@@ -60,7 +60,7 @@ export default function Categories() {
   const mission = useSelector(store => store.missionReducer.missionData);
   const [categoryText, setCategoryText] = useState('+ 추가');
   const createCategory = () => {
-    if (categoryText !== '') {
+    if (categoryText.trim() !== '' && categoryText !== '') {
       dispatch(addCategory({id: categoryText, name: categoryText}));
       setCategoryText('+ 추가');
     }

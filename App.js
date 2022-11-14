@@ -9,7 +9,6 @@ import {Provider} from 'react-redux';
 import {AuthProvider} from './providers/AuthProvider';
 import LogInScreen from './components/screen/LogInScreen';
 import CreateAccountScreen from './components/screen/CreateAccountScreen';
-import Detail from './components/screen/Detail';
 import MenuDrawer from './components/screen/MenuDrawer';
 import FriendScreen from './components/screen/FriendScreen';
 import DirectCreateMissionScreen from './components/screen/DirectCreateMissionScreen';
@@ -26,6 +25,9 @@ function App() {
   LogBox.ignoreLogs([
     'Tried to show an alert while not attached to an Activity',
   ]); // 나도 아니까 쉿...
+  LogBox.ignoreLogs([
+    'Please report: Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code:',
+  ]);
   return (
     <AuthProvider>
       <Provider store={store}>

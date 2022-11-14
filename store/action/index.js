@@ -85,3 +85,17 @@ export const selectSpace = item => {
     payload: item,
   };
 };
+
+export const addApps = items => {
+  return {
+    type: 'ADD_APPS',
+    payload: items,
+  };
+};
+
+export const addBlockedApps = items => {
+  return {
+    type: 'ADD_BLOCKED_APPS',
+    payload: items,
+  };
+};

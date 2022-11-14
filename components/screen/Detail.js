@@ -13,34 +13,71 @@ import PlaceListModal from '../modal/PlaceListModal';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
-import {ForegroundServiceModule, LockAppModule} from '../../wrap_module';
-// import {readProhibitedApps, updateProhibitedApps} from '../../functions';
+import {
+  ForegroundServiceModule,
+  LockAppModule,
+  AppListModule,
+} from '../../wrap_module';
+import {useDispatch} from 'react-redux';
+import {readProhibitedApps} from '../../functions';
+import {addApps, addBlockedApps} from '../../store/action';
 
 const Tab = createBottomTabNavigator();
 
 function Detail({navigation}) {
+  const dispatch = useDispatch();
+
   const Status = {
     NOT_YET: 0,
     OK: 1,
   };
   Object.freeze(Status);
 
+  const [isInit, setIsInit] = React.useState(false);
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
   const [modalVisible, setModalVisible] = useState(false);
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
-    if (checkStatus !== Status.OK) checkPermissionAlert();
-    // test용 alert 띄우기
-  }, [Status.OK, checkPermissionAlert, checkStatus, user]);
+    if (checkStatus === Status.NOT_YET) checkPermissionAlert();
 
-  // const finishAllPermissionAlert = () => {
-  //   Alert.alert('완료', '모든 권한 설정이 완료되었습니다. ', [
-  //     {
-  //       text: '확인',
-  //     },
-  //   ]);
-  // };
+    if (!isInit) {
+      loadApps();
+    }
+  }, [
+    Status.NOT_YET,
+    checkPermissionAlert,
+    checkStatus,
+    isInit,
+    loadApps,
+    user,
+  ]);
+
+  const loadApps = React.useCallback(async () => {
+    setIsInit(true);
+
+    console.log('설치 앱 리스트 불러오기 시작');
+    try {
+      let [tempApps, tempBlockApps] = await Promise.all([
+        AppListModule.getAppList(),
+        readProhibitedApps(user),
+      ]);
+      tempApps = tempApps.appList;
+      tempApps.sort(function (a, b) {
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+        else if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        else return 0;
+      });
+      dispatch(addApps(tempApps));
+      console.log();
+
+      dispatch(addBlockedApps(tempBlockApps));
+      // console.log(apps, blockedApps);
+      console.log('불러오기 완료');
+    } catch (err) {
+      console.log(err);
+    }
+  }, [dispatch, user]);
 
   const deniedPermissionAlert = React.useCallback(() => {
     Alert.alert(
@@ -64,7 +101,7 @@ function Detail({navigation}) {
   }, [checkPermissionAlert]);
 
   const checkPermissionAlert = React.useCallback(async () => {
-    if (checkStatus === Status.OK) return;
+    if (checkStatus !== Status.NOT_YET) return;
     let allowCnt = 0;
 
     const {
@@ -130,7 +167,7 @@ function Detail({navigation}) {
     } catch (err) {
       console.log(err.message);
     }
-  }, [Status.OK, checkStatus, deniedPermissionAlert]);
+  }, [Status.NOT_YET, Status.OK, checkStatus, deniedPermissionAlert]);
 
   const onPressLogOut = () => {
     navigation.replace('Login');

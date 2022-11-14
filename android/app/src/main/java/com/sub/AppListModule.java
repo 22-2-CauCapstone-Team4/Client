@@ -1,13 +1,10 @@
 package com.sub;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
@@ -20,10 +17,11 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AppListModule extends ReactContextBaseJavaModule {
+    WritableMap map = null;
+
     AppListModule(ReactApplicationContext context) {
         super(context);
     }
@@ -33,9 +31,9 @@ public class AppListModule extends ReactContextBaseJavaModule {
         return "AppListModule";
     }
 
-    @ReactMethod
-    public void getAppList(Promise promise) {
-        try {
+    private Runnable getAppListRunnable = new Runnable() {
+        @Override
+        public void run() {
             Log.i("AppListModule", "앱 리스트 부르기 시작");
             ReactApplicationContext context = getReactApplicationContext();
 
@@ -43,7 +41,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
             List<PackageInfo> infoList = pm.getInstalledPackages(0);
 
             // js에서 사용 가능한 arr, map
-            WritableMap map = Arguments.createMap();
+            map = Arguments.createMap();
             WritableArray array = Arguments.createArray();
 
             for (PackageInfo info : infoList) {
@@ -73,7 +71,18 @@ public class AppListModule extends ReactContextBaseJavaModule {
             map.putArray("appList", array);
 
             Log.i("AppListModule", "앱 리스트 부르기 종료");
+        }
+    };
+
+    @ReactMethod
+    public void getAppList(Promise promise) {
+        try {
+            Thread thread = new Thread(getAppListRunnable);
+            thread.start();
+            thread.join(); // 스레드 종료할 때까지 대기
+
             promise.resolve(map);
+            map = null;
         } catch (Exception e) {
             promise.reject("error", e);
         }

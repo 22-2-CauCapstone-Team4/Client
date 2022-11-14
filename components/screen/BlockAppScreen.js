@@ -9,27 +9,25 @@ import {
   StyleSheet,
   BackHandler,
 } from 'react-native';
+import {useDispatch} from 'react-redux';
 import {useAuth} from '../../providers/AuthProvider';
-import {AppListModule, ForegroundServiceModule} from '../../wrap_module';
-import {readProhibitedApps, updateProhibitedApps} from '../../functions';
-
+import {ForegroundServiceModule} from '../../wrap_module';
+import {updateProhibitedApps} from '../../functions';
+import {addBlockedApps} from '../../store/action';
+import {useSelector} from 'react-redux';
 import {styles} from '../../utils/styles';
 import Colors from '../../utils/Colors';
 
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
 export default function BlockApp({navigation}) {
+  const dispatch = useDispatch();
   const numColumns = 3;
   const {user} = useAuth();
 
-  const [isLoadingStarted, setIsLoadingStarted] = useState(false);
-  const [apps, setApps] = useState([]);
-  const [blockedApps, setBlockedApps] = useState([]);
+  const apps = useSelector(store => store.appReducer.data);
+  const blockedApps = useSelector(store => store.blockedAppReducer.data);
 
   useEffect(() => {
-    if (!isLoadingStarted) {
-      loadApps();
-    }
-
     const backAction = async () => {
       if (navigation?.canGoBack()) {
         try {
@@ -54,29 +52,7 @@ export default function BlockApp({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, [blockedApps, loadApps, isLoadingStarted, navigation, user]);
-
-  const loadApps = React.useCallback(async () => {
-    setIsLoadingStarted(true);
-
-    console.log('설치 앱 리스트 불러오기 시작');
-    let [tempApps, tempBlockApps] = await Promise.all([
-      AppListModule.getAppList(),
-      readProhibitedApps(user),
-    ]);
-    tempApps = tempApps.appList;
-    // console.log(tempApps[0]);
-    tempApps.sort(function (a, b) {
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-      else if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      else return 0;
-    });
-    setApps(tempApps);
-
-    setBlockedApps(tempBlockApps);
-    // console.log(apps, blockedApps);
-    console.log('불러오기 완료');
-  }, [user]);
+  }, [blockedApps, navigation, user]);
 
   //FlatList에 어플 하나씩 나열
   _renderItems = ({item}) => {
@@ -96,7 +72,7 @@ export default function BlockApp({navigation}) {
               )
             ) {
               console.log('now is free');
-              setBlockedApps(
+              dispatch(
                 blockedApps.filter(
                   blockedItem => blockedItem.packageName !== item.packageName,
                 ),
@@ -105,7 +81,7 @@ export default function BlockApp({navigation}) {
             // 없으면 blockedApp에 추가하고 클릭 표시 아이콘 state 변경
             else {
               console.log('now is blocked');
-              setBlockedApps(blockedApps.concat(item));
+              dispatch(addBlockedApps(blockedApps.concat(item)));
             }
           }}>
           {blockedApps.find(
