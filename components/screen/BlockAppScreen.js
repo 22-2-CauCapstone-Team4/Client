@@ -16,13 +16,9 @@ import {readProhibitedApps, updateProhibitedApps} from '../../functions';
 import {styles} from '../../utils/styles';
 import Colors from '../../utils/Colors';
 
-const numColumns = 3;
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
-
 export default function BlockApp({navigation}) {
-  const Status = {};
-  Object.freeze(Status);
-
+  const numColumns = 3;
   const {user} = useAuth();
 
   const [isLoadingStarted, setIsLoadingStarted] = useState(false);

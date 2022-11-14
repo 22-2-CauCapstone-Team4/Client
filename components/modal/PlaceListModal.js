@@ -1,0 +1,92 @@
+import React from 'react';
+import {
+  Text,
+  Modal,
+  View,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {styles} from '../../utils/styles';
+
+export default function PlaceListModal({
+  navigation,
+  modalVisible,
+  setModalVisible,
+}) {
+  const dispatch = useDispatch();
+  const place = useSelector(store => store.spaceReducer.data);
+  return (
+    <>
+      {modalVisible ? (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={style.placeText}>장소 목록</Text>
+              <View style={{height: 150, marginBottom: 20}}>
+                <ScrollView style={style.scrollView}>
+                  {place.map(item => (
+                    <TouchableOpacity key={item.id} style={style.place}>
+                      <Text style={{color: 'white'}}>{item.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={{flexDirection: 'row'}}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    navigation.navigate('CreateSpace');
+                    setModalVisible(!modalVisible);
+                  }}>
+                  <Text style={styles.textStyle}>추가</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>닫기</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      ) : null}
+    </>
+  );
+}
+
+const style = StyleSheet.create({
+  placeText: {
+    color: 'black',
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 20,
+  },
+  place: {
+    width: 150,
+    height: 30,
+    backgroundColor: '#0891b2',
+    borderRadius: 600,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  scrollView: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderColor: 'grey',
+    borderWidth: 0.5,
+    padding: 10,
+    borderBottomColor: '#fff',
+  },
+});

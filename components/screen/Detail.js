@@ -1,7 +1,7 @@
 /* eslint-disable curly */
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
-import {TouchableOpacity, Text, Alert, BackHandler} from 'react-native';
+import {TouchableOpacity, Text, Alert, BackHandler, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -9,6 +9,7 @@ import {Record, Statistics} from '../tab/tabbarList';
 import HomeTab from '../tab/HomeTab';
 import GoalTab from '../tab/GoalTab';
 import FriendTab from '../tab/FriendTab';
+import PlaceListModal from '../modal/PlaceListModal';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
@@ -25,6 +26,7 @@ function Detail({navigation}) {
   Object.freeze(Status);
 
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
+  const [modalVisible, setModalVisible] = useState(false);
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
@@ -135,12 +137,10 @@ function Detail({navigation}) {
     signOut();
   };
 
-  // 뒤로가기 -> 앱 종료 Alert
-  const isFocused = useIsFocused(); // 포커싱 감지
+  const isFocused = useIsFocused();
   useEffect(() => {
     const backAction = () => {
       if (isFocused) {
-        //console.log('Is Focused');
         Alert.alert('종료', '앱을 종료하시겠습니까?', [
           {
             text: '취소',
@@ -194,12 +194,22 @@ function Detail({navigation}) {
             );
           } else if (route.name === '목표') {
             return (
-              <TouchableOpacity
-                style={styles.tabButtonStyle}
-                onPress={() => {}}>
-                <Text style={{color: 'black'}}>공간 추가</Text>
-                <Icon name={'compass'} size={30} color={'black'} />
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  style={styles.tabButtonStyle}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}>
+                  <Text style={{color: 'black'}}>공간 추가</Text>
+                  <Icon name={'compass'} size={30} color={'black'} />
+                </TouchableOpacity>
+                <View style={styles.centeredView}>
+                  <PlaceListModal
+                    navigation={navigation}
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}></PlaceListModal>
+                </View>
+              </View>
             );
           }
         },

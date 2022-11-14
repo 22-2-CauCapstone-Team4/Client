@@ -13,6 +13,17 @@ export default function GoalCategoryBox(props) {
         <Category>{props.category}</Category>
         <Text style={{fontSize: 25, marginRight: 10, color: 'black'}}> | </Text>
         <MissionNumber>{props.number}</MissionNumber>
+        {props.category === '⭐전체목표' && props.number === 0 ? (
+          <Text
+            style={{
+              position: 'absolute',
+              right: 0,
+              color: 'red',
+              fontSize: 13,
+            }}>
+            미션을 추가하세요!
+          </Text>
+        ) : null}
       </ContentContainer>
     </Container>
   );

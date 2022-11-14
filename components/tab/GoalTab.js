@@ -16,58 +16,49 @@ import GoalCategoryBox from '../box/GoalCategoryBox';
 import GoalBox from '../box/GoalBox';
 import SpaceBox from '../box/SpaceBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
-
-const AboutMission = styled.View`
-  border: 1px solid #f1f1f1;
-  border-radius: 600px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  background-color: #fcfcfc;
-  height: 30px;
-`;
-const AddMissionBtn = styled.Pressable`
-  position: absolute;
-  bottom: 5%;
-  right: 5%;
-  border-radius: 600px;
-`;
-const Container = styled.View`
-  height: 100%;
-  background-color: white;
-  padding: 20px;
-`;
-const MainText = styled.Text`
-  color: #373737;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 15px 0;
-`;
-const GoalList = styled.View`
-  background-color: #ffffff;
-`;
-
+import {useDispatch, useSelector} from 'react-redux';
+import {addMission, deleteMission, selectMission} from '../../store/action';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 const GoalTab = ({navigation}) => {
-  const [mission, setMission] = useState(false);
+  const dispatch = useDispatch();
+  const missionData = useSelector(store => store.missionReducer.missionData);
+  const categoryList = useSelector(store => store.categoryReducer.data);
+  const categoryFilter = useSelector(store => store.categoryReducer.filter);
+  const missionNumber = missionData.length;
   const [modalVisible, setModalVisible] = useState(false);
-  const clickMission1 = () => setMission(false);
-  const clickMission2 = () => setMission(true);
-
   return (
     <Container>
       <Categories />
       <ScrollView>
         <GoalList>
-          <GoalBox
-            category="✏️수업"
-            missionName="그만듣고싶다"
-            type="time"></GoalBox>
-          <GoalCategoryBox category="✏️수업" number="20"></GoalCategoryBox>
-          {/* <SpaceBox category="✏️수업" missionName="학교 강의실"></SpaceBox> */}
+          {categoryFilter === '⭐전체목표' ? (
+            <View>
+              <GoalCategoryBox
+                category="⭐전체목표"
+                w
+                number={missionNumber}></GoalCategoryBox>
+              {categoryList.map(c => (
+                <GoalCategoryBox
+                  key={c.id}
+                  category={c.name}
+                  number={
+                    missionData.filter(el => el.category === c.name).length
+                  }></GoalCategoryBox>
+              ))}
+            </View>
+          ) : (
+            missionData
+              .filter(el => el.category === categoryFilter)
+              .map(item => (
+                <GoalBox
+                  key={item.id}
+                  category={item.category}
+                  missionName={item.name}
+                  type="time"></GoalBox>
+              ))
+          )}
         </GoalList>
       </ScrollView>
-
-      {/* modal */}
       <View style={styles.centeredView}>
         <CreateMissionModal
           navigation={navigation}
@@ -80,6 +71,22 @@ const GoalTab = ({navigation}) => {
     </Container>
   );
 };
+
+const AddMissionBtn = styled.Pressable`
+  position: absolute;
+  bottom: 5%;
+  right: 5%;
+  border-radius: 600px;
+`;
+const Container = styled.View`
+  height: 100%;
+  background-color: white;
+  padding: 20px;
+`;
+const GoalList = styled.View`
+  background-color: #ffffff;
+`;
+
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
