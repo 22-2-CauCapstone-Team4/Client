@@ -8,14 +8,20 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
+  Modal,
+  Pressable,
+  TextInput,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import MapView, {Marker} from 'react-native-maps';
-import {useNavigation} from '@react-navigation/native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import SnackBar from 'react-native-snackbar';
 
 import Colors from '../../utils/Colors';
+import {addSpace} from '../../store/action';
 
 export default function CreateSpaceScreen({navigation}) {
+  Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
   //뒤로가기 -> 페이지 뒤로
   useEffect(() => {
     const backAction = () => {
@@ -33,12 +39,12 @@ export default function CreateSpaceScreen({navigation}) {
     return () => backHandler.remove();
   }, []);
 
-  const ref = useRef();
-
   useEffect(() => {
     ref.current?.setAddressText('Some Text');
   }, []);
 
+  const dispatch = useDispatch();
+  const data = useSelector(store => store.spaceReducer.data);
   const [coord, setCoord] = useState({
     latitude: 37.503637,
     longitude: 126.956025,
@@ -46,8 +52,9 @@ export default function CreateSpaceScreen({navigation}) {
     longitudeDelta: 0.0421,
   });
   const [place, setPlace] = useState('');
-  const [visibleButton, setVisibleButton] = useState(true);
-  // Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [valid, setVaild] = useState(true);
+  const ref = useRef();
   // function getCoordinate() {
   //   return Geocoder.from('New York, 뉴욕 미국')
   //     .then(json => {
@@ -77,10 +84,21 @@ export default function CreateSpaceScreen({navigation}) {
   return (
     <>
       <SafeAreaView style={{height: '100%', backgroundColor: 'white'}}>
+        <View style={styles.buttonView}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModalVisible(!modalVisible)}>
+            <Text style={styles.buttonText}>여기로 선택!</Text>
+          </TouchableOpacity>
+        </View>
         <View style={{height: 150}}>
           <GooglePlacesAutocomplete
+            textInputProps={{
+              placeholderTextColor: Colors.MAIN_COLOR,
+              returnKeyType: 'search',
+            }}
             GooglePlacesSearchQuery={{rankby: 'distance'}}
-            placeholder="장소를 입력하세요"
+            placeholder="장소를 검색하세요"
             autoFocus={false}
             listViewDisplayed="auto"
             fetchDetails={true}
@@ -109,6 +127,10 @@ export default function CreateSpaceScreen({navigation}) {
                 borderBottomColor: 'grey',
                 borderBottomWidth: 1,
                 top: 0,
+                color: 'black',
+              },
+              description: {
+                color: 'black',
               },
             }}
           />
@@ -139,11 +161,79 @@ export default function CreateSpaceScreen({navigation}) {
             />
           </MapView>
         </View>
-        <View style={styles.buttonView}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>여기로 선택!</Text>
-          </TouchableOpacity>
-        </View>
+        {modalVisible ? (
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <View>
+                  <Text
+                    style={{
+                      marginBottom: 15,
+                      color: 'black',
+                      fontWeight: '900',
+                    }}>
+                    장소 이름을 입력해주세요
+                  </Text>
+                  <TextInput
+                    style={styles.textInputStyle}
+                    onChangeText={text => setPlace(text)}
+                    onPressIn={() => setPlace('')}>
+                    {place}
+                  </TextInput>
+                </View>
+                <View style={{alignItems: 'center'}}>
+                  <View style={{flexDirection: 'row', marginBottom: 5}}>
+                    <Pressable
+                      style={[styles.modalButton, styles.buttonClose]}
+                      onPress={() => {
+                        if (place !== '') {
+                          dispatch(
+                            addSpace({
+                              id: place,
+                              name: place,
+                              lat: coord.latitude,
+                              lng: coord.longitude,
+                            }),
+                          );
+                          SnackBar.show({
+                            text: `'${place}' 장소가 새로 추가 됐습니다.`,
+                            duration: SnackBar.LENGTH_SHORT,
+                          });
+                          setPlace('');
+                          setVaild(true);
+                          setModalVisible(!modalVisible);
+
+                          // console.log(data);
+                        } else setVaild(false);
+                      }}
+                      onSubmitEditing={() => setPlace('')}>
+                      <Text style={styles.textStyle}>저장</Text>
+                    </Pressable>
+                    <Pressable
+                      style={[styles.modalButton, styles.buttonClose]}
+                      onPress={() => {
+                        setModalVisible(!modalVisible);
+                        setPlace('');
+                      }}>
+                      <Text style={styles.textStyle}>취소</Text>
+                    </Pressable>
+                  </View>
+                  {valid ? null : (
+                    <Text style={{color: 'red', fontSize: 12}}>
+                      이름을 입력해주세요!
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : null}
       </SafeAreaView>
     </>
   );
@@ -157,7 +247,7 @@ const styles = StyleSheet.create({
   map: {
     top: 75,
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height * 0.6,
+    height: Dimensions.get('window').height * 0.65,
     position: 'absolute',
   },
   buttonView: {
@@ -179,5 +269,49 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontFamily: 'bold',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+
+  // 모달 버튼 텍스트 스타일
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalButton: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    margin: 5,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  textInputStyle: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    height: 40,
+    marginBottom: 20,
+    color: 'black',
   },
 });

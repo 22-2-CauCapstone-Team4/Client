@@ -35,6 +35,7 @@ const GoalTab = ({navigation}) => {
             <View>
               <GoalCategoryBox
                 category="⭐전체목표"
+                w
                 number={missionNumber}></GoalCategoryBox>
               {categoryList.map(c => (
                 <GoalCategoryBox
