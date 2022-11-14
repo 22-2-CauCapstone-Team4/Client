@@ -33,17 +33,18 @@ function Detail({navigation}) {
   };
   Object.freeze(Status);
 
+  const [blockedApps, setBlockedApps] = React.useState([]);
   const [isInit, setIsInit] = React.useState(false);
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
   const [modalVisible, setModalVisible] = useState(false);
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
-    if (checkStatus === Status.NOT_YET) checkPermissionAlert();
-
     if (!isInit) {
       loadApps();
     }
+
+    if (checkStatus === Status.NOT_YET) checkPermissionAlert();
   }, [
     Status.NOT_YET,
     checkPermissionAlert,
@@ -58,7 +59,7 @@ function Detail({navigation}) {
 
     console.log('설치 앱 리스트 불러오기 시작');
     try {
-      let [tempApps, tempBlockApps] = await Promise.all([
+      let [tempApps, tempBlockedApps] = await Promise.all([
         AppListModule.getAppList(),
         readProhibitedApps(user),
       ]);
@@ -69,10 +70,9 @@ function Detail({navigation}) {
         else return 0;
       });
       dispatch(addApps(tempApps));
-      console.log();
 
-      dispatch(addBlockedApps(tempBlockApps));
-      // console.log(apps, blockedApps);
+      dispatch(addBlockedApps(tempBlockedApps));
+      setBlockedApps(tempBlockedApps);
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);
@@ -126,10 +126,11 @@ function Detail({navigation}) {
     if (allowCnt === 2) {
       setCheckStatus(Status.OK);
 
-      await ForegroundServiceModule.startService([
-        'com.github.android',
-        'com.android.chrome',
-      ]);
+      console.log('서비스 시작');
+      await ForegroundServiceModule.startService(
+        blockedApps.map(blockedApp => blockedApp.packageName),
+      );
+
       return;
     }
 

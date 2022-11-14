@@ -5,7 +5,7 @@ const INITIAL_STATE = {
 const blockedAppReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'ADD_BLOCKED_APPS':
-      return {...state, data: [...state.data, ...action.payload]};
+      return {...state, data: action.payload};
     default:
       return state;
   }

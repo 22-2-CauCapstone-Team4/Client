@@ -26,7 +26,9 @@ export default function BlockApp({navigation}) {
   const {user} = useAuth();
 
   const apps = useSelector(store => store.appReducer.data);
-  const blockedApps = useSelector(store => store.blockedAppReducer.data);
+  const [blockedApps, setBlockedApps] = useState(
+    useSelector(store => store.blockedAppReducer.data),
+  );
 
   useEffect(() => {
     const backAction = async () => {
@@ -38,6 +40,8 @@ export default function BlockApp({navigation}) {
               blockedApps.map(blockedApp => blockedApp.packageName),
             ),
           ]);
+
+          dispatch(addBlockedApps(blockedApps));
         } catch (err) {
           console.log(err);
         }
@@ -53,7 +57,7 @@ export default function BlockApp({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, [blockedApps, navigation, user]);
+  }, [blockedApps, dispatch, navigation, user]);
 
   //FlatList에 어플 하나씩 나열
   _renderItems = ({item}) => {
@@ -73,7 +77,7 @@ export default function BlockApp({navigation}) {
               )
             ) {
               console.log('now is free');
-              dispatch(
+              setBlockedApps(
                 blockedApps.filter(
                   blockedItem => blockedItem.packageName !== item.packageName,
                 ),
@@ -82,7 +86,7 @@ export default function BlockApp({navigation}) {
             // 없으면 blockedApp에 추가하고 클릭 표시 아이콘 state 변경
             else {
               console.log('now is blocked');
-              dispatch(addBlockedApps(blockedApps.concat(item)));
+              setBlockedApps(blockedApps.concat(item));
             }
           }}>
           <Image
@@ -123,12 +127,12 @@ export default function BlockApp({navigation}) {
             color: Colors.MAIN_COLOR,
             fontSize: 20,
             fontWeight: 'bold',
-            paddingTop: 40,
+            paddingTop: 20,
           }}>
-          제한할 앱을 선택해주세요
+          미션 수행 시 제한할 앱을 선택해주세요.
         </Text>
         <FlatList
-          style={{marginTop: 40}}
+          style={{marginTop: 30}}
           numColumns={numColumns}
           data={apps}
           renderItem={this._renderItems}

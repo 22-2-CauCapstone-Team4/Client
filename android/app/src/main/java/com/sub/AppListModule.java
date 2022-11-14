@@ -1,7 +1,10 @@
 package com.sub;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -38,33 +41,38 @@ public class AppListModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
 
             PackageManager pm = context.getPackageManager();
-            List<PackageInfo> infoList = pm.getInstalledPackages(0);
+
+            Intent intent = new Intent(Intent.ACTION_MAIN, null);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            List<ResolveInfo> infoList = pm.queryIntentActivities(intent, 0);
 
             // js에서 사용 가능한 arr, map
             map = Arguments.createMap();
             WritableArray array = Arguments.createArray();
 
-            for (PackageInfo info : infoList) {
+            for (ResolveInfo info : infoList) {
+                ActivityInfo ai = info.activityInfo;
+
                 WritableMap app = Arguments.createMap();
-                app.putString("name", info.applicationInfo.loadLabel(pm) + "");
-                app.putString("packageName", info.packageName);
+                app.putString("name", ai.loadLabel(pm) + "");
+                app.putString("packageName", ai.packageName);
 
                 // icon img
                 // 1. drawble -> bitmap
-                Drawable iconBitmapDrawable = info.applicationInfo.loadIcon(pm);
-                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
-                iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, true);
+                Drawable iconBitmapDrawable = ai.applicationInfo.loadIcon(pm);
+                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 150, 150, true);
                 Canvas canvas = new Canvas(iconBitmap);
                 iconBitmapDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
                 iconBitmapDrawable.draw(canvas);
 
                 // 2. bitmap -> string
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                iconBitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos);
+                iconBitmap.compress(Bitmap.CompressFormat.PNG, 30, baos);
                 byte[] bytes = baos.toByteArray();
                 String iconStr = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-                app.putString("icon", "data:image/jpeg;base64," + iconStr);
+                app.putString("icon", "data:image/png;base64," + iconStr);
 
                 array.pushMap(app);
             }
