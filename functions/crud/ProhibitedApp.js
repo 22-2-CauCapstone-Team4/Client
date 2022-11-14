@@ -29,12 +29,11 @@ const readProhibitedApps = async user => {
       .objects('ProhibitedApp')
       .filtered(`owner_id == "${user.id}"`);
 
-    console.log('읽기 결과', list);
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    console.log('읽기 결과', result);
 
     console.log('닫기');
     realm.close();
-
-    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
   } catch (err) {
     console.log(err.message);
 
@@ -106,10 +105,11 @@ const updateProhibitedApps = async (user, newList) => {
       });
     });
 
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    console.log('업데이트 결과', result);
+
     console.log('닫기');
     realm.close();
-
-    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
   } catch (err) {
     console.log(err.message);
 
