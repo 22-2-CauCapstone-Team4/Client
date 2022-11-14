@@ -129,11 +129,14 @@ public class ForegroundService extends Service {
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                     Log.i("CheckAppService", "화면 켜짐");
                     // 화면 켠 경우, 다시 반복 시작
-                    thread = new Thread(checkCurApp);
-                    thread.start();
+                    if (prohibitedAppList != null) {
+                        thread = new Thread(checkCurApp);
+                        thread.start();
+                    }
                 }
             }
         };
+
         registerReceiver(receiver, intentFilter);
     }
 
@@ -156,6 +159,7 @@ public class ForegroundService extends Service {
             thread.start();
         }
 
+        Log.i("ForegroundService", "서비스 시작 작업 종료");
         return START_REDELIVER_INTENT;
     }
 

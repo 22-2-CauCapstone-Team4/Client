@@ -28,29 +28,8 @@ function Detail({navigation}) {
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
-    const innerFunc = async () => {
-      Alert.alert('테스트', '테스트할 함수를 선택하세요.', [
-        {
-          text: 'start service 1',
-          onPress: async () => {
-            await ForegroundServiceModule.startService(['com.github.android']);
-          },
-        },
-        {
-          text: '2',
-          onPress: async () => {
-            await ForegroundServiceModule.startService([
-              'com.github.android',
-              'com.android.chrome',
-            ]);
-          },
-        },
-      ]);
-    };
-
     if (checkStatus !== Status.OK) checkPermissionAlert();
     // test용 alert 띄우기
-    else innerFunc();
   }, [Status.OK, checkPermissionAlert, checkStatus, user]);
 
   // const finishAllPermissionAlert = () => {
@@ -83,7 +62,7 @@ function Detail({navigation}) {
   }, [checkPermissionAlert]);
 
   const checkPermissionAlert = React.useCallback(async () => {
-    if (checkStatus === 2) return;
+    if (checkStatus === Status.OK) return;
     let allowCnt = 0;
 
     const {
@@ -107,6 +86,11 @@ function Detail({navigation}) {
     console.log('허용된 권한 개수', allowCnt);
     if (allowCnt === 2) {
       setCheckStatus(Status.OK);
+
+      await ForegroundServiceModule.startService([
+        'com.github.android',
+        'com.android.chrome',
+      ]);
       return;
     }
 

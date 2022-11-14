@@ -2,11 +2,11 @@ import React, {useContext, useState, useEffect} from 'react';
 import {AppRegistry} from 'react-native';
 import Realm from 'realm';
 import {CurState} from '../schema';
-import {getRealmApp} from '../getRealmApp';
 import {mkConfigWithSubscriptions} from '../functions';
-import {appCheckHeadlessTask} from '../functions';
+import {appCheckHeadlessTask, startServiceTask} from '../functions';
+import {app} from '../index';
+import {ForegroundServiceModule} from '../wrap_module';
 
-const app = getRealmApp();
 const AuthContext = React.createContext(null);
 
 const AuthProvider = ({children}) => {
@@ -44,6 +44,9 @@ const AuthProvider = ({children}) => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
     );
+    AppRegistry.registerHeadlessTask('Boot', () => {
+      startServiceTask.bind(null, newUser);
+    });
 
     setUser(newUser);
     return newUser;
@@ -107,6 +110,9 @@ const AuthProvider = ({children}) => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
     );
+    AppRegistry.registerHeadlessTask('Boot', () => {
+      startServiceTask.bind(null, newUser);
+    });
 
     console.log('닫기');
     realm.close();
@@ -122,6 +128,8 @@ const AuthProvider = ({children}) => {
       return;
     }
 
+    await ForegroundServiceModule.stopService();
+
     user.logOut();
     setUser(null);
   };
@@ -133,7 +141,12 @@ const AuthProvider = ({children}) => {
     }
 
     // 다른 유저 데이터도 함께 삭제해야 함
-    await app.deleteUser(user);
+    // 서비스 종료
+    await Promise.all([
+      app.deleteUser(user),
+      ForegroundServiceModule.stopService(),
+    ]);
+
     setUser(null);
   };
 

@@ -57,7 +57,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
     console.log(
       '1. CurState 업데이트 완료',
-      `app = ${appPackageName}, isProhibitedApp = ${isProhibitedApp}`,
+      // `app = ${appPackageName}, isProhibitedApp = ${isProhibitedApp}`,
       //   curState.startTime,
       //   curState.endTime,
     );

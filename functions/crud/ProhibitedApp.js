@@ -34,7 +34,7 @@ const readProhibitedApps = async user => {
     console.log('닫기');
     realm.close();
 
-    result = list;
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
   } catch (err) {
     console.log(err.message);
 
@@ -109,7 +109,7 @@ const updateProhibitedApps = async (user, newList) => {
     console.log('닫기');
     realm.close();
 
-    result = list;
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
   } catch (err) {
     console.log(err.message);
 

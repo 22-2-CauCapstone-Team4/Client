@@ -7,9 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -26,7 +23,7 @@ import java.util.ArrayList;
 public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     // 서비스 시작 유무 확인
     private boolean isServiceStarted = false;
-    private Messenger messenger = null;
+    private Intent checkAppServiceIntent = null;
 
     ForegroundServiceModule(ReactApplicationContext context) {
         super(context);
@@ -36,7 +33,6 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "ForegroundServiceModule";
     }
-
 
     // 권한 확인 함수
     @ReactMethod
@@ -80,13 +76,15 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startService(ReadableArray appList) {
+        Log.i("ForegroundServiceModule", "서비스 시작 시도");
         ReactApplicationContext context = getReactApplicationContext();
 
         if (!checkPermission(context) || !LockAppModule.checkPermission(context)) {
+            Log.i("ForegroundServiceModule", "권한 없음");
             return;
         }
 
-        Intent checkAppServiceIntent = new Intent(context, ForegroundService.class);
+        checkAppServiceIntent = new Intent(context, ForegroundService.class);
         Bundle bundle = new Bundle();
 
         // 번들에 내용 담아서 넣어주기
@@ -100,6 +98,22 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
             context.startService(checkAppServiceIntent);
 
         isServiceStarted = true;
+    }
+
+    @ReactMethod
+    public void stopService() {
+        if (isServiceStarted) {
+            Log.i("ForegroundServiceModule", "서비스 종료");
+            ReactApplicationContext context = getReactApplicationContext();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                context.stopService(checkAppServiceIntent);
+            else
+                context.stopService(checkAppServiceIntent);
+
+            isServiceStarted = false;
+            checkAppServiceIntent = null;
+        }
     }
 
     private void allowPermission() {
