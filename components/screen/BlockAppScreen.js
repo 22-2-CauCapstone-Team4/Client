@@ -9,39 +9,40 @@ import {
   StyleSheet,
   BackHandler,
 } from 'react-native';
+import {useAuth} from '../../providers/AuthProvider';
+import {AppListModule, ForegroundServiceModule} from '../../wrap_module';
+import {readProhibitedApps, updateProhibitedApps} from '../../functions';
 
 import {styles} from '../../utils/styles';
 import Colors from '../../utils/Colors';
-export const apps = [
-  {id: 0, appName: 'Chrome'},
-  {id: 1, appName: 'YouTube'},
-  {id: 2, appName: 'GIF 메이커-편집기'},
-  {id: 3, appName: 'Instagram'},
-  {id: 4, appName: 'Microsoft Launcher'},
-  {id: 5, appName: 'LearningXStudent'},
-  {id: 6, appName: '카카오톡'},
-  {id: 7, appName: 'Instagram'},
-  {id: 8, appName: 'QR 코드 스캐너'},
-  {id: 9, appName: 'Samsung Global Goals'},
-  {id: 10, appName: '카카오톡'},
-  {id: 11, appName: 'Instagram'},
-  {id: 12, appName: 'Chrome'},
-  {id: 13, appName: 'YouTube'},
-  {id: 14, appName: '카카오톡'},
-  {id: 15, appName: 'Instagram'},
-  {id: 16, appName: 'Chrome'},
-  {id: 17, appName: 'YouTube'},
-  {id: 18, appName: '카카오톡'},
-  {id: 19, appName: 'Instagram'},
-]; // image 추가 예정
 
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
-
 export default function BlockApp({navigation}) {
   const numColumns = 3;
+  const {user} = useAuth();
+
+  const [isLoadingStarted, setIsLoadingStarted] = useState(false);
+  const [apps, setApps] = useState([]);
+  const [blockedApps, setBlockedApps] = useState([]);
+
   useEffect(() => {
-    const backAction = () => {
+    if (!isLoadingStarted) {
+      loadApps();
+    }
+
+    const backAction = async () => {
       if (navigation?.canGoBack()) {
+        try {
+          await Promise.all([
+            updateProhibitedApps(user, blockedApps),
+            ForegroundServiceModule.startService(
+              blockedApps.map(blockedApp => blockedApp.packageName),
+            ),
+          ]);
+        } catch (err) {
+          console.log(err);
+        }
+
         navigation.goBack();
         return true;
       }
@@ -53,17 +54,32 @@ export default function BlockApp({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [blockedApps, loadApps, isLoadingStarted, navigation, user]);
 
-  const [blockedApps, setBlockedApps] = useState([
-    // 사용자가 설정해 둔 금지 어플 여기다가 저장
-    {id: 0, appName: 'Chrome'},
-    {id: 1, appName: 'YouTube'},
-    {id: 2, appName: '카카오톡'},
-  ]);
+  const loadApps = React.useCallback(async () => {
+    setIsLoadingStarted(true);
+
+    console.log('설치 앱 리스트 불러오기 시작');
+    let [tempApps, tempBlockApps] = await Promise.all([
+      AppListModule.getAppList(),
+      readProhibitedApps(user),
+    ]);
+    tempApps = tempApps.appList;
+    // console.log(tempApps[0]);
+    tempApps.sort(function (a, b) {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      else if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+      else return 0;
+    });
+    setApps(tempApps);
+
+    setBlockedApps(tempBlockApps);
+    // console.log(apps, blockedApps);
+    console.log('불러오기 완료');
+  }, [user]);
 
   //FlatList에 어플 하나씩 나열
-  _renderItems = ({item, index}) => {
+  _renderItems = ({item}) => {
     return (
       <View
         style={{
@@ -74,9 +90,17 @@ export default function BlockApp({navigation}) {
           style={styled.appBox}
           onPress={() => {
             // blockedApp에 있는데 클릭됐으면 blockedApp에서 제거하고 클릭 표시 아이콘 state 변경
-            if (blockedApps.find(item => item.id === index)) {
+            if (
+              blockedApps.find(
+                blockedItem => blockedItem.packageName === item.packageName,
+              )
+            ) {
               console.log('now is free');
-              setBlockedApps(blockedApps.filter(app => app.id !== index));
+              setBlockedApps(
+                blockedApps.filter(
+                  blockedItem => blockedItem.packageName !== item.packageName,
+                ),
+              );
             }
             // 없으면 blockedApp에 추가하고 클릭 표시 아이콘 state 변경
             else {
@@ -84,7 +108,9 @@ export default function BlockApp({navigation}) {
               setBlockedApps(blockedApps.concat(item));
             }
           }}>
-          {blockedApps.find(item => item.id === index) ? (
+          {blockedApps.find(
+            blockedItem => blockedItem.packageName === item.packageName,
+          ) ? (
             <Icon
               name={'checkmark-circle'}
               size={30}
@@ -95,14 +121,14 @@ export default function BlockApp({navigation}) {
         {/*앱 박스 너비, 높이 달라지면 width 변경해줘야함*/}
         <View style={{width: 80}}>
           <Text numberOfLines={1} style={{color: 'black'}}>
-            {item.appName}
+            {item.name}
           </Text>
         </View>
       </View>
     );
   };
   // 현재 잠금 앱 목록 Log
-  console.log(blockedApps);
+  // console.log(blockedApps);
   return (
     <>
       <SafeAreaView style={styles.centeredView}>
@@ -120,7 +146,7 @@ export default function BlockApp({navigation}) {
           numColumns={numColumns}
           data={apps}
           renderItem={this._renderItems}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.packageName}
         />
       </SafeAreaView>
     </>

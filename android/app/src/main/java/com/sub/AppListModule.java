@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -35,6 +36,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getAppList(Promise promise) {
         try {
+            Log.i("AppListModule", "앱 리스트 부르기 시작");
             ReactApplicationContext context = getReactApplicationContext();
 
             PackageManager pm = context.getPackageManager();
@@ -42,35 +44,35 @@ public class AppListModule extends ReactContextBaseJavaModule {
 
             // js에서 사용 가능한 arr, map
             WritableMap map = Arguments.createMap();
-            WritableArray name = Arguments.createArray();
-            WritableArray packageName = Arguments.createArray();
-            WritableArray icon = Arguments.createArray();
+            WritableArray array = Arguments.createArray();
 
             for (PackageInfo info : infoList) {
-                name.pushString(info.applicationInfo.loadLabel(pm) + "");
-                packageName.pushString(info.packageName);
+                WritableMap app = Arguments.createMap();
+                app.putString("name", info.applicationInfo.loadLabel(pm) + "");
+                app.putString("packageName", info.packageName);
 
                 // icon img
                 // 1. drawble -> bitmap
                 Drawable iconBitmapDrawable = info.applicationInfo.loadIcon(pm);
-                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-                iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 150, 150, true);
+                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
+                iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, true);
                 Canvas canvas = new Canvas(iconBitmap);
                 iconBitmapDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
                 iconBitmapDrawable.draw(canvas);
 
                 // 2. bitmap -> string
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                iconBitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
+                iconBitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos);
                 byte[] bytes = baos.toByteArray();
                 String iconStr = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-                icon.pushString("data:image/png;base64," + iconStr);
-            }
+                app.putString("icon", "data:image/jpeg;base64," + iconStr);
 
-            map.putArray("nameList", name);
-            map.putArray("packageNameList", packageName);
-            map.putArray("iconList", icon);
+                array.pushMap(app);
+            }
+            map.putArray("appList", array);
+
+            Log.i("AppListModule", "앱 리스트 부르기 종료");
             promise.resolve(map);
         } catch (Exception e) {
             promise.reject("error", e);

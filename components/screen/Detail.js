@@ -13,7 +13,8 @@ import PlaceListModal from '../modal/PlaceListModal';
 import Color from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
-import {CurAppModule, LockAppModule} from '../../wrap_module';
+import {ForegroundServiceModule, LockAppModule} from '../../wrap_module';
+// import {readProhibitedApps, updateProhibitedApps} from '../../functions';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,21 +27,12 @@ function Detail({navigation}) {
 
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
   const [modalVisible, setModalVisible] = useState(false);
-  const {signOut} = useAuth();
+  const {user, signOut} = useAuth();
 
-  // 화면 추가 코드
   React.useEffect(() => {
     if (checkStatus !== Status.OK) checkPermissionAlert();
-  }, [Status.OK, checkPermissionAlert, checkStatus]);
-
-  // React.useEffect(() => {
-  //   const innerFunc = async () => {
-  //     const customUserData = await user.refreshCustomData();
-  //     console.log(user, customUserData);
-  //   };
-
-  //   innerFunc();
-  // }, [user]);
+    // test용 alert 띄우기
+  }, [Status.OK, checkPermissionAlert, checkStatus, user]);
 
   // const finishAllPermissionAlert = () => {
   //   Alert.alert('완료', '모든 권한 설정이 완료되었습니다. ', [
@@ -72,13 +64,13 @@ function Detail({navigation}) {
   }, [checkPermissionAlert]);
 
   const checkPermissionAlert = React.useCallback(async () => {
-    if (checkStatus === 2) return;
+    if (checkStatus === Status.OK) return;
     let allowCnt = 0;
 
     const {
       checkPermission: checkCurAppPermission,
       allowPermission: allowCurAppPermission,
-    } = CurAppModule;
+    } = ForegroundServiceModule;
     const {
       checkPermission: checkLockAppPermission,
       allowPermission: allowLockAppPermission,
@@ -96,6 +88,11 @@ function Detail({navigation}) {
     console.log('허용된 권한 개수', allowCnt);
     if (allowCnt === 2) {
       setCheckStatus(Status.OK);
+
+      await ForegroundServiceModule.startService([
+        'com.github.android',
+        'com.android.chrome',
+      ]);
       return;
     }
 

@@ -20,16 +20,19 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.util.ArrayList;
 
-public class CurAppModule extends ReactContextBaseJavaModule {
-    CurAppModule(ReactApplicationContext context) {
+public class ForegroundServiceModule extends ReactContextBaseJavaModule {
+    // 서비스 시작 유무 확인
+    private boolean isServiceStarted = false;
+    private Intent checkAppServiceIntent = null;
+
+    ForegroundServiceModule(ReactApplicationContext context) {
         super(context);
     }
 
     @Override
     public String getName() {
-        return "CurAppModule";
+        return "ForegroundServiceModule";
     }
-
 
     // 권한 확인 함수
     @ReactMethod
@@ -57,7 +60,7 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
             WritableMap map = Arguments.createMap();
 
-            Log.i("CurAppModule",  "허용 함수 호출");
+            Log.i("ForegroundServiceModule",  "허용 함수 호출");
             allowPermission();
             if (!checkPermission(context)) map.putBoolean("isAllowed", false);
             else {
@@ -73,14 +76,15 @@ public class CurAppModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startService(ReadableArray appList) {
+        Log.i("ForegroundServiceModule", "서비스 시작 시도");
         ReactApplicationContext context = getReactApplicationContext();
 
-        if (!checkPermission(context)) {
-            allowPermission();
+        if (!checkPermission(context) || !LockAppModule.checkPermission(context)) {
+            Log.i("ForegroundServiceModule", "권한 없음");
             return;
         }
 
-        Intent checkAppServiceIntent = new Intent(context, CheckAppService.class);
+        checkAppServiceIntent = new Intent(context, ForegroundService.class);
         Bundle bundle = new Bundle();
 
         // 번들에 내용 담아서 넣어주기
@@ -92,6 +96,24 @@ public class CurAppModule extends ReactContextBaseJavaModule {
             context.startForegroundService(checkAppServiceIntent);
         else
             context.startService(checkAppServiceIntent);
+
+        isServiceStarted = true;
+    }
+
+    @ReactMethod
+    public void stopService() {
+        if (isServiceStarted) {
+            Log.i("ForegroundServiceModule", "서비스 종료");
+            ReactApplicationContext context = getReactApplicationContext();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                context.stopService(checkAppServiceIntent);
+            else
+                context.stopService(checkAppServiceIntent);
+
+            isServiceStarted = false;
+            checkAppServiceIntent = null;
+        }
     }
 
     private void allowPermission() {

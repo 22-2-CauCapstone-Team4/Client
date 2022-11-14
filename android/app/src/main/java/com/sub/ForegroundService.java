@@ -27,7 +27,7 @@ import com.facebook.react.HeadlessJsTaskService;
 
 import java.util.ArrayList;
 
-public class CheckAppService extends Service {
+public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
     private static final String CHANNEL_ID = "PHONELOCK";
 
@@ -38,12 +38,14 @@ public class CheckAppService extends Service {
     private NotificationManager notificationManager;
     private Notification notification;
 
+    private Thread thread;
+
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
 
     private boolean isThreadRunning = false;
     // private Handler handler = new Handler();
-    private Runnable runnableCode = new Runnable() {
+    private Runnable checkCurApp = new Runnable() {
         @Override
         public void run() {
             Context context = getApplicationContext();
@@ -56,7 +58,7 @@ public class CheckAppService extends Service {
                 String nowAppPackageName = getPackageName(context);
                 boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
 
-                Log.i("CheckAppService", "AppName = " + nowAppPackageName);
+                Log.i("ForegroundService", "AppName = " + nowAppPackageName);
 
                 // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
                 if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
@@ -81,8 +83,6 @@ public class CheckAppService extends Service {
         }
     };
 
-    private Thread thread;
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -90,17 +90,7 @@ public class CheckAppService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // 번들의 내용 받아오기
-        if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
-            ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
-            if (appArrList != null)
-                prohibitedAppList = appArrList;
-
-            for (String appName : appArrList)
-                Log.i("CheckAppService", appName);
-        }
-
+    public void onCreate() {
         createNotificationChannel(); // Creating channel for API 26+
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -116,9 +106,6 @@ public class CheckAppService extends Service {
 
         startForeground(SERVICE_NOTIFICATION_ID, notification);
 
-        thread = new Thread(runnableCode);
-        thread.start();
-
         // 화면 꺼지고 켜지는 상황 대응하기
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -131,7 +118,6 @@ public class CheckAppService extends Service {
                     Log.i("CheckAppService", "화면 꺼짐");
 
                     // 화면 끈 경우, 코드가 반복될 필요 없음 (켜졌을 때 다시 반복을 시작해주면 됨)
-                    // handler.removeCallbacks(runnableCode);
                     isThreadRunning = false;
 
                     // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
@@ -142,17 +128,39 @@ public class CheckAppService extends Service {
                     isProhibitedApp = false;
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                     Log.i("CheckAppService", "화면 켜짐");
-
                     // 화면 켠 경우, 다시 반복 시작
-                    // handler.post(runnableCode);
-                    thread = new Thread(runnableCode);
-                    thread.start();
+                    if (prohibitedAppList != null) {
+                        thread = new Thread(checkCurApp);
+                        thread.start();
+                    }
                 }
             }
         };
-        registerReceiver(receiver, intentFilter);
 
-        return START_STICKY;
+        registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // 번들의 내용 받아오기
+        if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
+            ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
+            if (appArrList != null)
+                prohibitedAppList = appArrList;
+
+            for (String appName : appArrList)
+                Log.i("ForegroundService", appName);
+        }
+
+        if (prohibitedAppList != null && prohibitedAppList.size() != 0) {
+            // 금지 앱 리스트에 하나라도 금지 앱 존재하는 경우, 스레드 시작
+            Log.i("ForegroundService", "스레드 시작");
+            thread = new Thread(checkCurApp);
+            thread.start();
+        }
+
+        Log.i("ForegroundService", "서비스 시작 작업 종료");
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -222,7 +230,7 @@ public class CheckAppService extends Service {
         bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
         checkAppIntent.putExtras(bundle);
 
-        Log.i("CheckAppService", "JS쪽으로 전송");
+        Log.i("ForegroundService", "JS쪽으로 전송");
         context.startService(checkAppIntent);
 
         HeadlessJsTaskService.acquireWakeLockNow(context);
