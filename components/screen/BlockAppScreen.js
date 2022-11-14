@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -8,6 +8,7 @@ import {
   FlatList,
   StyleSheet,
   BackHandler,
+  Image,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import {useAuth} from '../../providers/AuthProvider';
@@ -84,10 +85,19 @@ export default function BlockApp({navigation}) {
               dispatch(addBlockedApps(blockedApps.concat(item)));
             }
           }}>
+          <Image
+            source={{
+              uri: item.icon,
+            }}
+            style={{width: 60, height: 60}}
+            color={Colors.MAIN_COLOR}
+          />
+
           {blockedApps.find(
             blockedItem => blockedItem.packageName === item.packageName,
           ) ? (
-            <Icon
+            <Ionicons
+              style={{position: 'absolute', top: 0, left: 0}}
               name={'checkmark-circle'}
               size={30}
               color={Colors.MAIN_COLOR}
@@ -95,7 +105,7 @@ export default function BlockApp({navigation}) {
           ) : null}
         </TouchableOpacity>
         {/*앱 박스 너비, 높이 달라지면 width 변경해줘야함*/}
-        <View style={{width: 80}}>
+        <View style={{width: 80, alignItems: 'center'}}>
           <Text numberOfLines={1} style={{color: 'black'}}>
             {item.name}
           </Text>
@@ -141,5 +151,7 @@ const styled = StyleSheet.create({
     width: 80,
     height: 80,
     margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

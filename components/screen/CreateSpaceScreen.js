@@ -37,7 +37,7 @@ export default function CreateSpaceScreen({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     ref.current?.setAddressText('Some Text');
@@ -207,7 +207,6 @@ export default function CreateSpaceScreen({navigation}) {
                           });
                           setPlace('');
                           setVaild(true);
-                          setModalVisible(!modalVisible);
 
                           // console.log(data);
                         } else setVaild(false);
@@ -255,7 +254,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     position: 'absolute',
-    bottom: 40,
+    bottom: 30,
   },
   button: {
     width: 250,

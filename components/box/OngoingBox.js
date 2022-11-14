@@ -28,9 +28,9 @@ const OngoingBox = () => {
           <Text style={styles.type1}>운동</Text> {'  '}|{'  '}
           <Text style={styles.type2}>학교 강의</Text>
         </Text>
-        <Text style={styles.info1}>
+        {/* <Text style={styles.info1}>
           전체 <Text>123</Text>명 · 친구 <Text>3</Text>명이 함께함
-        </Text>
+        </Text> */}
       </Info1>
       <Info2>
         <Text style={styles.info2}>

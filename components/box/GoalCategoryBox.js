@@ -19,7 +19,7 @@ export default function GoalCategoryBox(props) {
               position: 'absolute',
               right: 0,
               color: 'red',
-              fontSize: 13,
+              fontSize: 10,
             }}>
             미션을 추가하세요!
           </Text>
