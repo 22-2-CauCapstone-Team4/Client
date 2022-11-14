@@ -30,7 +30,10 @@ const readProhibitedApps = async user => {
       .filtered(`owner_id == "${user.id}"`);
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
-    console.log('읽기 결과', result);
+    console.log(
+      '읽기 결과',
+      result.map(app => app.packageName),
+    );
 
     console.log('닫기');
     realm.close();
@@ -78,7 +81,10 @@ const updateProhibitedApps = async (user, newList) => {
     //   });
     // });
 
-    console.log('읽기 결과', list);
+    console.log(
+      '읽기 결과',
+      list.map(app => app.packageName),
+    );
     const oldPackageNameList = list.map(app => app.packageName),
       newPackageNameList = newList.map(app => app.packageName);
 
@@ -88,7 +94,7 @@ const updateProhibitedApps = async (user, newList) => {
       list.forEach(app => {
         if (!newPackageNameList.includes(app.packageName)) {
           console.log(app.packageName, newPackageNameList);
-          console.log('삭제', app);
+          console.log('삭제', app.packageName);
           realm.delete(app);
         }
       });
@@ -100,13 +106,16 @@ const updateProhibitedApps = async (user, newList) => {
             'ProhibitedApp',
             new ProhibitedApp({owner_id: user.id, ...app}),
           );
-          console.log('추가', temp);
+          console.log('추가', temp.packageName);
         }
       });
     });
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
-    console.log('업데이트 결과', result);
+    console.log(
+      '업데이트 결과',
+      result.map(app => app.packageName),
+    );
 
     console.log('닫기');
     realm.close();

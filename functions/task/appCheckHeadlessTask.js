@@ -5,6 +5,7 @@ import Realm from 'realm';
 import {AppUsageRecord, CurState} from '../../schema';
 import moment from 'moment';
 import {mkConfig} from '../mkConfig';
+import {LockAppModule} from '../../wrap_module';
 
 const appCheckHeadlessTask = async (user, taskData) => {
   // 지금 날짜, 시간
@@ -278,11 +279,12 @@ const appCheckHeadlessTask = async (user, taskData) => {
     // Realm 작업 끝
     realm.close();
 
-    // try {
-    //   await LockAppModule.viewLockScreen();
-    // } catch (err) {
-    //   console.error(err.message);
-    // }
+    // 앱 실행 코드 추가
+    try {
+      await LockAppModule.viewLockScreen();
+    } catch (err) {
+      console.error(err.message);
+    }
 
     console.log('AppCheckHeadlessTask 완료');
   } catch (err) {

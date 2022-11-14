@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -35,6 +36,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getAppList(Promise promise) {
         try {
+            Log.i("AppListModule", "앱 리스트 부르기 시작");
             ReactApplicationContext context = getReactApplicationContext();
 
             PackageManager pm = context.getPackageManager();
@@ -52,7 +54,7 @@ public class AppListModule extends ReactContextBaseJavaModule {
                 // icon img
                 // 1. drawble -> bitmap
                 Drawable iconBitmapDrawable = info.applicationInfo.loadIcon(pm);
-                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.RGB_565);
                 iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, true);
                 Canvas canvas = new Canvas(iconBitmap);
                 iconBitmapDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -60,15 +62,17 @@ public class AppListModule extends ReactContextBaseJavaModule {
 
                 // 2. bitmap -> string
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                iconBitmap.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+                iconBitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos);
                 byte[] bytes = baos.toByteArray();
                 String iconStr = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-                app.putString("icon", "data:image/png;base64," + iconStr);
+                app.putString("icon", "data:image/jpeg;base64," + iconStr);
 
                 array.pushMap(app);
             }
             map.putArray("appList", array);
+
+            Log.i("AppListModule", "앱 리스트 부르기 종료");
             promise.resolve(map);
         } catch (Exception e) {
             promise.reject("error", e);
