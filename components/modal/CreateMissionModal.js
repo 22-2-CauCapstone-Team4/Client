@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, Component} from 'react';
 import {
   Text,
   Modal,
@@ -16,12 +16,16 @@ import {useNavigation} from '@react-navigation/native';
 import Categories from '../Categories';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {StyleSheet} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import SelectDropdown from 'react-native-select-dropdown';
+
 export default function CreateMissionModal({
   navigation,
   modalVisible,
   setModalVisible,
 }) {
+  // 카테고리
+
   // 시간, 공간 잠금
   const [lockingType, setLockingType] = useState(false);
   const lockTime = () => {
@@ -36,17 +40,72 @@ export default function CreateMissionModal({
   const toggleMoveSpace = () => setMoveSpace(!moveSpace);
   const toggleSpaceIn = () => setSpaceIn(!spaceIn);
 
-  // 요일 선택
-  // const dayData = [
-  //   {id: 0, title: '일'},
-  //   {id: 1, title: '월'},
-  //   {id: 2, title: '화'},
-  //   {id: 3, title: '수'},
-  //   {id: 4, title: '목'},
-  //   {id: 5, title: '금'},
-  //   {id: 6, title: '토'},
-  // ];
+  // --------------------------- ★ 요일, 시간 선택 작업중 --------------------------
+  // ------------------------ 시작 시간 -------------------------
+  const [date, onChangeDate] = useState(new Date()); // 선택 날짜
+  const [mode, setMode] = useState('date'); // 모달 유형
+  const [visible, setVisible] = useState(false); // 모달 노출 여부
 
+  const onPressDate = () => {
+    // 날짜 클릭 시
+    setMode('date'); // 모달 유형을 date로 변경
+    setVisible(true); // 모달 open
+  };
+
+  const onPressStartTime = () => {
+    // 시간 클릭 시
+    setMode('time'); // 모달 유형을 time으로 변경
+    setVisible(true); // 모달 open
+  };
+
+  const onConfirm = selectedDate => {
+    // 날짜 또는 시간 선택 시
+    setVisible(false); // 모달 close
+    onChangeDate(selectedDate); // 선택한 날짜 변경
+    console.log(`start time : ${selectedDate}`);
+  };
+
+  const onCancel = () => {
+    // 취소 시
+    setVisible(false); // 모달 close
+  };
+  // ------------------------ 종료 시간 ------------------------
+  const [date2, onChangeDate2] = useState(new Date()); // 선택 날짜
+  const [mode2, setMode2] = useState('date'); // 모달 유형
+  const [visible2, setVisible2] = useState(false); // 모달 노출 여부
+
+  const onPressDate2 = () => {
+    // 날짜 클릭 시
+    setMode2('date'); // 모달 유형을 date로 변경
+    setVisible2(true); // 모달 open
+  };
+
+  const onPressStartTime2 = () => {
+    // 시간 클릭 시
+    setMode2('time'); // 모달 유형을 time으로 변경
+    setVisible2(true); // 모달 open
+  };
+
+  const onConfirm2 = selectedDate => {
+    // 날짜 또는 시간 선택 시
+    setVisible2(false); // 모달 close
+    onChangeDate2(selectedDate); // 선택한 날짜 변경
+    console.log(`end time : ${selectedDate}`);
+  };
+
+  const onCancel2 = () => {
+    // 취소 시
+    setVisible2(false); // 모달 close
+  };
+
+  // 시간 계산
+  const diff = date2 - date;
+
+  const diffDay = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const diffHour = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const diffMin = Math.floor((diff / (1000 * 60)) % 60);
+  const categories = ['운동', '공부', '도서관']; // ★ 카테고리 내용 추가
+  const space = ['중앙대', '집', 'pc방']; // ★ 공간 내용 추가
   return (
     <>
       {modalVisible ? (
@@ -61,15 +120,27 @@ export default function CreateMissionModal({
             <View style={styles.modalView}>
               {/* 내용 시작 */}
               <ScrollView>
-                <Categories />
-                <TextInput
-                  placeholder="미션 이름 입력"
-                  style={missionStyle.missionInput}
-                />
+                <View style={{alignItems: 'center'}}>
+                  <SelectDropdown
+                    buttonStyle={{borderRadius: 100}}
+                    defaultButtonText="카테고리"
+                    data={categories}
+                    onSelect={(selectedItem, index) => {
+                      console.log(selectedItem, index);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                  />
+                </View>
                 <View style={missionStyle.inputRow}>
-                  {/* 입력값 받아서 적용하기 */}
-                  <Text style={missionStyle.selectCalendar}>11월 13일</Text>
-                  <TouchableOpacity>
+                  <Text style={missionStyle.selectCalendar}>
+                    {date.getMonth()}월 {date.getDate()}일
+                  </Text>
+                  <TouchableOpacity onPress={onPressDate}>
                     <Ionicons name="calendar-outline" size={30}></Ionicons>
                   </TouchableOpacity>
                 </View>
@@ -138,11 +209,22 @@ export default function CreateMissionModal({
                     {/* 알아볼 수 있게 임시로 넣어놓은 것 */}
                     <Text style={{fontSize: 20}}>공간 잠금</Text>
                     <View>
-                      <TouchableOpacity style={missionStyle.selectSpace}>
-                        <Text style={missionStyle.selectSpaceText}>
-                          공간을 선택해주세요
-                        </Text>
-                      </TouchableOpacity>
+                      <View style={{alignItems: 'center'}}>
+                        <SelectDropdown
+                          buttonStyle={{borderRadius: 100}}
+                          defaultButtonText="공간선택"
+                          data={space}
+                          onSelect={(selectedItem, index) => {
+                            console.log(selectedItem, index);
+                          }}
+                          buttonTextAfterSelection={(selectedItem, index) => {
+                            return selectedItem;
+                          }}
+                          rowTextForSelection={(item, index) => {
+                            return item;
+                          }}
+                        />
+                      </View>
                     </View>
                     <View style={missionStyle.toggleBtn}>
                       <Text style={missionStyle.spaceText}>공간 이동</Text>
@@ -165,11 +247,55 @@ export default function CreateMissionModal({
                   <View>
                     {/* Text 시간 잠금은 알아볼 수 있게 임시로 넣어놓은 것 */}
                     <Text style={{fontSize: 20}}>시간 잠금</Text>
-
                     {/* n에는 시작, 종료시간 계산하여 변수 대입 */}
-                    <Text style={{marginTop: 10}}>
-                      n 시간 잠기게 될 예정입니다.
-                    </Text>
+                    {/* 시작 시간 */}
+                    <View style={{marginTop: 10}}>
+                      <View>
+                        <TouchableOpacity
+                          onPress={onPressStartTime}
+                          style={missionStyle.time}>
+                          {/* 시간 선택 영역 */}
+                          <Text style={missionStyle.timeText}>시작 시간</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <DateTimePickerModal
+                        isVisible={visible}
+                        mode={mode}
+                        onConfirm={onConfirm}
+                        onCancel={onCancel}
+                        date={date}
+                      />
+                      <Text style={missionStyle.timeData}>
+                        {date.getHours()}시 {date.getMinutes()}분
+                      </Text>
+                    </View>
+                    {/* 종료 시간 */}
+                    <View>
+                      <View>
+                        <View />
+                        <TouchableOpacity
+                          onPress={onPressStartTime2}
+                          style={missionStyle.time}>
+                          {/* 시간 선택 영역 */}
+                          <Text style={missionStyle.timeText}>종료 시간</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <DateTimePickerModal
+                        isVisible={visible2}
+                        mode={mode2}
+                        onConfirm={onConfirm2}
+                        onCancel={onCancel2}
+                        date={date2}
+                      />
+                      <Text style={missionStyle.timeData}>
+                        {date2.getHours()}시 {date2.getMinutes()}분
+                      </Text>
+                    </View>
+                    <View style={{height: 100}}>
+                      <Text style={missionStyle.resultData}>
+                        {diffDay}일 {diffHour}시간 {diffMin}분 남았습니다!
+                      </Text>
+                    </View>
                   </View>
                 )}
               </ScrollView>
@@ -270,5 +396,35 @@ const missionStyle = StyleSheet.create({
   selectCalendar: {
     fontSize: 20,
     color: 'black',
+  },
+  // 날짜, 시간 설정 style
+  time: {
+    alignItems: 'center',
+    backgroundColor: '#81b0ff',
+    width: '100%',
+    height: 30,
+    justifyContent: 'center',
+    borderRadius: 200,
+  },
+  timeText: {
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  timeData: {
+    textAlign: 'center',
+    fontSize: 20,
+  },
+  resultData: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'black',
+    marginTop: 20,
+  },
+  selectCategories: {
+    marginTop: '7%',
+    height: '8%',
+    borderWidth: 1,
+    borderRadius: 10,
+    width: '100%',
   },
 });
