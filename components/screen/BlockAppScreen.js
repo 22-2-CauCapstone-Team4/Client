@@ -68,7 +68,16 @@ export default function BlockApp({navigation}) {
           alignItems: 'center',
         }}>
         <TouchableOpacity
-          style={styled.appBox}
+          style={[
+            styled.appBox,
+            {
+              backgroundColor: blockedApps.find(
+                blockedItem => blockedItem.packageName === item.packageName,
+              )
+                ? 'red'
+                : null,
+            },
+          ]}
           onPress={() => {
             // blockedApp에 있는데 클릭됐으면 blockedApp에서 제거하고 클릭 표시 아이콘 state 변경
             if (
@@ -97,20 +106,32 @@ export default function BlockApp({navigation}) {
             color={Colors.MAIN_COLOR}
           />
 
-          {blockedApps.find(
+          {/* {blockedApps.find(
             blockedItem => blockedItem.packageName === item.packageName,
           ) ? (
             <Ionicons
-              style={{position: 'absolute', top: 0, left: 0}}
+              style={{
+                position: 'absolute',
+                top: 10,
+                left: 10,
+              }}
               name={'checkmark-circle'}
-              size={30}
-              color={Colors.MAIN_COLOR}
+              size={60}
+              color="red"
             />
-          ) : null}
+          ) : null} */}
         </TouchableOpacity>
         {/*앱 박스 너비, 높이 달라지면 width 변경해줘야함*/}
         <View style={{width: 80, alignItems: 'center'}}>
-          <Text numberOfLines={1} style={{color: 'black'}}>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: blockedApps.find(
+                blockedItem => blockedItem.packageName === item.packageName,
+              )
+                ? 'red'
+                : 'black',
+            }}>
             {item.name}
           </Text>
         </View>
