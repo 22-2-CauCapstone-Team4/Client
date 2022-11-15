@@ -168,7 +168,13 @@ function Detail({navigation}) {
     } catch (err) {
       console.log(err.message);
     }
-  }, [Status.NOT_YET, Status.OK, checkStatus, deniedPermissionAlert]);
+  }, [
+    Status.NOT_YET,
+    Status.OK,
+    blockedApps,
+    checkStatus,
+    deniedPermissionAlert,
+  ]);
 
   const onPressLogOut = () => {
     navigation.replace('Login');

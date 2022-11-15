@@ -1,6 +1,7 @@
 /* eslint-disable curly */
 import Realm from 'realm';
 import {ProhibitedApp} from '../../schema';
+import {mkConfig} from '../mkConfig';
 
 const readProhibitedApps = async user => {
   console.log('read my prohibited apps');
@@ -8,22 +9,8 @@ const readProhibitedApps = async user => {
     realm = null;
 
   try {
-    // 렐름 컨피그 설정
-    const openRealmBehaviorConfig = {
-      type: 'openImmediately',
-    };
-    const config = {
-      schema: [ProhibitedApp.schema],
-      sync: {
-        user,
-        flexible: true,
-        // newRealmFileBehavior: openRealmBehaviorConfig,
-        existingRealmFileBehavior: openRealmBehaviorConfig,
-      },
-    };
-
     console.log('렐름 열기');
-    realm = await Realm.open(config);
+    realm = await Realm.open(mkConfig(user, [ProhibitedApp.schema]));
 
     const list = realm
       .objects('ProhibitedApp')
@@ -55,21 +42,8 @@ const updateProhibitedApps = async (user, newList) => {
 
   try {
     // 렐름 컨피그 설정
-    const openRealmBehaviorConfig = {
-      type: 'openImmediately',
-    };
-    const config = {
-      schema: [ProhibitedApp.schema],
-      sync: {
-        user,
-        flexible: true,
-        newRealmFileBehavior: openRealmBehaviorConfig,
-        existingRealmFileBehavior: openRealmBehaviorConfig,
-      },
-    };
-
     console.log('렐름 열기');
-    realm = await Realm.open(config);
+    realm = await Realm.open(mkConfig(user, [ProhibitedApp.schema]));
 
     const list = realm
       .objects('ProhibitedApp')

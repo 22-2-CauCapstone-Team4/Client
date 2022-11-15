@@ -1,4 +1,4 @@
-import {CurState, ProhibitedApp, AppUsageRecord} from '../schema';
+import {CurState, ProhibitedApp, AppUsageRecord, Goal} from '../schema';
 
 const openRealmBehaviorConfig = {
   type: 'openImmediately',
@@ -20,7 +20,12 @@ const mkConfig = (user, schema) => {
 const mkConfigWithSubscriptions = user => {
   console.log('config 생성');
   return {
-    schema: [CurState.schema, ProhibitedApp.schema, AppUsageRecord.schema],
+    schema: [
+      CurState.schema,
+      ProhibitedApp.schema,
+      AppUsageRecord.schema,
+      Goal.schema,
+    ],
     sync: {
       user,
       flexible: true,
@@ -40,6 +45,7 @@ const mkConfigWithSubscriptions = user => {
               .objects('AppUsageRecord')
               .filtered(`owner_id == "${user.id}"`),
           );
+          subs.add(realm.objects('Goal').filtered(`owner_id == "${user.id}"`));
         },
       },
     },

@@ -6,6 +6,7 @@ import {mkConfigWithSubscriptions} from '../functions';
 import {appCheckHeadlessTask, startServiceTask} from '../functions';
 import {app} from '../index';
 import {ForegroundServiceModule} from '../wrap_module';
+import {Goal} from '../schema/Goal';
 
 const AuthContext = React.createContext(null);
 
@@ -70,7 +71,7 @@ const AuthProvider = ({children}) => {
     console.log('새 유저 로그인');
     const newUser = await app.logIn(creds);
 
-    // 렐름 열면서 유저 데이터 추가
+    // 렐름 열면서 유저 데이터 추가, 함수로 기본 목표 정보 받아오기
     console.log('렐름 열기');
     const [realm] = await Promise.all([
       Realm.open(mkConfigWithSubscriptions(newUser)),
@@ -99,6 +100,11 @@ const AuthProvider = ({children}) => {
     console.log('쓰기 시작');
     realm.write(() => {
       realm.create('CurState', new CurState({owner_id: newUser.id}));
+      // 기본 목표 추가
+      const defalutName = ['💪 운동', '🏫 과제', '✏️ 공부'];
+      defalutName.forEach(name =>
+        realm.create('Goal', new Goal({owner_id: newUser.id, name: name})),
+      );
     });
 
     // remember to unregister the progress notifications
