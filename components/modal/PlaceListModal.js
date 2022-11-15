@@ -20,6 +20,7 @@ export default function PlaceListModal({
 }) {
   const dispatch = useDispatch();
   const place = useSelector(store => store.spaceReducer.data);
+  const placesNumber = place.length;
   // console.log(place);
   return (
     <>
@@ -35,6 +36,11 @@ export default function PlaceListModal({
             <View style={styles.modalView}>
               <View style={style.scrollView}>
                 <Text style={style.placeText}>장소 목록</Text>
+                {placesNumber === 0 ? (
+                  <Text style={{color: 'red', fontSize: 12}}>
+                    장소를 등록하세요!
+                  </Text>
+                ) : null}
                 <View style={{height: 150, marginBottom: 20}}>
                   <ScrollView contentContainerStyle={{alignItems: 'center'}}>
                     {place.map(item => (
