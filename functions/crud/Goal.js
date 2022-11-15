@@ -30,7 +30,7 @@ const readGoals = async user => {
   return result;
 };
 
-const createGoal = async (user, name) => {
+const createGoal = async (user, goal) => {
   console.log('create goal');
   let result = null,
     realm = null;
@@ -42,7 +42,7 @@ const createGoal = async (user, name) => {
     console.log('쓰기 시작');
 
     realm.write(() => {
-      const newGoal = realm.create('Goal', new Goal({owner_id: user.id, name}));
+      const newGoal = realm.create('Goal', goal);
       result = JSON.parse(JSON.stringify(newGoal));
     });
 
@@ -104,7 +104,7 @@ const deleteGoal = async (user, goal) => {
 
     const deletedGoal = realm
       .objects('Goal')
-      .filtered(`owner_id == "${user.id}" && _id == "${goal._id}"`);
+      .filtered(`owner_id == "${user.id}" && _id == oid(${goal._id})`);
 
     console.log('읽기 결과', JSON.parse(JSON.stringify(deletedGoal)));
 

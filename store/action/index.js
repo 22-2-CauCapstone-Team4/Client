@@ -1,4 +1,11 @@
 // CATEGORY
+export const initCategory = item => {
+  return {
+    type: 'INIT_CATEGORY',
+    payload: item,
+  };
+};
+
 export const addCategory = item => {
   return {
     type: 'ADD_CATEGORY',

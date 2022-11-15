@@ -19,8 +19,8 @@ import {
   AppListModule,
 } from '../../wrap_module';
 import {useDispatch} from 'react-redux';
-import {readProhibitedApps} from '../../functions';
-import {addApps, addBlockedApps} from '../../store/action';
+import {readProhibitedApps, readGoals} from '../../functions';
+import {addApps, addBlockedApps, initCategory} from '../../store/action';
 
 const Tab = createBottomTabNavigator();
 
@@ -57,12 +57,14 @@ function Detail({navigation}) {
   const loadApps = React.useCallback(async () => {
     setIsInit(true);
 
-    console.log('설치 앱 리스트 불러오기 시작');
+    console.log('설치 앱 리스트 및 데이터 불러오기 시작');
     try {
       let [tempApps, tempBlockedApps] = await Promise.all([
         AppListModule.getAppList(),
         readProhibitedApps(user),
       ]);
+      let tempGoals = await readGoals(user);
+
       tempApps = tempApps.appList;
       tempApps.sort(function (a, b) {
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
@@ -73,6 +75,8 @@ function Detail({navigation}) {
 
       dispatch(addBlockedApps(tempBlockedApps));
       setBlockedApps(tempBlockedApps);
+
+      dispatch(initCategory(tempGoals));
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

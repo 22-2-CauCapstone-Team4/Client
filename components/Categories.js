@@ -15,6 +15,10 @@ import {
   selectCategory,
   deleteMission,
 } from '../store/action';
+import {useAuth} from '../providers/AuthProvider';
+import {Goal} from '../schema';
+import {createGoal, updateGoal, deleteGoal} from '../functions';
+
 const MissionList = styled.Text`
   color: white;
 `;
@@ -54,15 +58,18 @@ const styles = StyleSheet.create({
 });
 
 export default function Categories() {
+  const {user} = useAuth();
   const dispatch = useDispatch();
   const data = useSelector(store => store.categoryReducer.data); // 카테고리 데이터
   const now = useSelector(store => store.categoryReducer.filter);
   const mission = useSelector(store => store.missionReducer.missionData);
-  const [categoryText, setCategoryText] = useState('+ 추가');
+  const [categoryText, setCategoryText] = useState('');
   const createCategory = () => {
-    if (categoryText.trim() !== '' && categoryText !== '') {
-      dispatch(addCategory({id: categoryText, name: categoryText}));
-      setCategoryText('+ 추가');
+    if (categoryText !== '') {
+      const newCategory = new Goal({name: categoryText, owner_id: user.id});
+      createGoal(user, newCategory);
+      dispatch(addCategory(newCategory));
+      setCategoryText('');
     }
   };
   return (
@@ -72,12 +79,12 @@ export default function Categories() {
         <ScrollView horizontal={true} style={styles.scroll}>
           <OverallGoal
             style={{
-              backgroundColor: now === '⭐전체목표' ? '#0891b2' : '#777',
+              backgroundColor: now === '⭐ 전체 목표' ? '#0891b2' : '#777',
             }}
             onPress={() => {
-              dispatch(selectCategory('⭐전체목표'));
+              dispatch(selectCategory('⭐ 전체 목표'));
             }}>
-            <MissionList>⭐전체목표</MissionList>
+            <MissionList>⭐ 전체 목표</MissionList>
           </OverallGoal>
           {/* 삭제 */}
           {data.map(item => (
@@ -85,18 +92,22 @@ export default function Categories() {
               style={{
                 backgroundColor: now === item.name ? '#0891b2' : '#777',
               }}
-              key={item.id}
+              key={item._id}
               onPress={() => {
                 dispatch(selectCategory(item.name));
               }}
               onLongPress={() => {
+                deleteGoal(user, item);
+
                 dispatch(
-                  deleteMission(mission.filter(el => el.category !== item.id)),
+                  deleteMission(
+                    mission.filter(el => el.category !== item.name),
+                  ),
                 );
                 dispatch(
-                  deleteCategory(data.filter(el => el.name !== item.id)),
+                  deleteCategory(data.filter(el => el.name !== item.name)),
                 );
-                dispatch(selectCategory('⭐전체목표'));
+                dispatch(selectCategory('⭐ 전체 목표'));
 
                 // 삭제된 카테고리 관련 미션도 삭제
               }}>
@@ -108,7 +119,7 @@ export default function Categories() {
             <TextInput
               placeholder="+ 추가"
               style={styles.inputStyle}
-              onChangeText={text => setCategoryText(text)}
+              onChangeText={text => setCategoryText(text.trim())}
               onPressIn={() => setCategoryText('')}
               onSubmitEditing={createCategory}>
               {categoryText}
