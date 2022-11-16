@@ -94,7 +94,15 @@ export default function FriendTab({navigation}) {
           </Text>
         </TouchableOpacity>
       </FriendState>
-      <StateText>전체 | 5</StateText>
+      <StateText>
+        {friendState == 'whole'
+          ? '전체 | 0'
+          : friendState == 'lock'
+          ? '잠금 중 | 0'
+          : friendState == 'quit'
+          ? '포기 | 0'
+          : '금지 앱 | 0'}
+      </StateText>
       <ScrollView>
         <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
         <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
