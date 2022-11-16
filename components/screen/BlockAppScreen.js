@@ -150,7 +150,7 @@ export default function BlockApp({navigation}) {
             fontWeight: 'bold',
             paddingTop: 20,
           }}>
-          미션 수행 시 제한할 앱을 선택해주세요.
+          미션 수행 시 금지할 앱을 선택해주세요.
         </Text>
         <FlatList
           style={{marginTop: 30}}
