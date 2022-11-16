@@ -1,4 +1,4 @@
-import React, {useState, useCallback, Component} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   Modal,
@@ -7,17 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Platform,
-  Button,
   Switch,
 } from 'react-native';
 import {styles} from '../../utils/styles';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {StyleSheet} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import SelectDropdown from 'react-native-select-dropdown';
-
+import {StyleSheet} from 'react-native';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -28,15 +25,16 @@ export default function CreateMissionModal({
     //  더미 데이터
     {
       test1: '시간 잠금',
-      // id: '조깅',
-      // category: '운동',
-      // name: '조깅',
-      // date: '오늘날짜',
-      // type: 'space',
-      // time: {startTime: '18:30', endTime: '21:00'},
-      // space: {},
+      id: '조깅',
+      category: '운동',
+      name: '조깅',
+      date: '오늘날짜',
+      type: 'space',
+      time: {startTime: '18:30', endTime: '21:00'},
+      space: {},
     },
   ]);
+  // ★ 시간 잠금 데이터 저장 함수
   const saveTimeLock = ({
     missionName,
     selectCategory,
@@ -50,7 +48,9 @@ export default function CreateMissionModal({
         id: missionName, // 미션 이름
         category: selectCategory, // 카테고리 이름
         name: missionName, // 미션 이름
-        date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
+        date: `${startTime.getFullYear()}-${
+          startTime.getMonth() + 1
+        }-${startTime.getDate()}`, // 년, 월, 일
         type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
         time: {
           // 시작시간, 종료시간
@@ -63,85 +63,77 @@ export default function CreateMissionModal({
     console.log(saveTime);
   };
   // ★ 공간 잠금 저장
-  const [saveSpace, setSaveSpace] = useState([
-    //  더미 데이터
-    {
-      test2: '공간 잠금',
-      // id: '조깅',
-      // category: '운동',
-      // name: '조깅',
-      // date: '오늘날짜',
-      // type: 'space',
-      // time: {},
-      // space: {type: 'outside', place: '집'},
-    },
-  ]);
-  const saveSpaceLock = ({
-    missionName,
-    selectCategory,
-    selectSpace,
-    startTime,
-    lockingType,
-    spaceIn,
-    moveSpace,
-  }) => {
-    setSaveSpace([
-      ...saveSpace,
-      {
-        id: missionName, // 미션 이름
-        category: selectCategory, // 카테고리 이름
-        name: missionName, // 미션 이름
-        date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
-        type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
-        time: {},
-        space: {
-          type:
-            {spaceIn} == true && {moveSpace} == true
-              ? 'global'
-              : {spaceIn}
-              ? 'inside'
-              : {moveSpace}
-              ? 'outside'
-              : 'none',
-          place: selectSpace,
-        },
-        state: 'none',
-      },
-    ]);
-    console.log(saveSpace);
-  };
+  // const [saveSpace, setSaveSpace] = useState([
+  //   //  더미 데이터
+  //   {
+  //     test2: '공간 잠금',
+  //     id: '조깅',
+  //     category: '운동',
+  //     name: '조깅',
+  //     date: '오늘날짜',
+  //     type: 'space',
+  //     time: {},
+  //     space: {type: 'outside', place: '집'},
+  //   },
+  // ]);
+  // ☆ 공간 잠금 저장
+  // const saveSpaceLock = ({
+  //   missionName,
+  //   selectCategory,
+  //   selectSpace,
+  //   startTime,
+  //   lockingType,
+  //   spaceIn,
+  //   moveSpace,
+  // }) => {
+  //   setSaveSpace([
+  //     ...saveSpace,
+  //     {
+  //       id: missionName, // 미션 이름
+  //       category: selectCategory, // 카테고리 이름
+  //       name: missionName, // 미션 이름
+  //       date: `${startTime.getFullYear()}-${
+  //         startTime.getMonth() + 1
+  //       }-${startTime.getDate()}`, // 년, 월, 일
+  //       type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
+  //       time: {},
+  //       space: {
+  //         type:
+  //           {spaceIn} == false
+  //             ? {moveSpace} == false
+  //               ? 'global'
+  //               : 'inside'
+  //             : 'outside',
+  //         place: selectSpace,
+  //       },
+  //       state: 'none',
+  //     },
+  //   ]);
+  //   console.log(saveSpace);
+  // };
   // 카테고리
+
   const category = ['운동', '공부', '도서관']; // ★ 카테고리 데이터
   const space = ['중앙대', '집', 'pc방']; // ★ 공간 데이터
-  const [selectCategory, setSelectCategory] = useState(''); // 카테고리 state
-  const [selectSpace, setSelectSpace] = useState('');
+  const [selectCategory, setSelectCategory] = useState(''); // 카테고리 선택 state
+  const [selectSpace, setSelectSpace] = useState(''); // 공간선택 state
   // 미션 이름 저장
   const [missionName, setMissionName] = useState('');
   const saveMission = text => {
     setMissionName(text);
   };
   // 시간, 공간 잠금
-  const [lockingType, setLockingType] = useState(false);
+  const [lockingType, setLockingType] = useState(false); // 시간잠금 or 공간잠금 state
   const lockTime = () => {
     if (lockingType === true) setLockingType(!lockingType);
   };
   const lockSpace = () => {
     if (lockingType === false) setLockingType(!lockingType);
   };
-  // 공간 이동, 공간 안
+  // 공간 이동, 공간 안 토글
   const [moveSpace, setMoveSpace] = useState(false); // 공간 이동 state
   const [spaceIn, setSpaceIn] = useState(false); // 공간 안 state
-  const toggleMoveSpace = () => {
-    setMoveSpace(!moveSpace);
-    console.log(`moveSpace : ${moveSpace}`);
-  };
-  const toggleSpaceIn = () => {
-    setSpaceIn(!spaceIn);
-    console.log(`spaceIn : ${spaceIn}`);
-  };
-
-  // --------------------------- ☆ 요일, 시간 선택 작업중 --------------------------
-  // ------------------------ 시작 시간 -------------------------
+  // ------------------------ 시작 시간 및 날짜 선택 -------------------------
   const [startTime, onChangeDate] = useState(new Date()); // 선택 날짜
   const [mode, setMode] = useState('date'); // 모달 유형
   const [visible, setVisible] = useState(false); // 모달 노출 여부
@@ -150,6 +142,7 @@ export default function CreateMissionModal({
     // 날짜 클릭 시
     setMode('date'); // 모달 유형을 date로 변경
     setVisible(true); // 모달 open
+    console.log(`mode: ${mode}`);
   };
 
   const onPressStartTime = () => {
@@ -174,25 +167,17 @@ export default function CreateMissionModal({
   const [mode2, setMode2] = useState('date'); // 모달 유형
   const [visible2, setVisible2] = useState(false); // 모달 노출 여부
 
-  const onPressDate2 = () => {
-    // 날짜 클릭 시
-    setMode2('date'); // 모달 유형을 date로 변경
-    setVisible2(true); // 모달 open
-  };
-
-  const onPressStartTime2 = () => {
+  const onPressEndTime = () => {
     // 시간 클릭 시
     setMode2('time'); // 모달 유형을 time으로 변경
     setVisible2(true); // 모달 open
   };
-
   const onConfirm2 = selectedDate => {
     // 날짜 또는 시간 선택 시
     setVisible2(false); // 모달 close
     onChangeDate2(selectedDate); // 선택한 날짜 변경
     console.log(`end time : ${endTime.time()}`);
   };
-
   const onCancel2 = () => {
     // 취소 시
     setVisible2(false); // 모달 close
@@ -218,7 +203,6 @@ export default function CreateMissionModal({
                     onSelect={selectedItem => setSelectCategory(selectedItem)}
                   />
                 </View>
-
                 <View style={missionStyle.missionText}>
                   <TextInput
                     onChangeText={saveMission}
@@ -227,47 +211,41 @@ export default function CreateMissionModal({
                 </View>
                 <View style={missionStyle.inputRow}>
                   <Text style={missionStyle.selectCalendar}>
-                    {startTime.getMonth()}월 {startTime.getDate()}일
+                    {startTime.getMonth() + 1}월 {startTime.getDate()}일
                   </Text>
                   <TouchableOpacity onPress={onPressDate}>
                     <Ionicons name="calendar-outline" size={30}></Ionicons>
                   </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={visible}
+                    mode={mode}
+                    onConfirm={onConfirm}
+                    onCancel={onCancel}
+                    date={startTime}
+                  />
                 </View>
+                {/* 아직 구현 x */}
                 <View style={missionStyle.week}>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="일">
-                      일
-                    </Text>
+                    <Text style={missionStyle.weekText}>일</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="월">
-                      월
-                    </Text>
+                    <Text style={missionStyle.weekText}>월</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="화">
-                      화
-                    </Text>
+                    <Text style={missionStyle.weekText}>화</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="수">
-                      수
-                    </Text>
+                    <Text style={missionStyle.weekText}>수</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="목">
-                      목
-                    </Text>
+                    <Text style={missionStyle.weekText}>목</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="금">
-                      금
-                    </Text>
+                    <Text style={missionStyle.weekText}>금</Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={missionStyle.weekText} value="토">
-                      토
-                    </Text>
+                    <Text style={missionStyle.weekText}>토</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={missionStyle.btnStyle}>
@@ -291,10 +269,9 @@ export default function CreateMissionModal({
                   </TouchableOpacity>
                 </View>
 
-                {/* 시간 or 공간 잠금 컴포넌트 보여주는 곳 */}
+                {/* state에 따라 시간 or 공간 잠금 컴포넌트 보여주는 곳 */}
                 {lockingType ? (
                   <View>
-                    {/* 알아볼 수 있게 임시로 넣어놓은 것 */}
                     <Text style={{fontSize: 20}}>공간 잠금</Text>
                     <View>
                       <View style={{alignItems: 'center', marginTop: 20}}>
@@ -311,7 +288,10 @@ export default function CreateMissionModal({
                       <Text style={missionStyle.spaceText}>공간 이동</Text>
                       <Switch
                         trackColor={{false: '#767577', true: '#81b0ff'}}
-                        onValueChange={toggleMoveSpace}
+                        onValueChange={() => {
+                          setMoveSpace(!moveSpace);
+                          console.log(`moveSpace: ${moveSpace}`);
+                        }}
                         value={moveSpace}
                       />
                     </View>
@@ -319,37 +299,24 @@ export default function CreateMissionModal({
                       <Text style={missionStyle.spaceText}>공간 안</Text>
                       <Switch
                         trackColor={{false: '#767577', true: '#81b0ff'}}
-                        onValueChange={toggleSpaceIn}
+                        onValueChange={() => {
+                          setSpaceIn(!spaceIn);
+                          console.log(`spaceIn: ${spaceIn}`);
+                        }}
                         value={spaceIn}
                       />
                     </View>
-                    <TouchableOpacity
-                      onPress={() =>
-                        saveSpaceLock({
-                          missionName,
-                          selectCategory,
-                          startTime,
-                          lockingType,
-                          selectSpace,
-                          spaceIn,
-                          moveSpace,
-                        })
-                      }>
-                      <Text>test</Text>
-                    </TouchableOpacity>
                   </View>
                 ) : (
                   <View>
-                    {/* Text 시간 잠금은 알아볼 수 있게 임시로 넣어놓은 것 */}
                     <Text style={{fontSize: 20}}>시간 잠금</Text>
-                    {/* n에는 시작, 종료시간 계산하여 변수 대입 */}
                     {/* 시작 시간 */}
                     <View style={{marginTop: 10}}>
                       <View>
+                        {/* 시간 선택 영역 */}
                         <TouchableOpacity
                           onPress={onPressStartTime}
                           style={missionStyle.time}>
-                          {/* 시간 선택 영역 */}
                           <Text style={missionStyle.timeText}>시작 시간</Text>
                         </TouchableOpacity>
                       </View>
@@ -368,10 +335,10 @@ export default function CreateMissionModal({
                     <View>
                       <View>
                         <View />
+                        {/* 시간 선택 영역 */}
                         <TouchableOpacity
-                          onPress={onPressStartTime2}
+                          onPress={onPressEndTime}
                           style={missionStyle.time}>
-                          {/* 시간 선택 영역 */}
                           <Text style={missionStyle.timeText}>종료 시간</Text>
                         </TouchableOpacity>
                       </View>
@@ -386,7 +353,8 @@ export default function CreateMissionModal({
                         {endTime.getHours()}시 {endTime.getMinutes()}분
                       </Text>
                     </View>
-                    <TouchableOpacity
+                    {/* ★ 잘 저장되는지 확인했던 부분 */}
+                    {/* <TouchableOpacity
                       onPress={() =>
                         saveTimeLock({
                           missionName,
@@ -397,7 +365,7 @@ export default function CreateMissionModal({
                         })
                       }>
                       <Text>test</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 )}
               </ScrollView>
