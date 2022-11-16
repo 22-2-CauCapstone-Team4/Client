@@ -37,7 +37,7 @@ export default function BlockApp({navigation}) {
     const backAction = async () => {
       if (navigation?.canGoBack()) {
         try {
-          Realm.open(mkConfig(user, [ProhibitedApp.shcema])).then(
+          Realm.open(mkConfig(user, [ProhibitedApp.schema])).then(
             async realm => {
               await updateProhibitedAppsInRealm(user, realm, blockedApps);
               realm.close();

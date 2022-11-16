@@ -23,6 +23,8 @@ import {
   readProhibitedAppsInRealm,
   readGoalsInRealm,
   readPlacesInRealm,
+  readMissionsInRealm,
+  createMissionInRealm,
 } from '../../functions';
 import {
   addApps,
@@ -32,7 +34,7 @@ import {
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
-import {ProhibitedApp, Goal, Place} from '../../schema';
+import {ProhibitedApp, Goal, Place, Mission} from '../../schema';
 
 const Tab = createBottomTabNavigator();
 
@@ -72,7 +74,12 @@ function Detail({navigation}) {
     console.log('설치 앱 리스트 및 데이터 불러오기 시작');
     try {
       const realm = await Realm.open(
-        mkConfig(user, [ProhibitedApp.schema, Goal.schema, Place.schema]),
+        mkConfig(user, [
+          ProhibitedApp.schema,
+          Goal.schema,
+          Place.schema,
+          // Mission.schema,
+        ]),
       );
 
       let [tempApps, tempBlockedApps, tempGoals, tempPlaces] =
@@ -82,6 +89,21 @@ function Detail({navigation}) {
           readGoalsInRealm(user, realm),
           readPlacesInRealm(user, realm),
         ]);
+
+      // // mission create 테스트
+      // const tempMission = new Mission({
+      //   owner_id: user.id,
+      //   name: 'test',
+      //   goal: tempGoals[0],
+      //   kind: Mission.KIND.TIME,
+      //   date: new Date(),
+      // });
+      // const mission = await createMissionInRealm(user, realm, tempMission);
+
+      // // mission read 테스트
+      // const readMission = readMissionsInRealm(user, realm);
+
+      // console.log('mission 테스트 결과', mission, readMission);
       realm.close();
 
       tempApps = tempApps.appList;
@@ -97,6 +119,7 @@ function Detail({navigation}) {
 
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
+
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

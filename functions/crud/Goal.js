@@ -3,14 +3,16 @@ import Realm from 'realm';
 import {Goal} from '../../schema';
 import {mkConfig} from '../mkConfig';
 
-const readGoals = async (user, realm) => {
+const readGoals = async (user, realm, getRealmObj = false) => {
   console.log('read my goals');
   let result = null;
 
   try {
     const list = realm.objects('Goal').filtered(`owner_id == "${user.id}"`);
 
-    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    if (!getRealmObj)
+      result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    else result = list;
     console.log('읽기 결과', result);
   } catch (err) {
     console.log(err.message);

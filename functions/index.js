@@ -10,6 +10,10 @@ import {
   createPlaceInRealm,
   updatePlaceInRealm,
   deletePlaceInRealm,
+  readMissionsInRealm,
+  createMissionInRealm,
+  updateMissionInRealm,
+  deleteMissionInRealm,
 } from './crud';
 import {appCheckHeadlessTask, startServiceTask} from './task';
 
@@ -26,6 +30,10 @@ module.exports = {
   createPlaceInRealm,
   updatePlaceInRealm,
   deletePlaceInRealm,
+  readMissionsInRealm,
+  createMissionInRealm,
+  updateMissionInRealm,
+  deleteMissionInRealm,
   mkConfig,
   mkConfigWithSubscriptions,
 };
