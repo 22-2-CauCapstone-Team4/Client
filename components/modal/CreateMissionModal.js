@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import {styles} from '../../utils/styles';
 import {useNavigation} from '@react-navigation/native';
-import Categories from '../Categories';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {StyleSheet} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -24,8 +23,90 @@ export default function CreateMissionModal({
   modalVisible,
   setModalVisible,
 }) {
+  // ★ 시간 잠금 저장
+  const [saveTime, setSaveTime] = useState([
+    //  더미 데이터
+    {
+      test1: '시간 잠금',
+      // id: '조깅',
+      // category: '운동',
+      // name: '조깅',
+      // date: '오늘날짜',
+      // type: 'space',
+      // time: {startTime: '18:30', endTime: '21:00'},
+      // space: {},
+    },
+  ]);
+  const saveTimeLock = ({
+    missionName,
+    selectCategory,
+    startTime,
+    endTime,
+    lockingType,
+  }) => {
+    setSaveTime([
+      ...saveTime,
+      {
+        id: missionName, // 미션 이름
+        category: selectCategory, // 카테고리 이름
+        name: missionName, // 미션 이름
+        date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
+        type: lockingType, // false: 시간 잠금, true: 공간 잠금
+        time: {
+          // 시작시간, 종료시간
+          startTime: `${startTime.getHours()}:${startTime.getMinutes()}`,
+          endTime: `${endTime.getHours()}:${endTime.getMinutes()}`,
+        },
+        space: {},
+      },
+    ]);
+    console.log(saveTime);
+  };
+  // ★ 공간 잠금 저장
+  const [saveSpace, setSaveSpace] = useState([
+    //  더미 데이터
+    {
+      test2: '공간 잠금',
+      // id: '조깅',
+      // category: '운동',
+      // name: '조깅',
+      // date: '오늘날짜',
+      // type: 'space',
+      // time: {},
+      // space: {type: 'outside', place: '집'},
+    },
+  ]);
+  const saveSpaceLock = ({
+    missionName,
+    selectCategory,
+    selectSpace,
+    startTime,
+    lockingType,
+  }) => {
+    setSaveSpace([
+      ...saveSpace,
+      {
+        id: missionName, // 미션 이름
+        category: selectCategory, // 카테고리 이름
+        name: missionName, // 미션 이름
+        date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
+        type: lockingType, // false: 시간 잠금, true: 공간 잠금
+        time: {},
+        space: {type: lockingType, place: selectSpace},
+      },
+    ]);
+    console.log(saveSpace);
+  };
   // 카테고리
-
+  const category = ['운동', '공부', '도서관']; // ★ 카테고리 데이터
+  const space = ['중앙대', '집', 'pc방']; // ★ 공간 데이터
+  const [selectCategory, setSelectCategory] = useState(''); // 카테고리 state
+  const [selectSpace, setSelectSpace] = useState('');
+  // 미션 이름 저장
+  const [missionName, setMissionName] = useState('');
+  const saveMission = text => {
+    setMissionName(text);
+  };
   // 시간, 공간 잠금
   const [lockingType, setLockingType] = useState(false);
   const lockTime = () => {
@@ -40,9 +121,9 @@ export default function CreateMissionModal({
   const toggleMoveSpace = () => setMoveSpace(!moveSpace);
   const toggleSpaceIn = () => setSpaceIn(!spaceIn);
 
-  // --------------------------- ★ 요일, 시간 선택 작업중 --------------------------
+  // --------------------------- ☆ 요일, 시간 선택 작업중 --------------------------
   // ------------------------ 시작 시간 -------------------------
-  const [date, onChangeDate] = useState(new Date()); // 선택 날짜
+  const [startTime, onChangeDate] = useState(new Date()); // 선택 날짜
   const [mode, setMode] = useState('date'); // 모달 유형
   const [visible, setVisible] = useState(false); // 모달 노출 여부
 
@@ -70,7 +151,7 @@ export default function CreateMissionModal({
     setVisible(false); // 모달 close
   };
   // ------------------------ 종료 시간 ------------------------
-  const [date2, onChangeDate2] = useState(new Date()); // 선택 날짜
+  const [endTime, onChangeDate2] = useState(new Date()); // 선택 날짜
   const [mode2, setMode2] = useState('date'); // 모달 유형
   const [visible2, setVisible2] = useState(false); // 모달 노출 여부
 
@@ -90,22 +171,13 @@ export default function CreateMissionModal({
     // 날짜 또는 시간 선택 시
     setVisible2(false); // 모달 close
     onChangeDate2(selectedDate); // 선택한 날짜 변경
-    console.log(`end time : ${selectedDate}`);
+    console.log(`end time : ${endTime.time()}`);
   };
 
   const onCancel2 = () => {
     // 취소 시
     setVisible2(false); // 모달 close
   };
-
-  // 시간 계산
-  const diff = date2 - date;
-
-  const diffDay = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const diffHour = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const diffMin = Math.floor((diff / (1000 * 60)) % 60);
-  const categories = ['운동', '공부', '도서관']; // ★ 카테고리 내용 추가
-  const space = ['중앙대', '집', 'pc방']; // ★ 공간 내용 추가
   return (
     <>
       {modalVisible ? (
@@ -122,29 +194,26 @@ export default function CreateMissionModal({
               <ScrollView>
                 <View style={{alignItems: 'center'}}>
                   <SelectDropdown
-                    buttonStyle={{borderRadius: 100}}
                     defaultButtonText="카테고리"
-                    data={categories}
-                    onSelect={(selectedItem, index) => {
-                      console.log(selectedItem, index);
-                    }}
-                    buttonTextAfterSelection={(selectedItem, index) => {
-                      return selectedItem;
-                    }}
-                    rowTextForSelection={(item, index) => {
-                      return item;
-                    }}
+                    data={category}
+                    onSelect={selectedItem => setSelectCategory(selectedItem)}
+                  />
+                </View>
+
+                <View style={missionStyle.missionText}>
+                  <TextInput
+                    onChangeText={saveMission}
+                    placeholder="미션 입력"
                   />
                 </View>
                 <View style={missionStyle.inputRow}>
                   <Text style={missionStyle.selectCalendar}>
-                    {date.getMonth()}월 {date.getDate()}일
+                    {startTime.getMonth()}월 {startTime.getDate()}일
                   </Text>
                   <TouchableOpacity onPress={onPressDate}>
                     <Ionicons name="calendar-outline" size={30}></Ionicons>
                   </TouchableOpacity>
                 </View>
-
                 <View style={missionStyle.week}>
                   <TouchableOpacity>
                     <Text style={missionStyle.weekText} value="일">
@@ -209,19 +278,12 @@ export default function CreateMissionModal({
                     {/* 알아볼 수 있게 임시로 넣어놓은 것 */}
                     <Text style={{fontSize: 20}}>공간 잠금</Text>
                     <View>
-                      <View style={{alignItems: 'center'}}>
+                      <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
-                          buttonStyle={{borderRadius: 100}}
                           defaultButtonText="공간선택"
                           data={space}
-                          onSelect={(selectedItem, index) => {
-                            console.log(selectedItem, index);
-                          }}
-                          buttonTextAfterSelection={(selectedItem, index) => {
-                            return selectedItem;
-                          }}
-                          rowTextForSelection={(item, index) => {
-                            return item;
+                          onSelect={selectedItem => {
+                            setSelectSpace(selectedItem);
                           }}
                         />
                       </View>
@@ -242,6 +304,18 @@ export default function CreateMissionModal({
                         value={spaceIn}
                       />
                     </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        saveSpaceLock({
+                          missionName,
+                          selectCategory,
+                          startTime,
+                          lockingType,
+                          selectSpace,
+                        })
+                      }>
+                      <Text>test</Text>
+                    </TouchableOpacity>
                   </View>
                 ) : (
                   <View>
@@ -263,10 +337,10 @@ export default function CreateMissionModal({
                         mode={mode}
                         onConfirm={onConfirm}
                         onCancel={onCancel}
-                        date={date}
+                        date={startTime}
                       />
                       <Text style={missionStyle.timeData}>
-                        {date.getHours()}시 {date.getMinutes()}분
+                        {startTime.getHours()}시 {startTime.getMinutes()}분
                       </Text>
                     </View>
                     {/* 종료 시간 */}
@@ -285,17 +359,24 @@ export default function CreateMissionModal({
                         mode={mode2}
                         onConfirm={onConfirm2}
                         onCancel={onCancel2}
-                        date={date2}
+                        date={endTime}
                       />
                       <Text style={missionStyle.timeData}>
-                        {date2.getHours()}시 {date2.getMinutes()}분
+                        {endTime.getHours()}시 {endTime.getMinutes()}분
                       </Text>
                     </View>
-                    <View style={{height: 100}}>
-                      <Text style={missionStyle.resultData}>
-                        {diffDay}일 {diffHour}시간 {diffMin}분 남았습니다!
-                      </Text>
-                    </View>
+                    <TouchableOpacity
+                      onPress={() =>
+                        saveTimeLock({
+                          missionName,
+                          selectCategory,
+                          startTime,
+                          endTime,
+                          lockingType,
+                        })
+                      }>
+                      <Text>test</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </ScrollView>
@@ -424,7 +505,12 @@ const missionStyle = StyleSheet.create({
     marginTop: '7%',
     height: '8%',
     borderWidth: 1,
-    borderRadius: 10,
+    // borderRadius: 10,
     width: '100%',
+  },
+  missionText: {
+    borderWidth: 1,
+    borderRadius: 100,
+    marginTop: 10,
   },
 });
