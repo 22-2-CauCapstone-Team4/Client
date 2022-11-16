@@ -11,15 +11,18 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {styles} from '../../utils/styles';
-import {deleteSpace} from '../../store/action/index';
+import {useAuth} from '../../providers/AuthProvider';
+import {deletePlace} from '../../store/action/index';
+import {deletePlaceInRealm} from '../../functions';
 
 export default function PlaceListModal({
   navigation,
   modalVisible,
   setModalVisible,
 }) {
+  const {user} = useAuth();
   const dispatch = useDispatch();
-  const place = useSelector(store => store.spaceReducer.data);
+  const place = useSelector(store => store.placeReducer.data);
   const placesNumber = place.length;
   // console.log(place);
   return (
@@ -45,11 +48,12 @@ export default function PlaceListModal({
                   <ScrollView contentContainerStyle={{alignItems: 'center'}}>
                     {place.map(item => (
                       <TouchableOpacity
-                        key={item.id}
+                        key={item._id}
                         style={style.place}
-                        onLongPress={() => {
+                        onLongPress={async () => {
+                          await deletePlaceInRealm(user, item);
                           dispatch(
-                            deleteSpace(
+                            deletePlace(
                               place.filter(el => el.name !== item.name),
                             ),
                           );

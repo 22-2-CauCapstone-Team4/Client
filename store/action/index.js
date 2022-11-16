@@ -72,23 +72,30 @@ export const selectFriend = item => {
 };
 
 // 장소
-export const addSpace = item => {
+export const initPlace = item => {
   return {
-    type: 'ADD_SPACE',
+    type: 'INIT_PLACE',
     payload: item,
   };
 };
 
-export const deleteSpace = items => {
+export const addPlace = item => {
   return {
-    type: 'DELETE_SPACE',
+    type: 'ADD_PLACE',
+    payload: item,
+  };
+};
+
+export const deletePlace = items => {
+  return {
+    type: 'DELETE_PLACE',
     payload: items,
   };
 };
 
-export const selectSpace = item => {
+export const selectPlace = item => {
   return {
-    type: 'SELECT_SPACE',
+    type: 'SELECT_PLACE',
     payload: item,
   };
 };

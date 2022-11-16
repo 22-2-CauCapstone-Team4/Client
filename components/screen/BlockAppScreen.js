@@ -13,7 +13,7 @@ import {
 import {useDispatch} from 'react-redux';
 import {useAuth} from '../../providers/AuthProvider';
 import {ForegroundServiceModule} from '../../wrap_module';
-import {updateProhibitedApps} from '../../functions';
+import {updateProhibitedAppsInRealm} from '../../functions';
 import {addBlockedApps} from '../../store/action';
 import {useSelector} from 'react-redux';
 import {styles} from '../../utils/styles';
@@ -35,7 +35,7 @@ export default function BlockApp({navigation}) {
       if (navigation?.canGoBack()) {
         try {
           await Promise.all([
-            updateProhibitedApps(user, blockedApps),
+            updateProhibitedAppsInRealm(user, blockedApps),
             ForegroundServiceModule.startService(
               blockedApps.map(blockedApp => blockedApp.packageName),
             ),

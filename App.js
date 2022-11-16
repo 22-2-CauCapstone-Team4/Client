@@ -28,6 +28,9 @@ function App() {
   LogBox.ignoreLogs([
     'Please report: Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code:',
   ]);
+  LogBox.ignoreLogs([
+    'registerHeadlessTask or registerCancellableHeadlessTask called multiple times for same key',
+  ]);
   return (
     <AuthProvider>
       <Provider store={store}>

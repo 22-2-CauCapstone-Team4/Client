@@ -53,7 +53,7 @@ function compareToday(date) {
 const HomeTab = ({navigation}) => {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
-  const place = useSelector(store => store.spaceReducer.data);
+  const place = useSelector(store => store.placeReducer.data);
   const today = new Date();
   //오늘 날짜
   const todayDate =

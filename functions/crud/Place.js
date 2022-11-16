@@ -1,18 +1,18 @@
 /* eslint-disable curly */
 import Realm from 'realm';
-import {Goal} from '../../schema';
+import {Place} from '../../schema';
 import {mkConfig} from '../mkConfig';
 
-const readGoals = async user => {
-  console.log('read my goals');
+const readPlaces = async user => {
+  console.log('read my places');
   let result = null,
     realm = null;
 
   try {
     console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
+    realm = await Realm.open(mkConfig(user, [Place.schema]));
 
-    const list = realm.objects('Goal').filtered(`owner_id == "${user.id}"`);
+    const list = realm.objects('Place').filtered(`owner_id == "${user.id}"`);
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
     console.log('읽기 결과', result);
@@ -30,20 +30,19 @@ const readGoals = async user => {
   return result;
 };
 
-const createGoal = async (user, goal) => {
-  console.log('create goal');
+const createPlace = async (user, place) => {
+  console.log('create place');
   let result = null,
     realm = null;
 
   try {
     console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
+    realm = await Realm.open(mkConfig(user, [Place.schema]));
 
-    console.log('쓰기 시작');
-
+    console.log('쓰기 시작', place);
     realm.write(() => {
-      const newGoal = realm.create('Goal', goal);
-      result = JSON.parse(JSON.stringify(newGoal));
+      const newPlace = realm.create('Place', place);
+      result = JSON.parse(JSON.stringify(newPlace));
     });
 
     console.log('업데이트 결과', result);
@@ -61,22 +60,24 @@ const createGoal = async (user, goal) => {
   return result;
 };
 
-const updateGoal = async (user, goal) => {
-  console.log('update goal');
+const updatePlace = async (user, place) => {
+  console.log('update place');
   let result = null,
     realm = null;
 
   try {
     console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
+    realm = await Realm.open(mkConfig(user, [Place.schema]));
 
     console.log('쓰기 시작');
     realm.write(() => {
-      const oldGoal = realm
-        .objects('Goal')
-        .filtered(`owner_id == "${user.id}" && _id == oid(${goal._id})`);
-      oldGoal.name = goal.name;
-      result = JSON.parse(JSON.stringify(oldGoal));
+      const oldPlace = realm
+        .objects('Place')
+        .filtered(`owner_id == "${user.id}" && _id == oid(${place._id})`);
+      oldPlace.name = place.name;
+      oldPlace.lat = place.lat;
+      oldPlace.lng = place.lng;
+      result = JSON.parse(JSON.stringify(oldPlace));
     });
 
     console.log('생성 결과', result);
@@ -94,17 +95,17 @@ const updateGoal = async (user, goal) => {
   return result;
 };
 
-const deleteGoal = async (user, goal) => {
+const deletePlace = async (user, place) => {
   console.log('delete goal');
   let realm = null;
 
   try {
     console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
+    realm = await Realm.open(mkConfig(user, [Place.schema]));
 
     const deletedGoal = realm
-      .objects('Goal')
-      .filtered(`owner_id == "${user.id}" && _id == oid(${goal._id})`);
+      .objects('Place')
+      .filtered(`owner_id == "${user.id}" && _id == oid(${place._id})`);
 
     console.log('읽기 결과', JSON.parse(JSON.stringify(deletedGoal)));
 
@@ -125,4 +126,4 @@ const deleteGoal = async (user, goal) => {
   }
 };
 
-export {readGoals, createGoal, updateGoal, deleteGoal};
+export {readPlaces, createPlace, updatePlace, deletePlace};

@@ -19,8 +19,17 @@ import {
   AppListModule,
 } from '../../wrap_module';
 import {useDispatch} from 'react-redux';
-import {readProhibitedApps, readGoals} from '../../functions';
-import {addApps, addBlockedApps, initCategory} from '../../store/action';
+import {
+  readProhibitedAppsInRealm,
+  readGoalsInRealm,
+  readPlacesInRealm,
+} from '../../functions';
+import {
+  addApps,
+  addBlockedApps,
+  initCategory,
+  initPlace,
+} from '../../store/action';
 
 const Tab = createBottomTabNavigator();
 
@@ -61,9 +70,10 @@ function Detail({navigation}) {
     try {
       let [tempApps, tempBlockedApps] = await Promise.all([
         AppListModule.getAppList(),
-        readProhibitedApps(user),
+        readProhibitedAppsInRealm(user),
       ]);
-      let tempGoals = await readGoals(user);
+      let tempGoals = await readGoalsInRealm(user);
+      let tempPlaces = await readPlacesInRealm(user);
 
       tempApps = tempApps.appList;
       tempApps.sort(function (a, b) {
@@ -77,6 +87,7 @@ function Detail({navigation}) {
       setBlockedApps(tempBlockedApps);
 
       dispatch(initCategory(tempGoals));
+      dispatch(initPlace(tempPlaces));
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

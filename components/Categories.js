@@ -17,7 +17,7 @@ import {
 } from '../store/action';
 import {useAuth} from '../providers/AuthProvider';
 import {Goal} from '../schema';
-import {createGoal, updateGoal, deleteGoal} from '../functions';
+import {createGoalInRealm, deleteGoalInRealm} from '../functions';
 
 const MissionList = styled.Text`
   color: white;
@@ -67,7 +67,7 @@ export default function Categories() {
   const createCategory = () => {
     if (categoryText !== '') {
       const newCategory = new Goal({name: categoryText, owner_id: user.id});
-      createGoal(user, newCategory);
+      createGoalInRealm(user, newCategory);
       dispatch(addCategory(newCategory));
       setCategoryText('');
     }
@@ -97,7 +97,7 @@ export default function Categories() {
                 dispatch(selectCategory(item.name));
               }}
               onLongPress={() => {
-                deleteGoal(user, item);
+                deleteGoalInRealm(user, item);
 
                 dispatch(
                   deleteMission(

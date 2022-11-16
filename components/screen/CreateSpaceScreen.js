@@ -18,7 +18,10 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import SnackBar from 'react-native-snackbar';
 
 import Colors from '../../utils/Colors';
-import {addSpace} from '../../store/action';
+import {addPlace} from '../../store/action';
+import {Place} from '../../schema';
+import {createPlaceInRealm} from '../../functions';
+import {useAuth} from '../../providers/AuthProvider';
 
 export default function CreateSpaceScreen({navigation}) {
   Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
@@ -43,8 +46,9 @@ export default function CreateSpaceScreen({navigation}) {
     ref.current?.setAddressText('Some Text');
   }, []);
 
+  const {user} = useAuth();
   const dispatch = useDispatch();
-  const data = useSelector(store => store.spaceReducer.data);
+  const data = useSelector(store => store.placeReducer.data);
   const [coord, setCoord] = useState({
     latitude: 37.503637,
     longitude: 126.956025,
@@ -191,18 +195,20 @@ export default function CreateSpaceScreen({navigation}) {
                   <View style={{flexDirection: 'row', marginBottom: 5}}>
                     <Pressable
                       style={[styles.modalButton, styles.buttonClose]}
-                      onPress={() => {
+                      onPress={async () => {
                         if (place !== '') {
-                          dispatch(
-                            addSpace({
-                              id: place,
-                              name: place,
-                              lat: coord.latitude,
-                              lng: coord.longitude,
-                            }),
-                          );
+                          console.log(coord);
+                          const newPlace = new Place({
+                            name: place,
+                            owner_id: user.id,
+                            lat: coord.latitude,
+                            lng: coord.longitude,
+                          });
+                          await createPlaceInRealm(user, newPlace);
+                          dispatch(addPlace(newPlace));
+
                           SnackBar.show({
-                            text: `'${place}' 장소가 새로 추가 됐습니다.`,
+                            text: `'${place}' 장소가 추가되었습니다.`,
                             duration: SnackBar.LENGTH_SHORT,
                           });
                           setPlace('');
