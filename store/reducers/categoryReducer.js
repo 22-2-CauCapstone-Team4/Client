@@ -1,4 +1,5 @@
 // 카테고리
+// ✏️공부
 const INITIAL_STATE = {
   data: [],
   filter: '⭐ 전체 목표',

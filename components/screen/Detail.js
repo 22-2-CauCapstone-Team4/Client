@@ -192,8 +192,8 @@ function Detail({navigation}) {
   ]);
 
   const onPressLogOut = () => {
-    navigation.replace('Login');
     signOut();
+    navigation.replace('Login');
   };
 
   const isFocused = useIsFocused();
