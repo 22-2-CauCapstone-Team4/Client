@@ -30,6 +30,9 @@ import {
   initCategory,
   initPlace,
 } from '../../store/action';
+import Realm from 'realm';
+import {mkConfig} from '../../functions/mkConfig';
+import {ProhibitedApp, Goal, Place} from '../../schema';
 
 const Tab = createBottomTabNavigator();
 
@@ -68,12 +71,18 @@ function Detail({navigation}) {
 
     console.log('설치 앱 리스트 및 데이터 불러오기 시작');
     try {
-      let [tempApps, tempBlockedApps] = await Promise.all([
-        AppListModule.getAppList(),
-        readProhibitedAppsInRealm(user),
-      ]);
-      let tempGoals = await readGoalsInRealm(user);
-      let tempPlaces = await readPlacesInRealm(user);
+      const realm = await Realm.open(
+        mkConfig(user, [ProhibitedApp.schema, Goal.schema, Place.schema]),
+      );
+
+      let [tempApps, tempBlockedApps, tempGoals, tempPlaces] =
+        await Promise.all([
+          AppListModule.getAppList(),
+          readProhibitedAppsInRealm(user, realm),
+          readGoalsInRealm(user, realm),
+          readPlacesInRealm(user, realm),
+        ]);
+      realm.close();
 
       tempApps = tempApps.appList;
       tempApps.sort(function (a, b) {

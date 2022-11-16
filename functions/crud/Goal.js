@@ -3,22 +3,15 @@ import Realm from 'realm';
 import {Goal} from '../../schema';
 import {mkConfig} from '../mkConfig';
 
-const readGoals = async user => {
+const readGoals = async (user, realm) => {
   console.log('read my goals');
-  let result = null,
-    realm = null;
+  let result = null;
 
   try {
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
-
     const list = realm.objects('Goal').filtered(`owner_id == "${user.id}"`);
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
     console.log('읽기 결과', result);
-
-    console.log('닫기');
-    realm.close();
   } catch (err) {
     console.log(err.message);
 
@@ -30,15 +23,11 @@ const readGoals = async user => {
   return result;
 };
 
-const createGoal = async (user, goal) => {
+const createGoal = async (user, realm, goal) => {
   console.log('create goal');
-  let result = null,
-    realm = null;
+  let result = null;
 
   try {
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
-
     console.log('쓰기 시작');
 
     realm.write(() => {
@@ -47,9 +36,6 @@ const createGoal = async (user, goal) => {
     });
 
     console.log('업데이트 결과', result);
-
-    console.log('닫기');
-    realm.close();
   } catch (err) {
     console.log(err.message);
 
@@ -61,15 +47,11 @@ const createGoal = async (user, goal) => {
   return result;
 };
 
-const updateGoal = async (user, goal) => {
+const updateGoal = async (user, realm, goal) => {
   console.log('update goal');
-  let result = null,
-    realm = null;
+  let result = null;
 
   try {
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
-
     console.log('쓰기 시작');
     realm.write(() => {
       const oldGoal = realm
@@ -80,9 +62,6 @@ const updateGoal = async (user, goal) => {
     });
 
     console.log('생성 결과', result);
-
-    console.log('닫기');
-    realm.close();
   } catch (err) {
     console.log(err.message);
 
@@ -94,14 +73,10 @@ const updateGoal = async (user, goal) => {
   return result;
 };
 
-const deleteGoal = async (user, goal) => {
+const deleteGoal = async (user, realm, goal) => {
   console.log('delete goal');
-  let realm = null;
 
   try {
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [Goal.schema]));
-
     const deletedGoal = realm
       .objects('Goal')
       .filtered(`owner_id == "${user.id}" && _id == oid(${goal._id})`);
@@ -114,8 +89,7 @@ const deleteGoal = async (user, goal) => {
       realm.delete(deletedGoal);
     });
 
-    console.log('닫기');
-    realm.close();
+    console.log('삭제 완료');
   } catch (err) {
     console.log(err.message);
 

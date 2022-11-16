@@ -29,6 +29,13 @@ class Mission {
     this.place = place;
   }
 
+  static KIND = {
+    TIME: 'TIME',
+    MOVE_TO_PLACE: 'MOVE_TO_PLACE',
+    IN_PLACE: 'IN_PLACE',
+    MOVE_AND_IN_PLACE: 'MOVE_AND_IN_PLACE',
+  };
+
   static schema = {
     name: 'Mission',
     properties: {

@@ -18,6 +18,9 @@ import {addBlockedApps} from '../../store/action';
 import {useSelector} from 'react-redux';
 import {styles} from '../../utils/styles';
 import Colors from '../../utils/Colors';
+import {mkConfig} from '../../functions/mkConfig';
+import {ProhibitedApp} from '../../schema';
+import Realm from 'realm';
 
 // blockedApps: 해당 유저가 설정해놓은 금지 앱 정보들
 export default function BlockApp({navigation}) {
@@ -34,12 +37,15 @@ export default function BlockApp({navigation}) {
     const backAction = async () => {
       if (navigation?.canGoBack()) {
         try {
-          await Promise.all([
-            updateProhibitedAppsInRealm(user, blockedApps),
-            ForegroundServiceModule.startService(
-              blockedApps.map(blockedApp => blockedApp.packageName),
-            ),
-          ]);
+          Realm.open(mkConfig(user, [ProhibitedApp.shcema])).then(
+            async realm => {
+              await updateProhibitedAppsInRealm(user, realm, blockedApps);
+              realm.close();
+            },
+          );
+          ForegroundServiceModule.startService(
+            blockedApps.map(blockedApp => blockedApp.packageName),
+          );
 
           dispatch(addBlockedApps(blockedApps));
         } catch (err) {
