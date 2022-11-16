@@ -1,4 +1,11 @@
-import {CurState, ProhibitedApp, AppUsageRecord, Goal, Place} from '../schema';
+import {
+  CurState,
+  ProhibitedApp,
+  AppUsageRecord,
+  Goal,
+  Place,
+  Mission,
+} from '../schema';
 
 const openRealmBehaviorConfig = {
   type: 'openImmediately',
@@ -26,6 +33,7 @@ const mkConfigWithSubscriptions = user => {
       AppUsageRecord.schema,
       Goal.schema,
       Place.schema,
+      Mission.schema,
     ],
     sync: {
       user,
@@ -48,6 +56,9 @@ const mkConfigWithSubscriptions = user => {
           );
           subs.add(realm.objects('Goal').filtered(`owner_id == "${user.id}"`));
           subs.add(realm.objects('Place').filtered(`owner_id == "${user.id}"`));
+          subs.add(
+            realm.objects('Mission').filtered(`owner_id == "${user.id}"`),
+          );
         },
       },
     },

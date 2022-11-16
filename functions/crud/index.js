@@ -1,6 +1,12 @@
 import {readProhibitedApps, updateProhibitedApps} from './ProhibitedApp';
 import {readGoals, createGoal, updateGoal, deleteGoal} from './Goal';
 import {readPlaces, createPlace, updatePlace, deletePlace} from './Place';
+import {
+  readMissions,
+  createMission,
+  updateMission,
+  deleteMission,
+} from './Mission';
 
 module.exports = {
   readProhibitedAppsInRealm: readProhibitedApps,
@@ -13,4 +19,8 @@ module.exports = {
   createPlaceInRealm: createPlace,
   updatePlaceInRealm: updatePlace,
   deletePlaceInRealm: deletePlace,
+  readMissionsInRealm: readMissions,
+  createMissionInRealm: createMission,
+  updateMissionInRealm: updateMission,
+  deleteMissionInRealm: deleteMission,
 };

@@ -14,6 +14,9 @@ import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
 import {deletePlace, deleteMission} from '../../store/action/index';
 import {deletePlaceInRealm} from '../../functions';
+import {mkConfig} from '../../functions/mkConfig';
+import {Place} from '../../schema';
+import Realm from 'realm';
 
 export default function PlaceListModal({
   navigation,
@@ -52,7 +55,13 @@ export default function PlaceListModal({
                         key={item._id}
                         style={style.place}
                         onLongPress={async () => {
-                          await deletePlaceInRealm(user, item);
+                          Realm.open(mkConfig(user, [Place.schema])).then(
+                            async realm => {
+                              await deletePlaceInRealm(user, item);
+                              realm.close();
+                            },
+                          );
+
                           dispatch(
                             deletePlace(
                               place.filter(el => el.name !== item.name),

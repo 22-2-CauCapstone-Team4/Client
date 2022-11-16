@@ -18,6 +18,8 @@ import {
 import {useAuth} from '../providers/AuthProvider';
 import {Goal} from '../schema';
 import {createGoalInRealm, deleteGoalInRealm} from '../functions';
+import {mkConfig} from '../functions/mkConfig';
+import Realm from 'realm';
 
 const MissionList = styled.Text`
   color: white;
@@ -67,7 +69,10 @@ export default function Categories() {
   const createCategory = () => {
     if (categoryText !== '') {
       const newCategory = new Goal({name: categoryText, owner_id: user.id});
-      createGoalInRealm(user, newCategory);
+      Realm.open(mkConfig(user, [Goal.schema])).then(async realm => {
+        await createGoalInRealm(user, realm, newCategory);
+        realm.close();
+      });
       dispatch(addCategory(newCategory));
       setCategoryText('');
     }

@@ -29,6 +29,11 @@ class Mission {
     this.place = place;
   }
 
+  static KIND = {
+    TIME: 'TIME',
+    PLACE: 'PLACE',
+  };
+
   static schema = {
     name: 'Mission',
     properties: {
