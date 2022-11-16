@@ -51,7 +51,7 @@ export default function CreateMissionModal({
         category: selectCategory, // 카테고리 이름
         name: missionName, // 미션 이름
         date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
-        type: lockingType, // false: 시간 잠금, true: 공간 잠금
+        type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
         time: {
           // 시작시간, 종료시간
           startTime: `${startTime.getHours()}:${startTime.getMinutes()}`,
@@ -82,6 +82,8 @@ export default function CreateMissionModal({
     selectSpace,
     startTime,
     lockingType,
+    spaceIn,
+    moveSpace,
   }) => {
     setSaveSpace([
       ...saveSpace,
@@ -90,9 +92,20 @@ export default function CreateMissionModal({
         category: selectCategory, // 카테고리 이름
         name: missionName, // 미션 이름
         date: `${startTime.getFullYear()}-${startTime.getMonth()}-${startTime.getDate()}`, // 년, 월, 일
-        type: lockingType, // false: 시간 잠금, true: 공간 잠금
+        type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
         time: {},
-        space: {type: lockingType, place: selectSpace},
+        space: {
+          type:
+            {spaceIn} == true && {moveSpace} == true
+              ? 'global'
+              : {spaceIn}
+              ? 'inside'
+              : {moveSpace}
+              ? 'outside'
+              : 'none',
+          place: selectSpace,
+        },
+        state: 'none',
       },
     ]);
     console.log(saveSpace);
@@ -118,8 +131,14 @@ export default function CreateMissionModal({
   // 공간 이동, 공간 안
   const [moveSpace, setMoveSpace] = useState(false); // 공간 이동 state
   const [spaceIn, setSpaceIn] = useState(false); // 공간 안 state
-  const toggleMoveSpace = () => setMoveSpace(!moveSpace);
-  const toggleSpaceIn = () => setSpaceIn(!spaceIn);
+  const toggleMoveSpace = () => {
+    setMoveSpace(!moveSpace);
+    console.log(`moveSpace : ${moveSpace}`);
+  };
+  const toggleSpaceIn = () => {
+    setSpaceIn(!spaceIn);
+    console.log(`spaceIn : ${spaceIn}`);
+  };
 
   // --------------------------- ☆ 요일, 시간 선택 작업중 --------------------------
   // ------------------------ 시작 시간 -------------------------
@@ -312,6 +331,8 @@ export default function CreateMissionModal({
                           startTime,
                           lockingType,
                           selectSpace,
+                          spaceIn,
+                          moveSpace,
                         })
                       }>
                       <Text>test</Text>
