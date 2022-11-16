@@ -23,7 +23,6 @@ const GoalTab = ({navigation}) => {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
   const categoryList = useSelector(store => store.categoryReducer.data);
-  // console.log(categoryList);
   const categoryFilter = useSelector(store => store.categoryReducer.filter);
   const missionNumber = missionData.length;
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,14 +31,14 @@ const GoalTab = ({navigation}) => {
       <Categories />
       <ScrollView>
         <GoalList>
-          {categoryFilter === '⭐ 전체 목표' ? (
+          {categoryFilter === '⭐전체목표' ? (
             <View>
               <GoalCategoryBox
-                category="⭐ 전체 목표"
+                category="⭐전체목표"
                 number={missionNumber}></GoalCategoryBox>
               {categoryList.map(c => (
                 <GoalCategoryBox
-                  key={c._id}
+                  key={c.id}
                   category={c.name}
                   number={
                     missionData.filter(el => el.category === c.name).length
@@ -51,7 +50,7 @@ const GoalTab = ({navigation}) => {
               .filter(el => el.category === categoryFilter)
               .map(item => (
                 <GoalBox
-                  key={item._id}
+                  key={item.id}
                   category={item.category}
                   missionName={item.name}
                   type="time"></GoalBox>

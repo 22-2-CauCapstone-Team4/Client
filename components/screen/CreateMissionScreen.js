@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {View, TouchableOpacity, Text, BackHandler} from 'react-native';
 import {styles} from '../../utils/styles';
+import {useNavigation} from '@react-navigation/native';
 
 export default function CreateMissionScreen({navigation}) {
   //뒤로가기 -> 페이지 뒤로
@@ -18,7 +19,7 @@ export default function CreateMissionScreen({navigation}) {
     );
 
     return () => backHandler.remove();
-  }, [navigation]);
+  }, []);
   return (
     <>
       <View style={styles.makeCenter}>

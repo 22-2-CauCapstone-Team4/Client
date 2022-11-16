@@ -2,6 +2,6 @@ import {NativeModules} from 'react-native';
 
 module.exports = {
   AppListModule: NativeModules.AppListModule,
-  ForegroundServiceModule: NativeModules.ForegroundServiceModule,
+  CurAppModule: NativeModules.CurAppModule,
   LockAppModule: NativeModules.LockAppModule,
 };

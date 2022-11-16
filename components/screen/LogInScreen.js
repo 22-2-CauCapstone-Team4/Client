@@ -10,7 +10,7 @@ import {
   Pressable,
 } from 'native-base';
 import SnackBar from 'react-native-snackbar';
-// import {CurAppModule} from '../../wrap_module';
+// import {CurAppModule, LockAppModule} from '../wrap_module';
 
 function LogInScreen({navigation}) {
   const Status = {
@@ -40,13 +40,22 @@ function LogInScreen({navigation}) {
     try {
       setCheckSignInStatus(Status.NOW_CHECKING);
 
-      await signIn({email, password});
+      await signIn(email, password);
       setLoginValid(' ');
       navigation.replace('Menu');
 
       // 서비스 실행
       // ** TODO : 금지 앱 CRUD 이후 아래 코드 추가하기
+      // ** TODO : 모달창 띄워서 권한 허락받기
       // try {
+      //   let isAlreadyAllowed;
+      //   do {
+      //     ({isAlreadyAllowed} = await CurAppModule.allowPermission());
+      //   } while (isAlreadyAllowed);
+      //   do {
+      //     ({isAlreadyAllowed} = await LockAppModule.allowPermission());
+      //   } while (isAlreadyAllowed);
+
       //   await CurAppModule.startService([
       //     // 서비스 실행 시점
       //     // ** TODO: 1. 금지 앱 리스트 바뀔 때 (기존 것 삭제 + 실행)

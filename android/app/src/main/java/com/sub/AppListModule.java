@@ -1,15 +1,14 @@
 package com.sub;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Base64;
-import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -20,11 +19,10 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AppListModule extends ReactContextBaseJavaModule {
-    WritableMap map = null;
-
     AppListModule(ReactApplicationContext context) {
         super(context);
     }
@@ -34,32 +32,27 @@ public class AppListModule extends ReactContextBaseJavaModule {
         return "AppListModule";
     }
 
-    private Runnable getAppListRunnable = new Runnable() {
-        @Override
-        public void run() {
-            Log.i("AppListModule", "앱 리스트 부르기 시작");
+    @ReactMethod
+    public void getAppList(Promise promise) {
+        try {
             ReactApplicationContext context = getReactApplicationContext();
 
             PackageManager pm = context.getPackageManager();
-
-            Intent intent = new Intent(Intent.ACTION_MAIN, null);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            List<ResolveInfo> infoList = pm.queryIntentActivities(intent, 0);
+            List<PackageInfo> infoList = pm.getInstalledPackages(0);
 
             // js에서 사용 가능한 arr, map
-            map = Arguments.createMap();
-            WritableArray array = Arguments.createArray();
+            WritableMap map = Arguments.createMap();
+            WritableArray name = Arguments.createArray();
+            WritableArray packageName = Arguments.createArray();
+            WritableArray icon = Arguments.createArray();
 
-            for (ResolveInfo info : infoList) {
-                ActivityInfo ai = info.activityInfo;
-
-                WritableMap app = Arguments.createMap();
-                app.putString("name", ai.loadLabel(pm) + "");
-                app.putString("packageName", ai.packageName);
+            for (PackageInfo info : infoList) {
+                name.pushString(info.applicationInfo.loadLabel(pm) + "");
+                packageName.pushString(info.packageName);
 
                 // icon img
                 // 1. drawble -> bitmap
-                Drawable iconBitmapDrawable = ai.applicationInfo.loadIcon(pm);
+                Drawable iconBitmapDrawable = info.applicationInfo.loadIcon(pm);
                 Bitmap iconBitmap = Bitmap.createBitmap(iconBitmapDrawable.getIntrinsicWidth(), iconBitmapDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
                 iconBitmap = Bitmap.createScaledBitmap(iconBitmap, 150, 150, true);
                 Canvas canvas = new Canvas(iconBitmap);
@@ -68,29 +61,17 @@ public class AppListModule extends ReactContextBaseJavaModule {
 
                 // 2. bitmap -> string
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                iconBitmap.compress(Bitmap.CompressFormat.PNG, 30, baos);
+                iconBitmap.compress(Bitmap.CompressFormat.PNG, 50, baos);
                 byte[] bytes = baos.toByteArray();
                 String iconStr = Base64.encodeToString(bytes, Base64.DEFAULT);
 
-                app.putString("icon", "data:image/png;base64," + iconStr);
-
-                array.pushMap(app);
+                icon.pushString("data:image/png;base64," + iconStr);
             }
-            map.putArray("appList", array);
 
-            Log.i("AppListModule", "앱 리스트 부르기 종료");
-        }
-    };
-
-    @ReactMethod
-    public void getAppList(Promise promise) {
-        try {
-            Thread thread = new Thread(getAppListRunnable);
-            thread.start();
-            thread.join(); // 스레드 종료할 때까지 대기
-
+            map.putArray("nameList", name);
+            map.putArray("packageNameList", packageName);
+            map.putArray("iconList", icon);
             promise.resolve(map);
-            map = null;
         } catch (Exception e) {
             promise.reject("error", e);
         }
