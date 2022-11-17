@@ -76,9 +76,12 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
         const startSec =
           days === 0
-            ? moment(curState.endPhoneTime).diff(curState.startPhoneTime) / 1000
+            ? parseInt(
+                moment(curState.endPhoneTime).diff(curState.startPhoneTime) /
+                  1000,
+              )
             : 60 * 60 * 60 -
-              moment(curState.startPhoneTime).diff(startDate) / 1000;
+              parseInt(moment(curState.startPhoneTime).diff(startDate) / 1000);
 
         console.log(days, startDate, endDate, startSec);
 
@@ -117,7 +120,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
         }
 
         if (days !== 0) {
-          const endSec = moment(curState.endPhoneTime).diff(endDate) / 1000;
+          const endSec = parseInt(
+            moment(curState.endPhoneTime).diff(endDate) / 1000,
+          );
           // 항상 새로 생성해야 함
           // 중간 날짜 - X, 같은 앱, 같은 화면을 한 번도 안 끄고 볼 수 있는 시간 24시간 이하라고 가정
           // 종료 날짜

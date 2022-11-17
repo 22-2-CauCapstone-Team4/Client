@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, TouchableOpacity, View} from 'react-native';
 import {Dimensions} from 'react-native';
@@ -21,14 +21,13 @@ const Container = styled.View`
 `;
 const StatisticsTab = () => {
   const {user} = useAuth();
-  const [isInit, setIsInit] = useState(true);
+  const [now, setNow] = useState(new Date());
   const [data1, setData1] = useState(null);
   const [data2, setData2] = useState(null);
   const [data3, setData3] = useState(null);
 
   useEffect(() => {
     const innerFunc = async () => {
-      setIsInit(false);
       const realm = await Realm.open(
         mkConfig(user, [
           AppUsageRecord.schema,
@@ -37,7 +36,6 @@ const StatisticsTab = () => {
         ]),
       );
 
-      const now = new Date();
       let [tempData1, tempData2, tempData3] = await Promise.all([
         readUsageInRealm(user, realm, now, now),
         readAppSecInRealm(user, realm, now, now),
@@ -49,12 +47,7 @@ const StatisticsTab = () => {
       tempData1 = {
         labels: ['평소'],
         legend: ['일반 앱', '금지 앱'],
-        data: [
-          [
-            ((tempData1.total - tempData1.app) / 60).toFixed(1),
-            (tempData1.app / 60).toFixed(1),
-          ],
-        ],
+        data: [[tempData1.total - tempData1.app, tempData1.app / 60]],
         barColors: ['#fe6383', '#36a2eb'],
       };
 
@@ -62,7 +55,7 @@ const StatisticsTab = () => {
         labels: tempData2.map(app => app.appPackageName),
         datasets: [
           {
-            data: tempData2.map(app => (app.usageSec / 60).toFixed(1)),
+            data: tempData2.map(app => app.usageSec / 60),
           },
         ],
       };
@@ -75,21 +68,25 @@ const StatisticsTab = () => {
         ],
       };
 
-      console.log(
-        tempData1,
-        tempData2,
-        tempData3,
-        tempData2.datasets[0].data,
-        tempData3.datasets[0].data,
-      );
+      // console.log(
+      //   tempData1,
+      //   tempData2,
+      //   tempData3,
+      //   tempData2.datasets[0].data,
+      //   tempData3.datasets[0].data,
+      // );
 
       setData1(tempData1);
       setData2(tempData2);
       setData3(tempData3);
     };
 
-    if (isInit) innerFunc();
-  }, [isInit, user]);
+    innerFunc();
+
+    setTimeout(() => {
+      setNow(new Date());
+    }, 30000);
+  }, [user, now]);
 
   const screenWidth = Dimensions.get('window').width;
 
