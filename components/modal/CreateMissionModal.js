@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   Text,
   Modal,
@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
+  FlatList,
+  SafeAreaView,
 } from 'react-native';
 import {styles} from '../../utils/styles';
 import {useNavigation} from '@react-navigation/native';
@@ -57,6 +59,7 @@ export default function CreateMissionModal({
           startTime: `${startTime.getHours()}:${startTime.getMinutes()}`,
           endTime: `${endTime.getHours()}:${endTime.getMinutes()}`,
         },
+        dayOfWeek: {}, // ＠ 요일 데이터
         space: {},
       },
     ]);
@@ -182,6 +185,71 @@ export default function CreateMissionModal({
     // 취소 시
     setVisible2(false); // 모달 close
   };
+  // ＠ 요일 선택
+  const [selected, setSelected] = React.useState(new Map());
+  const [selectedDay, setSelectedDay] = useState('');
+
+  const dayOfWeekSave = selected => {
+    setSelectedDay([...selected.keys()]);
+    console.log(selectedDay);
+  };
+  const Data = [
+    //＠ 요일 데이터
+    {
+      id: 0,
+      title: '일',
+    },
+    {
+      id: 1,
+      title: '월',
+    },
+    {
+      id: 2,
+      title: '화',
+    },
+    {
+      id: 3,
+      title: '수',
+    },
+    {
+      id: 4,
+      title: '목',
+    },
+    {
+      id: 5,
+      title: '금',
+    },
+    {
+      id: 6,
+      title: '토',
+    },
+  ];
+  // ＠ 이후 쭉 요일 관련 함수
+  const onSelect = useCallback(
+    id => {
+      const newSelected = new Map(selected);
+      newSelected.set(id, !selected.get(id));
+      setSelected(newSelected);
+    },
+    [selected],
+  );
+  const Item = ({id, title, selected, onSelect}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => onSelect(id, title)}
+        style={{
+          backgroundColor: selected ? 'grey' : 'white',
+          padding: 8,
+          margin: 1,
+          marginTop: 10,
+          borderWidth: 1,
+          borderRadius: 100,
+        }}>
+        <Text>{title}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <>
       {modalVisible ? (
@@ -224,30 +292,24 @@ export default function CreateMissionModal({
                     date={startTime}
                   />
                 </View>
-                {/* 아직 구현 x */}
-                <View style={missionStyle.week}>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>일</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>월</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>화</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>수</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>목</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>금</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={missionStyle.weekText}>토</Text>
-                  </TouchableOpacity>
+                {/* ＠ 요일 아직 구현 x */}
+                <View>
+                  <FlatList
+                    horizontal
+                    data={Data}
+                    renderItem={({item}) => (
+                      <Item
+                        id={item.id}
+                        title={item.title}
+                        selected={!!selected.get(item.id)}
+                        onSelect={onSelect}
+                      />
+                    )}
+                    keyExtractor={item => item.id}
+                    extraData={selected}
+                  />
                 </View>
+                {/* 시간 잠금 or 공간 잠금 */}
                 <View style={missionStyle.btnStyle}>
                   <TouchableOpacity onPress={lockTime}>
                     <Text
@@ -362,6 +424,7 @@ export default function CreateMissionModal({
                           startTime,
                           endTime,
                           lockingType,
+                          selected,
                         })
                       }>
                       <Text>test</Text>
@@ -369,6 +432,9 @@ export default function CreateMissionModal({
                   </View>
                 )}
               </ScrollView>
+              {/* <TouchableOpacity onPress={setSelectedDay([...selected.keys()])}>
+                <Text>test</Text>
+              </TouchableOpacity> */}
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
@@ -501,5 +567,9 @@ const missionStyle = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 100,
     marginTop: 10,
+  },
+  // 요일 style
+  dayOfWeekStyle: {
+    flexDirection: 'row',
   },
 });
