@@ -421,9 +421,6 @@ export default function CreateMissionModal({
                           style={missionStyle.time}>
                           <Text style={missionStyle.timeText}>시작 시간</Text>
                         </TouchableOpacity>
-                        <Text style={{color: 'black'}}>
-                          {startTime.getHours() + ':' + startTime.getMinutes()}
-                        </Text>
                       </View>
                       <DateTimePickerModal
                         isVisible={visible}
@@ -449,9 +446,6 @@ export default function CreateMissionModal({
                           style={missionStyle.time}>
                           <Text style={missionStyle.timeText}>종료 시간</Text>
                         </TouchableOpacity>
-                        <Text style={{color: 'black'}}>
-                          {endTime.getHours() + ':' + endTime.getMinutes()}
-                        </Text>
                       </View>
                       <DateTimePickerModal
                         isVisible={visible2}
@@ -592,7 +586,7 @@ const missionStyle = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#81b0ff',
     width: '100%',
-    height: 30,
+    height: 40,
     justifyContent: 'center',
     borderRadius: 200,
   },
@@ -603,6 +597,7 @@ const missionStyle = StyleSheet.create({
   timeData: {
     textAlign: 'center',
     fontSize: 20,
+    color: 'black',
   },
   resultData: {
     textAlign: 'center',
