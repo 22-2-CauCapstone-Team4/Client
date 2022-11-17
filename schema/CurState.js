@@ -6,15 +6,19 @@ class CurState {
     owner_id,
     isNowUsingProhibitedApp = false,
     appPackageName = '',
-    startTime,
-    endTime,
+    startAppTime,
+    endAppTime,
+    startPhoneTime,
+    endPhoneTime,
   }) {
     this._id = id;
     this.owner_id = owner_id;
     this.isNowUsingProhibitedApp = isNowUsingProhibitedApp;
     this.appPackageName = appPackageName;
-    if (startTime) this.startTime = startTime;
-    if (endTime) this.endTime = endTime;
+    if (startAppTime) this.startTime = startAppTime;
+    if (endAppTime) this.endTime = endAppTime;
+    if (startPhoneTime) this.startTime = startPhoneTime;
+    if (endPhoneTime) this.endTime = endPhoneTime;
   }
 
   static schema = {
@@ -24,8 +28,10 @@ class CurState {
       owner_id: 'string',
       isNowUsingProhibitedApp: {type: 'bool', default: false},
       appPackageName: {type: 'string', default: ''},
-      startTime: {type: 'date?'},
-      endTime: {type: 'date?'},
+      startAppTime: {type: 'date?'},
+      endAppTime: {type: 'date?'},
+      startPhoneTime: {type: 'date?'},
+      endPhoneTime: {type: 'date?'},
     },
     primaryKey: '_id',
   };
