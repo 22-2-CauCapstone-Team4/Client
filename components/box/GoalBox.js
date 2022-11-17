@@ -42,7 +42,7 @@ function GoalBox(props) {
             <TouchableOpacity>
               <Ionicons
                 name={'settings-outline'}
-                size={20}
+                size={24}
                 style={{
                   color: 'grey',
                 }}></Ionicons>
@@ -52,19 +52,18 @@ function GoalBox(props) {
       </View>
 
       <ConditionView>
-        <Text style={styles.info}>진행 날짜: {props.mission.date}</Text>
         {props.mission.type === 'time' ? (
           <View>
-            <Ionicons name={'lock-closed'} size={12} style={styles.timeIcon}>
+            <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
               시작:
-              <Text style={[styles.info, {marginHorizontal: 5}]}>
+              <Text style={[{marginHorizontal: 5}]}>
                 {timeInfoText(props.mission.time.startTime)}
               </Text>
             </Ionicons>
 
-            <Ionicons name={'lock-open'} size={12} style={styles.timeIcon}>
+            <Ionicons name={'lock-open'} size={14} style={styles.timeIcon}>
               종료:
-              <Text style={[styles.info, {marginHorizontal: 20}]}>
+              <Text style={[{marginHorizontal: 20}]}>
                 {timeInfoText(props.mission.time.endTime)}
               </Text>
             </Ionicons>
@@ -77,6 +76,9 @@ function GoalBox(props) {
             </Text>
           </View>
         )}
+        <Ionicons name={'calendar'} size={14} style={styles.timeIcon}>
+          <Text style={[{marginHorizontal: 10}]}> {props.mission.date}</Text>
+        </Ionicons>
       </ConditionView>
     </Container>
   );
@@ -103,12 +105,13 @@ const ContentContainer = styled.View`
 `;
 
 const Container = styled.View`
-  height: 140px;
+  height: 120px;
   width: 100%;
-  border: 1px solid #f1f1f1;
+  border: 1px solid #e1e1e1;
   border-radius: 20px;
   padding: 10px;
   margin: 5px 0;
+  align-items: center;
 `;
 
 const ContentView = styled.View`
@@ -121,12 +124,14 @@ const ContentView = styled.View`
 `;
 
 const ConditionView = styled.View`
-  padding: 5px 5px;
+  padding: 10px;
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  position: absolute;
+  bottom: 0px;
 `;
 
 // 10자 이내로 제한

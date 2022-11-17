@@ -1,11 +1,3 @@
-// 미션
-// 날짜 구하기
-// new Date().toLocaleDateString("ko", {
-//   weekday: "long",
-//   year: "numeric",
-//   month: "short",
-//   day: "numeric",
-// }); //2022년 11월 15일 화요일
 import {todayDate} from '../../functions/time';
 const INITIAL_STATE = {
   missionData: [
@@ -21,7 +13,7 @@ const INITIAL_STATE = {
     },
     {
       id: '캡스톤',
-      category: '💻과제',
+      category: '🏫수업',
       name: '캡스톤',
       date: todayDate,
       type: 'time',
@@ -55,7 +47,7 @@ const INITIAL_STATE = {
       name: '리액트',
       date: '2022-11-17',
       type: 'time',
-      time: {startTime: '21:30', endTime: '23:00'},
+      time: {startTime: '21:00', endTime: '23:00'},
       space: {},
       state: 'none',
     },

@@ -17,11 +17,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import SelectDropdown from 'react-native-select-dropdown';
 import {StyleSheet} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
   setModalVisible,
 }) {
+  const dispatch = useDispatch();
+  const missionData = useSelector(store => store.missionReducer.missionData);
   // ★ 시간 잠금 저장
   const [saveTime, setSaveTime] = useState([
     //  더미 데이터

@@ -225,7 +225,7 @@ function Detail({navigation}) {
 
   const onPressLogOut = () => {
     signOut();
-    navigation.replace('Login');
+    navigation.navigate('Login');
   };
 
   const isFocused = useIsFocused();
@@ -308,7 +308,7 @@ function Detail({navigation}) {
         },
       })}>
       {/* 홈 -> tabBarBadge: 현재 진행 중인 미션 개수를 띄워두기(?) */}
-      <Tab.Screen name="홈" component={HomeTab} options={{tabBarBadge: 0}} />
+      <Tab.Screen name="홈" component={HomeTab} />
       <Tab.Screen name="목표" component={GoalTab} />
       <Tab.Screen name="기록" component={Record} />
       <Tab.Screen name="통계" component={Statistics} />

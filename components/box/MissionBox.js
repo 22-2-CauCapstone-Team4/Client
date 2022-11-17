@@ -8,15 +8,43 @@ import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
 function MissionBox(props) {
   const [isEnabled, setIsEnabled] = useState(true);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-  const [leftTime, setLeftTime] = useState('');
+  const [leftTime, setLeftTime] = useState(
+    compareTimeBeforeStart(props.mission.time.startTime),
+  );
+  const [endMissionTime, setEndMissionTime] = useState(
+    compareTimeBeforeStart(props.mission.time.endTime),
+  );
   const sixty = useRef(new Date().getUTCSeconds());
   useEffect(() => {
     sixty.current = setTimeout(() => {
       if (props.mission.type === 'time') {
         setLeftTime(compareTimeBeforeStart(props.mission.time.startTime));
+        setEndMissionTime(compareTimeBeforeStart(props.mission.time.endTime));
       }
     }, 1000);
   }, [leftTime]);
+
+  function missionStateMessage() {
+    // 미션 시작 시간 전
+    if (leftTime[0] > 0 || leftTime[1] > 0) {
+      return (
+        <LeftCondition>
+          {leftTime[0] == 0 ? null : leftTime[0] + '시간'} {leftTime[1]} 분 후
+          시작
+        </LeftCondition>
+      );
+    } else {
+      // 미션 시작 시간 이후 ~ 미션 종료 시간
+      if (endMissionTime[0] > 0 || endMissionTime[1] > 0) {
+        return (
+          <LeftCondition style={{color: 'orange'}}>미션 진행 중</LeftCondition>
+        );
+        // 미션 종료 시간 이후
+      } else {
+        return <LeftCondition style={{color: 'red'}}>미션 종료</LeftCondition>;
+      }
+    }
+  }
 
   return (
     <Container>
@@ -29,12 +57,7 @@ function MissionBox(props) {
           </ContentView>
         </View>
         <LeftView>
-          {props.mission.type === 'time' ? (
-            <LeftCondition>
-              {leftTime[0] == 0 ? null : leftTime[0]} 시간 {leftTime[1]} 분 후
-              시작
-            </LeftCondition>
-          ) : null}
+          {props.mission.type === 'time' ? missionStateMessage() : null}
         </LeftView>
       </ContentContainer>
       <ConditionView>
@@ -103,12 +126,13 @@ const ContentContainer = styled.View`
 `;
 
 const Container = styled.View`
-  height: 140px;
+  height: 120px;
   width: 100%;
-  border: 1px solid #f1f1f1;
+  border: 1px solid #e1e1e1;
   border-radius: 20px;
   padding: 10px;
   margin: 5px 0;
+  align-items: center;
 `;
 
 const ContentView = styled.View`
@@ -121,12 +145,14 @@ const ContentView = styled.View`
 `;
 
 const ConditionView = styled.View`
-  padding: 5px 5px;
+  padding: 10px;
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  position: absolute;
+  bottom: 0px;
 `;
 
 // 10자 이내로 제한

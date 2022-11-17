@@ -80,7 +80,7 @@ export default function BlockApp({navigation}) {
               backgroundColor: blockedApps.find(
                 blockedItem => blockedItem.packageName === item.packageName,
               )
-                ? 'red'
+                ? Colors.MAIN_COLOR
                 : null,
             },
           ]}
@@ -135,8 +135,9 @@ export default function BlockApp({navigation}) {
               color: blockedApps.find(
                 blockedItem => blockedItem.packageName === item.packageName,
               )
-                ? 'red'
+                ? Colors.MAIN_COLOR
                 : 'black',
+              fontSize: 10,
             }}>
             {item.name}
           </Text>
@@ -152,7 +153,7 @@ export default function BlockApp({navigation}) {
         <Text
           style={{
             color: Colors.MAIN_COLOR,
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: 'bold',
             paddingTop: 20,
           }}>

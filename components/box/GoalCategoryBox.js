@@ -39,7 +39,7 @@ const ContentContainer = styled.View`
 
 const Container = styled.View`
   width: 100%;
-  border: 1px solid #f1f1f1;
+  border: 1px solid #e1e1e1;
   border-radius: 20px;
   padding: 10px;
   margin: 5px 0;

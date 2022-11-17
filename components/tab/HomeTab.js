@@ -32,10 +32,24 @@ const HomeTab = ({navigation}) => {
     <View style={styles.tabContainer}>
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>
-          <Text style={{color: mission ? 'black' : '#38a6c0'}}>오늘 미션</Text>
+          <Text
+            style={{
+              color: mission ? 'black' : '#38a6c0',
+              fontSize: 16,
+              fontWeight: mission ? '400' : '600',
+            }}>
+            오늘 미션
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={clickMission2}>
-          <Text style={{color: mission ? '#38a6c0' : 'black'}}>진행 중</Text>
+          <Text
+            style={{
+              color: mission ? '#38a6c0' : 'black',
+              fontSize: 16,
+              fontWeight: mission ? '600' : '400',
+            }}>
+            진행 중
+          </Text>
         </TouchableOpacity>
       </AboutMission>
       <MainText>
@@ -47,19 +61,32 @@ const HomeTab = ({navigation}) => {
       ) : (
         <ScrollViews>
           <MissionList>
-            {/* 시간 공간미션 따로 보여주자 */}
-            <Text style={styles.missionTypeText}>
-              시간 미션 | {todayTimeMission.length}
-            </Text>
+            <View style={styles.missionTypeView}>
+              <Ionicons
+                name={'timer-sharp'}
+                style={{color: Colors.MAIN_COLOR}}
+                size={24}></Ionicons>
+              <Text style={styles.missionTypeText}>
+                시간 미션 | {todayTimeMission.length}
+              </Text>
+            </View>
+
             {todayTimeMission.map(mission => {
               return (
                 <MissionBox key={mission.id} mission={mission}></MissionBox>
               );
             })}
             <View style={styles.lineStyle}></View>
-            <Text style={styles.missionTypeText}>
-              공간 미션 | {todaySpaceMission.length}
-            </Text>
+            <View style={styles.missionTypeView}>
+              <Ionicons
+                name={'trail-sign-sharp'}
+                style={{color: Colors.MAIN_COLOR}}
+                size={24}></Ionicons>
+              <Text style={styles.missionTypeText}>
+                공간 미션 | {todaySpaceMission.length}
+              </Text>
+            </View>
+
             {todaySpaceMission.map(mission => {
               return (
                 <MissionBox key={mission.id} mission={mission}></MissionBox>
@@ -110,6 +137,11 @@ const MissionList = styled.View`
 const ScrollViews = styled.ScrollView``;
 
 const styles = StyleSheet.create({
+  missionTypeView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 3,
+  },
   tabContainer: {
     height: '100%',
     backgroundColor: 'white',

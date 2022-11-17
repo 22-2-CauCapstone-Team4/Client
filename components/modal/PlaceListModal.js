@@ -10,6 +10,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
 import {deletePlace, deleteMission} from '../../store/action/index';
@@ -40,9 +42,10 @@ export default function PlaceListModal({
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
-            <View style={styles.modalView}>
+            <View style={style.modalView}>
               <View style={style.scrollView}>
                 <Text style={style.placeText}>장소 목록</Text>
+                <View style={style.lineStyle}></View>
                 {placesNumber === 0 ? (
                   <Text style={{color: 'red', fontSize: 12}}>
                     장소를 등록하세요!
@@ -109,15 +112,21 @@ export default function PlaceListModal({
 }
 
 const style = StyleSheet.create({
+  lineStyle: {
+    width: '100%',
+    borderWidth: 0.5,
+    borderColor: Colors.MAIN_COLOR,
+    margin: 10,
+  },
   placeText: {
     color: 'black',
     fontSize: 22,
     fontWeight: '700',
-    marginBottom: 20,
+    marginBottom: 5,
   },
   place: {
     width: 150,
-    height: 30,
+    height: 36,
     backgroundColor: '#0891b2',
     borderRadius: 600,
     justifyContent: 'center',
@@ -132,5 +141,22 @@ const style = StyleSheet.create({
     borderWidth: 0.5,
     padding: 10,
     marginBottom: 5,
+  },
+  modalView: {
+    margin: 20,
+    width: '65%',
+    height: '50%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
