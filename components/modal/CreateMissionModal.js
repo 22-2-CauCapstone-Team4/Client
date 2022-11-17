@@ -27,8 +27,8 @@ export default function CreateMissionModal({
 }) {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
-  console.log('미션 정보');
-  console.log(missionData);
+  //console.log('미션 정보');
+  //console.log(missionData);
   // ★ 시간 잠금 저장
   const [saveTime, setSaveTime] = useState();
   // ★ 시간 잠금 데이터 저장 함수
@@ -80,8 +80,8 @@ export default function CreateMissionModal({
       space: {},
     };
   };
-  console.log('시간 데이터');
-  console.log(saveTime);
+  //console.log('시간 데이터');
+  //console.log(saveTime);
   // ★ 공간 잠금 저장
   // const [saveSpace, setSaveSpace] = useState([
   //   //  더미 데이터
@@ -291,8 +291,8 @@ export default function CreateMissionModal({
                     defaultButtonText="카테고리"
                     data={category}
                     onSelect={selectedItem => {
-                      console.log(selectedItem);
                       setSelectCategory(selectedItem);
+                      console.log(selectedItem);
                     }}
                   />
                 </View>

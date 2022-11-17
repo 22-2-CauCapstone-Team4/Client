@@ -38,14 +38,16 @@ const GoalTab = ({navigation}) => {
               <GoalCategoryBox
                 category="⭐ 전체 목표"
                 number={missionNumber}></GoalCategoryBox>
-              {categoryList.map(c => (
-                <GoalCategoryBox
-                  key={c._id}
-                  category={c.name}
-                  number={
-                    missionData.filter(el => el.category === c.name).length
-                  }></GoalCategoryBox>
-              ))}
+              {categoryList.map(c => {
+                return (
+                  <GoalCategoryBox
+                    key={c._id}
+                    category={c.name}
+                    number={
+                      missionData.filter(el => el.category === c.name).length
+                    }></GoalCategoryBox>
+                );
+              })}
             </View>
           ) : (
             missionData

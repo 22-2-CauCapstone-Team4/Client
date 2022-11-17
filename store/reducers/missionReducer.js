@@ -3,7 +3,7 @@ const INITIAL_STATE = {
   missionData: [
     {
       id: '플러터',
-      category: '✏️공부',
+      category: '✏️ 공부',
       name: '플러터',
       date: todayDate,
       dayOfWeek: {},
@@ -14,7 +14,7 @@ const INITIAL_STATE = {
     },
     {
       id: '캡스톤',
-      category: '🏫수업',
+      category: '🏫 과제',
       name: '캡스톤',
       date: todayDate,
       dayOfWeek: {},
@@ -25,7 +25,7 @@ const INITIAL_STATE = {
     },
     {
       id: '조깅',
-      category: '💪운동',
+      category: '💪 운동',
       name: '조깅',
       date: todayDate,
       dayOfWeek: {},
@@ -36,7 +36,7 @@ const INITIAL_STATE = {
     },
     {
       id: '모바일 앱',
-      category: '🏫수업',
+      category: '🏫 과제',
       name: '모바일 앱',
       date: '2022-11-17',
       dayOfWeek: {},
@@ -47,7 +47,7 @@ const INITIAL_STATE = {
     },
     {
       id: '리액트',
-      category: '✏️공부',
+      category: '✏️ 공부',
       name: '리액트',
       date: '2022-11-17',
       dayOfWeek: {},
@@ -58,7 +58,7 @@ const INITIAL_STATE = {
     },
     {
       id: '인공지능',
-      category: '🏫과제',
+      category: '🏫 과제',
       name: '인공지능',
       date: '2022-11-19',
       dayOfWeek: {},
@@ -69,7 +69,7 @@ const INITIAL_STATE = {
     },
     {
       id: '헬스',
-      category: '💪운동',
+      category: '💪 운동',
       name: '헬스',
       date: '2022-11-17',
       dayOfWeek: {},

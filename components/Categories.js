@@ -102,7 +102,7 @@ export default function Categories() {
                 dispatch(selectCategory(item.name));
               }}
               onLongPress={() => {
-                deleteGoalInRealm(user, item);
+                deleteGoalInRealm(user, item.name);
 
                 dispatch(
                   deleteMission(
