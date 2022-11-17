@@ -279,7 +279,7 @@ function Detail({navigation}) {
               <TouchableOpacity
                 style={styles.tabButtonStyle}
                 onPress={onPressLogOut}>
-                <Text style={{color: 'black'}}>로그아웃</Text>
+                <Text style={{color: 'black', marginRight: 3}}>로그아웃</Text>
                 <Icon name={'log-out'} size={30} color={'black'} />
               </TouchableOpacity>
             );
@@ -297,8 +297,10 @@ function Detail({navigation}) {
                   onPress={() => {
                     setModalVisible(!modalVisible);
                   }}>
-                  <Text style={{color: 'black'}}>공간 추가</Text>
-                  <Icon name={'compass'} size={30} color={'black'} />
+                  <Text style={{color: 'black', marginRight: 3}}>
+                    장소 목록
+                  </Text>
+                  <Icon name={'map-sharp'} size={30} color={'black'} />
                 </TouchableOpacity>
               </View>
             );

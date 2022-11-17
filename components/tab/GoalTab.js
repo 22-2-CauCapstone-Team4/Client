@@ -18,7 +18,6 @@ import SpaceBox from '../box/SpaceBox';
 import CreateMissionModal from '../modal/CreateMissionModal';
 import {useDispatch, useSelector} from 'react-redux';
 import {addMission, deleteMission, selectMission} from '../../store/action';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 const GoalTab = ({navigation}) => {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
@@ -49,12 +48,8 @@ const GoalTab = ({navigation}) => {
           ) : (
             missionData
               .filter(el => el.category === categoryFilter)
-              .map(item => (
-                <GoalBox
-                  key={item._id}
-                  category={item.category}
-                  missionName={item.name}
-                  type="time"></GoalBox>
+              .map(mission => (
+                <GoalBox key={mission.id} mission={mission}></GoalBox>
               ))
           )}
         </GoalList>
