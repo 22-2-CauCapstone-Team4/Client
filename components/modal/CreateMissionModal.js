@@ -133,8 +133,8 @@ export default function CreateMissionModal({
   // };
   // 카테고리
 
-  const category = ['운동', '공부', '도서관']; // ★ 카테고리 데이터
-  const space = ['중앙대', '집', 'pc방']; // ★ 공간 데이터
+  const category = useSelector(store => store.categoryReducer.data); // ★ 카테고리 데이터
+  const space = useSelector(store => store.placeReducer.data); // ★ 공간 데이터
   const [selectCategory, setSelectCategory] = useState(''); // 카테고리 선택 state
   const [selectSpace, setSelectSpace] = useState(''); // 공간선택 state
   // 미션 이름 저장
@@ -289,7 +289,7 @@ export default function CreateMissionModal({
                 <View style={{alignItems: 'center'}}>
                   <SelectDropdown
                     defaultButtonText="카테고리"
-                    data={category}
+                    data={category.map(el => el.name)}
                     onSelect={selectedItem => {
                       setSelectCategory(selectedItem);
                       console.log(selectedItem);
@@ -375,7 +375,7 @@ export default function CreateMissionModal({
                       <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
                           defaultButtonText="공간선택"
-                          data={space}
+                          data={space.map(el => el.name)}
                           onSelect={selectedItem => {
                             setSelectSpace(selectedItem);
                           }}
@@ -492,6 +492,7 @@ export default function CreateMissionModal({
                         ),
                       ),
                     );
+                    setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
