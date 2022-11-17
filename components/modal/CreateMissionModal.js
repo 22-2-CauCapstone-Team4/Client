@@ -11,6 +11,7 @@ import {
   FlatList,
   SafeAreaView,
 } from 'react-native';
+import SnackBar from 'react-native-snackbar';
 import {styles} from '../../utils/styles';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -499,6 +500,10 @@ export default function CreateMissionModal({
                         ),
                       ),
                     );
+                    SnackBar.show({
+                      text: '미션 생성이 완료되었습니다. ',
+                      duration: SnackBar.LENGTH_SHORT,
+                    });
                   }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
