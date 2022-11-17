@@ -8,6 +8,8 @@ import {
   deleteMission,
 } from './Mission';
 
+import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
+
 module.exports = {
   readProhibitedAppsInRealm: readProhibitedApps,
   updateProhibitedAppsInRealm: updateProhibitedApps,
@@ -23,4 +25,7 @@ module.exports = {
   createMissionInRealm: createMission,
   updateMissionInRealm: updateMission,
   deleteMissionInRealm: deleteMission,
+  readUsageInRealm: readUsage,
+  readAppSecInRealm: readAppSec,
+  readAppCntInRealm: readAppCnt,
 };

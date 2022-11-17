@@ -5,6 +5,7 @@ import {
   Goal,
   Place,
   Mission,
+  PhoneUsageRecord,
 } from '../schema';
 
 const openRealmBehaviorConfig = {
@@ -34,6 +35,7 @@ const mkConfigWithSubscriptions = user => {
       Goal.schema,
       Place.schema,
       Mission.schema,
+      PhoneUsageRecord.schema,
     ],
     sync: {
       user,
@@ -58,6 +60,11 @@ const mkConfigWithSubscriptions = user => {
           subs.add(realm.objects('Place').filtered(`owner_id == "${user.id}"`));
           subs.add(
             realm.objects('Mission').filtered(`owner_id == "${user.id}"`),
+          );
+          subs.add(
+            realm
+              .objects('PhoneUsageRecord')
+              .filtered(`owner_id == "${user.id}"`),
           );
         },
       },

@@ -2,32 +2,36 @@
 // import {LockAppModule} from './wrap_module';
 
 import Realm from 'realm';
-import {AppUsageRecord, CurState} from '../../schema';
+import {AppUsageRecord, PhoneUsageRecord, CurState} from '../../schema';
 import moment from 'moment';
 import {mkConfig} from '../mkConfig';
 import {LockAppModule} from '../../wrap_module';
 
 const appCheckHeadlessTask = async (user, taskData) => {
   // 지금 날짜, 시간
-  let realm,
-    isOpened = false;
+  let realm = null;
   try {
     const now = new Date();
 
     console.log('CheckApp 이벤트', taskData);
-    const {appPackageName, isProhibitedApp} = taskData;
+    const {appPackageName, appName, isProhibitedApp, isPhoneOn, isPhoneOff} =
+      taskData;
 
     // Realm 열기
     realm = await Realm.open(
-      mkConfig(user, [AppUsageRecord.schema, CurState.schema]),
+      mkConfig(user, [
+        AppUsageRecord.schema,
+        PhoneUsageRecord.schema,
+        CurState.schema,
+      ]),
     );
-    isOpened = true;
     console.log('0. realm open');
 
     // 1. 현 상태 업데이트
     let curState,
       isPrevUsedProhibitedApp,
       prevAppPackageName,
+      prevAppName,
       prevStartTime = null;
     realm.write(() => {
       // 상태 데이터 없으면 err
@@ -42,25 +46,108 @@ const appCheckHeadlessTask = async (user, taskData) => {
       curState = curState[0];
       isPrevUsedProhibitedApp = curState.isNowUsingProhibitedApp;
       prevAppPackageName = curState.appPackageName;
+      prevAppName = curState.appName;
 
       curState.isNowUsingProhibitedApp = isProhibitedApp;
       if (isProhibitedApp) {
         curState.appPackageName = appPackageName;
+        curState.appName = appName;
+
         if (curState.isNowUsingProhibitedApp) {
           // 이전 시작 시간을 따로 변수에 기록해두어야 함
-          prevStartTime = curState.startTime;
+          prevStartTime = curState.startAppTime;
         }
-        curState.startTime = now;
+        curState.startAppTime = now;
       } else {
-        curState.endTime = now;
+        curState.endAppTime = now;
+      }
+
+      // phone on, off 처리
+      console.log(isPhoneOn, isPhoneOff);
+      if (isPhoneOn) {
+        console.log('1. phone on');
+        curState.startPhoneTime = now;
+      } else if (isPhoneOff) {
+        console.log('1. 폰 사용시간 기록 (phone off)');
+        curState.endPhoneTime = now;
+
+        const startDate = curState.startPhoneTime;
+        startDate.setHours(0, 0, 0, 0);
+
+        const endDate = new Date(now);
+        endDate.setHours(0, 0, 0, 0);
+
+        const days = moment(endDate).diff(startDate, 'days');
+
+        const startSec =
+          days === 0
+            ? parseInt(
+                moment(curState.endPhoneTime).diff(curState.startPhoneTime) /
+                  1000,
+              )
+            : 60 * 60 * 60 -
+              parseInt(moment(curState.startPhoneTime).diff(startDate) / 1000);
+
+        console.log(days, startDate, endDate, startSec);
+
+        // 시간 기록
+        // 시작 날짜
+        let todayRecord = realm
+          .objects('PhoneUsageRecord')
+          .filtered(
+            `date == ${moment(startDate)
+              .utc()
+              .format('YYYY-MM-DD@HH:mm:ss')}:0`,
+          );
+        // 1. 기록 없는 경우, 생성
+        if (todayRecord.length === 0) {
+          realm.create(
+            'PhoneUsageRecord',
+            new PhoneUsageRecord({
+              owner_id: user.id,
+              date: startDate,
+              usageSec: startSec,
+            }),
+          );
+        }
+
+        // 2. 오늘의 기록 있는 경우
+        else if (todayRecord.length === 1) {
+          todayRecord = todayRecord[0];
+          todayRecord.usageSec += startSec;
+        }
+
+        // 여러 개면 error
+        else {
+          throw new Error(
+            `1. 현재 앱 현재 시간에 대한 PhoneUsageRecord는 0개 또는 1개 존재해야 함, 현재 ${todayRecord.length}개`,
+          );
+        }
+
+        if (days !== 0) {
+          const endSec = parseInt(
+            moment(curState.endPhoneTime).diff(endDate) / 1000,
+          );
+          // 항상 새로 생성해야 함
+          // 중간 날짜 - X, 같은 앱, 같은 화면을 한 번도 안 끄고 볼 수 있는 시간 24시간 이하라고 가정
+          // 종료 날짜
+          realm.create(
+            'PhoneUsageRecord',
+            new PhoneUsageRecord({
+              owner_id: user.id,
+              date: endDate,
+              usageSec: endSec,
+            }),
+          );
+        }
       }
     });
 
     console.log(
       '1. CurState 업데이트 완료',
       // `app = ${appPackageName}, isProhibitedApp = ${isProhibitedApp}`,
-      //   curState.startTime,
-      //   curState.endTime,
+      //   curState.startAppTime,
+      //   curState.endAppTime,
     );
 
     // 2. 기록 업데이트 (금지 앱 사용 끝인 경우)
@@ -104,6 +191,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
             new AppUsageRecord({
               owner_id: user.id,
               appPackageName,
+              appName,
               date: todayMidnight,
               hour,
               clickCnt: 1,
@@ -127,13 +215,13 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
       // 2. 금지 앱 사용 종료 case
       if (
-        !isProhibitedApp ||
+        (!isProhibitedApp && isPrevUsedProhibitedApp) ||
         (isProhibitedApp && isPrevUsedProhibitedApp) // 연속해서 바로 금지 앱 사용하는 경우, 이전 금지 앱 사용은 끝난 것
       ) {
-        // 이전 앱의 사용 종료인지에 따라 startTime으로 사용할 값 바뀜
+        // 이전 앱의 사용 종료인지에 따라 startAppTime으로 사용할 값 바뀜
         // 현재 앱이 금지 앱이 아닌지에 따라 앱 이름으로 사용할 값 바뀜
         const selectedStartTime = !isProhibitedApp
-          ? curState.startTime
+          ? curState.startAppTime
           : prevStartTime;
 
         const startDate = new Date(selectedStartTime);
@@ -146,8 +234,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
         if (days === 0 && startHour === endHour) {
           // for문 필요 없이 기록하면 됨
-          const sec =
-            curState.endTime.getSeconds() - curState.startTime.getSeconds();
+          const sec = parseInt(
+            moment(curState.endAppTime).diff(selectedStartTime) / 1000,
+          );
 
           let record = realm
             .objects('AppUsageRecord')
@@ -182,8 +271,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
               (selectedStartTime.getMinutes() * 60 +
                 selectedStartTime.getSeconds()),
             endSec =
-              curState.endTime.getMinutes() * 60 +
-              curState.endTime.getSeconds();
+              curState.endAppTime.getMinutes() * 60 +
+              curState.endAppTime.getSeconds();
 
           const tempDate = moment(startDate);
           console.log(startSec, endSec);
@@ -244,6 +333,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                   new AppUsageRecord({
                     owner_id: user.id,
                     appPackageName: prevAppPackageName,
+                    appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
                     usageSec: endSec,
@@ -262,6 +352,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                   new AppUsageRecord({
                     owner_id: user.id,
                     appPackageName: prevAppPackageName,
+                    appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
                     usageSec: 60 * 60,
@@ -280,17 +371,17 @@ const appCheckHeadlessTask = async (user, taskData) => {
     realm.close();
 
     // 앱 실행 코드 추가
-    try {
-      await LockAppModule.viewLockScreen();
-    } catch (err) {
-      console.error(err.message);
-    }
+    // try {
+    //   await LockAppModule.viewLockScreen();
+    // } catch (err) {
+    //   console.error(err.message);
+    // }
 
-    console.log('AppCheckHeadlessTask 완료');
+    console.log('appCheckHeadlessTask 완료');
   } catch (err) {
     console.error(err.message);
 
-    if (isOpened) {
+    if (realm !== null) {
       realm.close();
     }
   }

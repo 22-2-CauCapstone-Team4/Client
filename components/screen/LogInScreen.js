@@ -31,7 +31,11 @@ function LogInScreen({navigation}) {
   const {user, signIn} = useAuth();
 
   React.useEffect(() => {
-    if (user !== null && user.providerType === 'local-userpass') {
+    if (
+      user !== null &&
+      user.providerType === 'local-userpass' &&
+      user.isLoggedIn
+    ) {
       navigation.replace('Menu');
     }
   }, [navigation, user]);
@@ -97,7 +101,7 @@ function LogInScreen({navigation}) {
           />
           <Pressable
             w="300px"
-            onPress={() => navigation.navigate('CreateAccount')}>
+            onPress={() => navigation.replace('CreateAccount')}>
             <Text textAlign="right">가입하기</Text>
           </Pressable>
         </Box>
