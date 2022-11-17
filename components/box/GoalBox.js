@@ -1,7 +1,7 @@
 // 목표 탭에서 전체목표가 아닌 특정 카테고리를 눌렀을 때 표시되는 해당 카테고리 미션 컴포넌트
 
 import React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, Modal} from 'react-native';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -22,7 +22,7 @@ function GoalBox(props) {
             style={{
               width: '100%',
               flexDirection: 'row',
-              // backgroundColor: 'black',
+              justifyContent: 'space-between',
             }}>
             <ContentView>
               <Category>{props.mission.category}</Category>
@@ -45,8 +45,6 @@ function GoalBox(props) {
                 size={20}
                 style={{
                   color: 'grey',
-                  position: 'absolute',
-                  left: 0,
                 }}></Ionicons>
             </TouchableOpacity>
           </View>
@@ -57,16 +55,16 @@ function GoalBox(props) {
         <Text style={styles.info}>진행 날짜: {props.mission.date}</Text>
         {props.mission.type === 'time' ? (
           <View>
-            <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
+            <Ionicons name={'lock-closed'} size={12} style={styles.timeIcon}>
               시작:
-              <Text style={{color: Colors.MAIN_COLOR, marginHorizontal: 5}}>
+              <Text style={[styles.info, {marginHorizontal: 5}]}>
                 {timeInfoText(props.mission.time.startTime)}
               </Text>
             </Ionicons>
 
-            <Ionicons name={'lock-open'} size={14} style={styles.timeIcon}>
+            <Ionicons name={'lock-open'} size={12} style={styles.timeIcon}>
               종료:
-              <Text style={{color: Colors.MAIN_COLOR}}>
+              <Text style={[styles.info, {marginHorizontal: 20}]}>
                 {timeInfoText(props.mission.time.endTime)}
               </Text>
             </Ionicons>
@@ -79,7 +77,6 @@ function GoalBox(props) {
             </Text>
           </View>
         )}
-        <Text style={{color: 'black'}}>{null}</Text>
       </ConditionView>
     </Container>
   );
@@ -94,7 +91,7 @@ const styles = StyleSheet.create({
   },
   timeIcon: {
     color: Colors.MAIN_COLOR,
-    marginVertical: 2,
+    marginVertical: 3,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Text, View, StyleSheet, Switch} from 'react-native';
 import styled from 'styled-components/native';
 import Colors from '../../utils/Colors';
@@ -8,6 +8,16 @@ import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
 function MissionBox(props) {
   const [isEnabled, setIsEnabled] = useState(true);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [leftTime, setLeftTime] = useState('');
+  const sixty = useRef(new Date().getUTCSeconds());
+  useEffect(() => {
+    sixty.current = setTimeout(() => {
+      if (props.mission.type === 'time') {
+        setLeftTime(compareTimeBeforeStart(props.mission.time.startTime));
+      }
+    }, 1000);
+  }, [leftTime]);
+
   return (
     <Container>
       <ContentContainer>
@@ -19,7 +29,12 @@ function MissionBox(props) {
           </ContentView>
         </View>
         <LeftView>
-          <LeftCondition>3시간 24분 남음</LeftCondition>
+          {props.mission.type === 'time' ? (
+            <LeftCondition>
+              {leftTime[0] == 0 ? null : leftTime[0]} 시간 {leftTime[1]} 분 후
+              시작
+            </LeftCondition>
+          ) : null}
         </LeftView>
       </ContentContainer>
       <ConditionView>
