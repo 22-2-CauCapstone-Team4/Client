@@ -28,7 +28,6 @@ const HomeTab = ({navigation}) => {
   const clickMission2 = () => setMission(true);
 
   return (
-    // 미션 중 화면 채택시 Container 자체를 바꿔야 할 듯
     <View style={styles.tabContainer}>
       <AboutMission>
         <TouchableOpacity onPress={clickMission1}>

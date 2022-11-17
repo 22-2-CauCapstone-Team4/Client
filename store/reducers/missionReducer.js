@@ -6,6 +6,7 @@ const INITIAL_STATE = {
       category: '✏️공부',
       name: '플러터',
       date: todayDate,
+      dayOfWeek: {},
       type: 'time',
       time: {startTime: '16:50', endTime: '22:00'},
       space: {},
@@ -16,8 +17,9 @@ const INITIAL_STATE = {
       category: '🏫수업',
       name: '캡스톤',
       date: todayDate,
+      dayOfWeek: {},
       type: 'time',
-      time: {startTime: '22:00', endTime: '23:45'},
+      time: {startTime: '10:00', endTime: '13:00'},
       space: {},
       state: 'none',
     },
@@ -26,6 +28,7 @@ const INITIAL_STATE = {
       category: '💪운동',
       name: '조깅',
       date: todayDate,
+      dayOfWeek: {},
       type: 'space',
       time: {},
       space: {type: 'outside', place: '집'},
@@ -36,6 +39,7 @@ const INITIAL_STATE = {
       category: '🏫수업',
       name: '모바일 앱',
       date: '2022-11-17',
+      dayOfWeek: {},
       type: 'time',
       time: {startTime: '18:30', endTime: '21:00'},
       space: {},
@@ -46,6 +50,7 @@ const INITIAL_STATE = {
       category: '✏️공부',
       name: '리액트',
       date: '2022-11-17',
+      dayOfWeek: {},
       type: 'time',
       time: {startTime: '21:00', endTime: '23:00'},
       space: {},
@@ -53,9 +58,10 @@ const INITIAL_STATE = {
     },
     {
       id: '인공지능',
-      category: '💻과제',
+      category: '🏫과제',
       name: '인공지능',
       date: '2022-11-19',
+      dayOfWeek: {},
       type: 'time',
       time: {startTime: '12:30', endTime: '14:00'},
       space: {},
@@ -66,6 +72,7 @@ const INITIAL_STATE = {
       category: '💪운동',
       name: '헬스',
       date: '2022-11-17',
+      dayOfWeek: {},
       type: 'space',
       time: {},
       space: {type: 'inside', place: '집'},
@@ -79,7 +86,7 @@ const missionReducer = (state = INITIAL_STATE, action) => {
   // console.log(action.payload);
   switch (action.type) {
     case 'ADD_MISSION':
-      return {...state, missionData: [...state.data, action.payload]};
+      return {...state, missionData: [...state.missionData, action.payload]};
     case 'DELETE_MISSION':
       return {...state, missionData: action.payload};
     case 'SELECT_MISSION':

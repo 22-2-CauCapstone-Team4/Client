@@ -208,6 +208,7 @@ function CreateAccountScreen({navigation}) {
 
     try {
       await signUp({email, password, nickname});
+      navigation.replace('Menu');
       console.log('회원가입, 로그인 완료');
 
       SnackBar.show({
@@ -341,7 +342,7 @@ function CreateAccountScreen({navigation}) {
             </Text>
           </Box>
           <Box>
-            <Pressable onPress={() => navigation.pop()}>
+            <Pressable onPress={() => navigation.replace('Login')}>
               <Text textAlign="right" mb="2">
                 로그인하기
               </Text>

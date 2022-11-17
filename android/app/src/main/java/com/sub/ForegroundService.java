@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +32,7 @@ public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
     private static final String CHANNEL_ID = "PHONELOCK";
 
+    private String phoneUsageState = "INIT";
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
     private ArrayList<String> prohibitedAppList = null;
@@ -42,6 +44,8 @@ public class ForegroundService extends Service {
 
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
+
+    private PackageManager pm;
 
     private boolean isThreadRunning = false;
     // private Handler handler = new Handler();
@@ -65,7 +69,11 @@ public class ForegroundService extends Service {
                     // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
                     // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
                     if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
-                        sendAppPackageNameToJS(context, nowAppPackageName, nowIsProhibitedApp);
+                        sendAppPackageNameToJS(context, nowAppPackageName,getAppName(nowAppPackageName), nowIsProhibitedApp, phoneUsageState);
+                    if (!phoneUsageState.equals("")){
+                        Log.i("ForegroundService", phoneUsageState);
+                        phoneUsageState = "";
+                    }
 
                     appPackageName = nowAppPackageName;
                     isProhibitedApp = nowIsProhibitedApp;
@@ -91,6 +99,9 @@ public class ForegroundService extends Service {
 
     @Override
     public void onCreate() {
+        Context context = getApplicationContext();
+        pm = context.getPackageManager();
+
         createNotificationChannel(); // Creating channel for API 26+
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -109,29 +120,40 @@ public class ForegroundService extends Service {
         // 화면 꺼지고 켜지는 상황 대응하기
         intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_SHUTDOWN);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
 
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                    Log.i("CheckAppService", "화면 꺼짐");
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) || intent.getAction().equals((Intent.ACTION_SHUTDOWN))) {
+                    Log.i("ForegroundService", "화면 꺼짐");
 
                     // 화면 끈 경우, 코드가 반복될 필요 없음 (켜졌을 때 다시 반복을 시작해주면 됨)
                     isThreadRunning = false;
 
                     // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
-                    if (isProhibitedApp)
-                        sendAppPackageNameToJS(context, "", false);
+                    // if (isProhibitedApp)
+                    sendAppPackageNameToJS(context, "", "", false, "PHONE_OFF");
 
                     appPackageName = "";
                     isProhibitedApp = false;
+
+                    if (intent.getAction().equals((Intent.ACTION_SHUTDOWN))) {
+                        onDestroy();
+                    }
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                    Log.i("CheckAppService", "화면 켜짐");
+                    Log.i("ForegroundService", "화면 켜짐");
                     // 화면 켠 경우, 다시 반복 시작
-                    if (prohibitedAppList != null) {
+                    if (prohibitedAppList != null && prohibitedAppList.size() != 0) {
+                        Log.i("ForegroundService", "스레드 시작");
+                        phoneUsageState = "PHONE_ON";
+
                         thread = new Thread(checkCurApp);
                         thread.start();
+                    } else {
+                        Log.i("ForegroundService", "phone on 알림 보내기");
+                        sendAppPackageNameToJS(context, "", "", false, "PHONE_ON");
                     }
                 }
             }
@@ -159,6 +181,11 @@ public class ForegroundService extends Service {
             thread.start();
         }
 
+        if (phoneUsageState.equals("INIT")) {
+            Log.i("ForegroundService", "phone on 알림 보내기");
+            sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
+        }
+
         Log.i("ForegroundService", "서비스 시작 작업 종료");
         return START_REDELIVER_INTENT;
     }
@@ -166,6 +193,7 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(receiver);
         // handler.removeCallbacks(runnableCode);
         isThreadRunning = false;
     }
@@ -212,6 +240,15 @@ public class ForegroundService extends Service {
         return packageNameMap.get(lastRunAppTimeStamp, "").toString();
     }
 
+    private String getAppName(String appPackageName) {
+        try {
+            return pm.getApplicationLabel(pm.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA)).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean isForeGroundEvent(UsageEvents.Event event) {
         if (event == null) return false;
@@ -222,15 +259,19 @@ public class ForegroundService extends Service {
         return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
     }
 
-    private void sendAppPackageNameToJS(Context context, String nowAppPackageName, boolean nowIsProhibitedApp) {
+    static void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
         Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
         Bundle bundle = new Bundle();
 
         bundle.putString("appPackageName", nowAppPackageName);
+        bundle.putString("appName", nowAppName);
         bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
+        if (phoneUsageState.equals("PHONE_ON")) bundle.putBoolean("isPhoneOn", true);
+        else if (phoneUsageState.equals("PHONE_OFF")) bundle.putBoolean("isPhoneOff", true);
+
         checkAppIntent.putExtras(bundle);
 
-        Log.i("ForegroundService", "JS쪽으로 전송");
+        Log.i("ForegroundService", "checkAppEvnet JS쪽으로 전송");
         context.startService(checkAppIntent);
 
         HeadlessJsTaskService.acquireWakeLockNow(context);

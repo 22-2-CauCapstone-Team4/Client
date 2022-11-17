@@ -5,6 +5,7 @@ class AppUsageRecord {
     id = new ObjectId(),
     owner_id,
     appPackageName,
+    appName,
     date,
     hour,
     usageSec,
@@ -13,6 +14,7 @@ class AppUsageRecord {
     this._id = id;
     this.owner_id = owner_id;
     this.appPackageName = appPackageName;
+    this.appName = appName;
     this.date = date;
     this.hour = hour;
     this.usageSec = usageSec;
@@ -25,6 +27,7 @@ class AppUsageRecord {
       _id: 'objectId',
       owner_id: 'string',
       appPackageName: {type: 'string', indexed: true},
+      appName: {type: 'string'},
       date: {type: 'date', indexed: true},
       hour: 'int',
       usageSec: {type: 'int', default: 0},
