@@ -20,6 +20,7 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {addMission} from '../../store/action';
+import {withTheme} from 'styled-components';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -255,17 +256,18 @@ export default function CreateMissionModal({
       <TouchableOpacity
         onPress={() => onSelect(id, title)}
         style={{
-          backgroundColor: selected ? 'grey' : 'white',
+          backgroundColor: selected ? Colors.MAIN_COLOR : 'white',
           margin: 1,
           marginTop: 10,
           borderWidth: 1,
           borderRadius: 25,
+          borderColor: Colors.MAIN_COLOR,
           width: 35,
           height: 35,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text style={{color: 'black'}}>{title}</Text>
+        <Text style={{color: selected ? 'white' : 'black'}}>{title}</Text>
       </TouchableOpacity>
     );
   };
@@ -288,7 +290,14 @@ export default function CreateMissionModal({
               <ScrollView>
                 <View style={{alignItems: 'center'}}>
                   <SelectDropdown
-                    defaultButtonText="카테고리"
+                    defaultButtonText="카테고리 선택"
+                    buttonStyle={{
+                      borderRadius: 25,
+                      height: 40,
+                      width: '100%',
+                      backgroundColor: Colors.MAIN_COLOR,
+                    }}
+                    buttonTextStyle={{color: 'white'}}
                     data={category.map(el => el.name)}
                     onSelect={selectedItem => {
                       setSelectCategory(selectedItem);
@@ -376,6 +385,13 @@ export default function CreateMissionModal({
                       <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
                           defaultButtonText="공간선택"
+                          buttonStyle={{
+                            borderRadius: 25,
+                            height: 40,
+                            width: '100%',
+                            backgroundColor: Colors.MAIN_COLOR,
+                          }}
+                          buttonTextStyle={{color: 'white'}}
                           data={space.map(el => el.name)}
                           onSelect={selectedItem => {
                             setSelectSpace(selectedItem);
@@ -483,7 +499,6 @@ export default function CreateMissionModal({
                         ),
                       ),
                     );
-                    setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
@@ -584,7 +599,7 @@ const missionStyle = StyleSheet.create({
   // 날짜, 시간 설정 style
   time: {
     alignItems: 'center',
-    backgroundColor: '#81b0ff',
+    backgroundColor: Colors.MAIN_COLOR,
     width: '100%',
     height: 40,
     justifyContent: 'center',
