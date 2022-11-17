@@ -31,7 +31,11 @@ function LogInScreen({navigation}) {
   const {user, signIn} = useAuth();
 
   React.useEffect(() => {
-    if (user !== null && user.providerType === 'local-userpass') {
+    if (
+      user !== null &&
+      user.providerType === 'local-userpass' &&
+      user.isLoggedIn
+    ) {
       navigation.replace('Menu');
     }
   }, [navigation, user]);

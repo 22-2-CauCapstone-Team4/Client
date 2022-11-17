@@ -208,6 +208,7 @@ function CreateAccountScreen({navigation}) {
 
     try {
       await signUp({email, password, nickname});
+      navigation.pop();
       console.log('회원가입, 로그인 완료');
 
       SnackBar.show({
