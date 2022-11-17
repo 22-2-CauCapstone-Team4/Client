@@ -3,15 +3,11 @@ import Realm from 'realm';
 import {ProhibitedApp} from '../../schema';
 import {mkConfig} from '../mkConfig';
 
-const readProhibitedApps = async user => {
+const readProhibitedApps = async (user, realm) => {
   console.log('read my prohibited apps');
-  let result = null,
-    realm = null;
+  let result = null;
 
   try {
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [ProhibitedApp.schema]));
-
     const list = realm
       .objects('ProhibitedApp')
       .filtered(`owner_id == "${user.id}"`);
@@ -21,9 +17,6 @@ const readProhibitedApps = async user => {
       '읽기 결과',
       result.map(app => app.packageName),
     );
-
-    console.log('닫기');
-    realm.close();
   } catch (err) {
     console.log(err.message);
 
@@ -35,16 +28,11 @@ const readProhibitedApps = async user => {
   return result;
 };
 
-const updateProhibitedApps = async (user, newList) => {
+const updateProhibitedApps = async (user, realm, newList) => {
   console.log('update my prohibited apps');
-  let result = null,
-    realm = null;
+  let result = null;
 
   try {
-    // 렐름 컨피그 설정
-    console.log('렐름 열기');
-    realm = await Realm.open(mkConfig(user, [ProhibitedApp.schema]));
-
     const list = realm
       .objects('ProhibitedApp')
       .filtered(`owner_id == "${user.id}"`);
@@ -90,9 +78,6 @@ const updateProhibitedApps = async (user, newList) => {
       '업데이트 결과',
       result.map(app => app.packageName),
     );
-
-    console.log('닫기');
-    realm.close();
   } catch (err) {
     console.log(err.message);
 

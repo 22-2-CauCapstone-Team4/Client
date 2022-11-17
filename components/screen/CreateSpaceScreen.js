@@ -22,6 +22,8 @@ import {addPlace} from '../../store/action';
 import {Place} from '../../schema';
 import {createPlaceInRealm} from '../../functions';
 import {useAuth} from '../../providers/AuthProvider';
+import {mkConfig} from '../../functions/mkConfig';
+import Realm from 'realm';
 
 export default function CreateSpaceScreen({navigation}) {
   Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
@@ -204,7 +206,12 @@ export default function CreateSpaceScreen({navigation}) {
                             lat: coord.latitude,
                             lng: coord.longitude,
                           });
-                          await createPlaceInRealm(user, newPlace);
+                          Realm.open(mkConfig(user, [Place.schema])).then(
+                            async realm => {
+                              await createPlaceInRealm(user, realm, newPlace);
+                              realm.close();
+                            },
+                          );
                           dispatch(addPlace(newPlace));
 
                           SnackBar.show({
