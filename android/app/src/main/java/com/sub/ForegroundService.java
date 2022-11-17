@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,6 +45,8 @@ public class ForegroundService extends Service {
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
 
+    private PackageManager pm;
+
     private boolean isThreadRunning = false;
     // private Handler handler = new Handler();
     private Runnable checkCurApp = new Runnable() {
@@ -66,7 +69,7 @@ public class ForegroundService extends Service {
                     // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
                     // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
                     if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
-                        sendAppPackageNameToJS(context, nowAppPackageName, nowIsProhibitedApp, phoneUsageState);
+                        sendAppPackageNameToJS(context, nowAppPackageName,getAppName(nowAppPackageName), nowIsProhibitedApp, phoneUsageState);
                     if (!phoneUsageState.equals("")){
                         Log.i("ForegroundService", phoneUsageState);
                         phoneUsageState = "";
@@ -96,6 +99,9 @@ public class ForegroundService extends Service {
 
     @Override
     public void onCreate() {
+        Context context = getApplicationContext();
+        pm = context.getPackageManager();
+
         createNotificationChannel(); // Creating channel for API 26+
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -128,7 +134,7 @@ public class ForegroundService extends Service {
 
                     // 감지 앱 사용 중이었던 경우, 꺼졌다는 신호를 보내주어야 함
                     // if (isProhibitedApp)
-                    sendAppPackageNameToJS(context, "", false, "PHONE_OFF");
+                    sendAppPackageNameToJS(context, "", "", false, "PHONE_OFF");
 
                     appPackageName = "";
                     isProhibitedApp = false;
@@ -147,7 +153,7 @@ public class ForegroundService extends Service {
                         thread.start();
                     } else {
                         Log.i("ForegroundService", "phone on 알림 보내기");
-                        sendAppPackageNameToJS(context, "", false, "PHONE_ON");
+                        sendAppPackageNameToJS(context, "", "", false, "PHONE_ON");
                     }
                 }
             }
@@ -177,7 +183,7 @@ public class ForegroundService extends Service {
 
         if (phoneUsageState.equals("INIT")) {
             Log.i("ForegroundService", "phone on 알림 보내기");
-            sendAppPackageNameToJS(getApplicationContext(), "", false, "PHONE_ON");
+            sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
         }
 
         Log.i("ForegroundService", "서비스 시작 작업 종료");
@@ -234,6 +240,15 @@ public class ForegroundService extends Service {
         return packageNameMap.get(lastRunAppTimeStamp, "").toString();
     }
 
+    private String getAppName(String appPackageName) {
+        try {
+            return pm.getApplicationLabel(pm.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA)).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean isForeGroundEvent(UsageEvents.Event event) {
         if (event == null) return false;
@@ -244,11 +259,12 @@ public class ForegroundService extends Service {
         return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
     }
 
-    static void sendAppPackageNameToJS(Context context, String nowAppPackageName, boolean nowIsProhibitedApp, String phoneUsageState) {
+    static void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
         Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
         Bundle bundle = new Bundle();
 
         bundle.putString("appPackageName", nowAppPackageName);
+        bundle.putString("appName", nowAppName);
         bundle.putBoolean("isProhibitedApp", nowIsProhibitedApp);
         if (phoneUsageState.equals("PHONE_ON")) bundle.putBoolean("isPhoneOn", true);
         else if (phoneUsageState.equals("PHONE_OFF")) bundle.putBoolean("isPhoneOff", true);

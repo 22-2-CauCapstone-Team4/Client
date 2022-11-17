@@ -223,9 +223,9 @@ function Detail({navigation}) {
     deniedPermissionAlert,
   ]);
 
-  const onPressLogOut = () => {
+  const onPressLogOut = async () => {
+    await signOut();
     navigation.replace('Login');
-    signOut();
   };
 
   const isFocused = useIsFocused();

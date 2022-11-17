@@ -87,18 +87,18 @@ const readAppSec = async (user, realm, startDate, endDate) => {
     );
 
     // 1. 앱 이름으로 정렬
-    appUsageRecords.sort((a, b) => a.appPackageName - b.appPackageName);
+    appUsageRecords.sort((a, b) => a.appName - b.appName);
     result = [];
 
     // 2. 계산
     let privName = '';
     appUsageRecords.forEach(app => {
-      if (app.appPackageName === privName) {
+      if (app.appName === privName) {
         // 이름 같으면 걍 더해주기
         result[result.length - 1].usageSec += app.usageSec;
       } else {
         result.push({
-          appPackageName: app.appPackageName,
+          appName: app.appName,
           usageSec: app.usageSec,
         });
       }
@@ -140,18 +140,18 @@ const readAppCnt = async (user, realm, startDate, endDate) => {
     );
 
     // 1. 앱 이름으로 정렬
-    appUsageRecords.sort((a, b) => a.appPackageName - b.appPackageName);
+    appUsageRecords.sort((a, b) => a.appName - b.appName);
     result = [];
 
     // 2. 계산
     let privName = '';
     appUsageRecords.forEach(app => {
-      if (app.appPackageName === privName) {
+      if (app.appName === privName) {
         // 이름 같으면 걍 더해주기
         result[result.length - 1].clickCnt += app.clickCnt;
       } else {
         result.push({
-          appPackageName: app.appPackageName,
+          appName: app.appName,
           clickCnt: app.clickCnt,
         });
       }

@@ -6,6 +6,7 @@ class CurState {
     owner_id,
     isNowUsingProhibitedApp = false,
     appPackageName = '',
+    appName = '',
     startAppTime,
     endAppTime,
     startPhoneTime,
@@ -15,6 +16,7 @@ class CurState {
     this.owner_id = owner_id;
     this.isNowUsingProhibitedApp = isNowUsingProhibitedApp;
     this.appPackageName = appPackageName;
+    this.appName = appName;
     if (startAppTime) this.startTime = startAppTime;
     if (endAppTime) this.endTime = endAppTime;
     if (startPhoneTime) this.startTime = startPhoneTime;
@@ -28,6 +30,7 @@ class CurState {
       owner_id: 'string',
       isNowUsingProhibitedApp: {type: 'bool', default: false},
       appPackageName: {type: 'string', default: ''},
+      appName: {type: 'string', default: ''},
       startAppTime: {type: 'date?'},
       endAppTime: {type: 'date?'},
       startPhoneTime: {type: 'date?'},

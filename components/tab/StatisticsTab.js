@@ -47,20 +47,20 @@ const StatisticsTab = () => {
       tempData1 = {
         labels: ['평소'],
         legend: ['일반 앱', '금지 앱'],
-        data: [[tempData1.total - tempData1.app, tempData1.app / 60]],
+        data: [[tempData1.total - tempData1.app, tempData1.app]],
         barColors: ['#fe6383', '#36a2eb'],
       };
 
       tempData2 = {
-        labels: tempData2.map(app => app.appPackageName),
+        labels: tempData2.map(app => app.appName),
         datasets: [
           {
-            data: tempData2.map(app => app.usageSec / 60),
+            data: tempData2.map(app => app.usageSec),
           },
         ],
       };
       tempData3 = {
-        labels: tempData3.map(app => app.appPackageName),
+        labels: tempData3.map(app => app.appName),
         datasets: [
           {
             data: tempData3.map(app => app.clickCnt),
@@ -132,7 +132,6 @@ const StatisticsTab = () => {
     color: (opacity = 0.5) => '#888888',
     labelColor: (opacity = 1) => '#000000',
     decimalPlaces: 1,
-    barPercentage: 0.8,
     style: {
       borderRadius: 16,
     },

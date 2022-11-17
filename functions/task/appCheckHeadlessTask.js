@@ -14,7 +14,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
     const now = new Date();
 
     console.log('CheckApp 이벤트', taskData);
-    const {appPackageName, isProhibitedApp, isPhoneOn, isPhoneOff} = taskData;
+    const {appPackageName, appName, isProhibitedApp, isPhoneOn, isPhoneOff} =
+      taskData;
 
     // Realm 열기
     realm = await Realm.open(
@@ -30,6 +31,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
     let curState,
       isPrevUsedProhibitedApp,
       prevAppPackageName,
+      prevAppName,
       prevStartTime = null;
     realm.write(() => {
       // 상태 데이터 없으면 err
@@ -44,10 +46,13 @@ const appCheckHeadlessTask = async (user, taskData) => {
       curState = curState[0];
       isPrevUsedProhibitedApp = curState.isNowUsingProhibitedApp;
       prevAppPackageName = curState.appPackageName;
+      prevAppName = curState.appName;
 
       curState.isNowUsingProhibitedApp = isProhibitedApp;
       if (isProhibitedApp) {
         curState.appPackageName = appPackageName;
+        curState.appName = appName;
+
         if (curState.isNowUsingProhibitedApp) {
           // 이전 시작 시간을 따로 변수에 기록해두어야 함
           prevStartTime = curState.startAppTime;
@@ -186,6 +191,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
             new AppUsageRecord({
               owner_id: user.id,
               appPackageName,
+              appName,
               date: todayMidnight,
               hour,
               clickCnt: 1,
@@ -228,9 +234,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
         if (days === 0 && startHour === endHour) {
           // for문 필요 없이 기록하면 됨
-          const sec =
-            curState.endAppTime.getSeconds() -
-            curState.startAppTime.getSeconds();
+          const sec = parseInt(
+            moment(curState.endAppTime).diff(selectedStartTime) / 1000,
+          );
 
           let record = realm
             .objects('AppUsageRecord')
@@ -327,6 +333,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                   new AppUsageRecord({
                     owner_id: user.id,
                     appPackageName: prevAppPackageName,
+                    appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
                     usageSec: endSec,
@@ -345,6 +352,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                   new AppUsageRecord({
                     owner_id: user.id,
                     appPackageName: prevAppPackageName,
+                    appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
                     usageSec: 60 * 60,
