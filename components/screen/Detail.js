@@ -48,13 +48,13 @@ function Detail({navigation}) {
   Object.freeze(Status);
 
   const [blockedApps, setBlockedApps] = React.useState([]);
-  const [isInit, setIsInit] = React.useState(false);
+  const [isInit, setIsInit] = React.useState(true);
   const [checkStatus, setCheckStatus] = React.useState(Status.NOT_YET);
   const [modalVisible, setModalVisible] = useState(false);
   const {user, signOut} = useAuth();
 
   React.useEffect(() => {
-    if (!isInit) {
+    if (isInit) {
       loadApps();
     }
 
@@ -69,7 +69,7 @@ function Detail({navigation}) {
   ]);
 
   const loadApps = React.useCallback(async () => {
-    setIsInit(true);
+    setIsInit(false);
 
     console.log('설치 앱 리스트 및 데이터 불러오기 시작');
     try {

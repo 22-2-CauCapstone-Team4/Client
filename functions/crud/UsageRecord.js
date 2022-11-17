@@ -5,6 +5,8 @@ const readUsage = async (user, realm, startDate, endDate) => {
   let result = null;
 
   try {
+    const now = new Date();
+
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
 
@@ -25,7 +27,8 @@ const readUsage = async (user, realm, startDate, endDate) => {
             .format('YYYY-MM-DD@HH:mm:ss')}:0 && date <= ${moment(endDate)
             .utc()
             .format('YYYY-MM-DD@HH:mm:ss')}:0`,
-        );
+        ),
+      curState = realm.objects('CurState');
 
     appUsageRecords = appUsageRecords.map(realmObj =>
       JSON.parse(JSON.stringify(realmObj)),
@@ -38,6 +41,7 @@ const readUsage = async (user, realm, startDate, endDate) => {
       phoneUsageSec = 0;
     appUsageRecords.forEach(app => (appUsageSec += app.usageSec));
     phoneUsageRecords.forEach(phone => (phoneUsageSec += phone.usageSec));
+    phoneUsageRecords += moment(now).diff(curState.startPhoneTime);
 
     result = {total: phoneUsageSec, app: appUsageSec};
     console.log('읽기 결과', result);

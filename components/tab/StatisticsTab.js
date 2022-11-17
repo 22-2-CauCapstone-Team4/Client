@@ -11,7 +11,7 @@ import {
   readAppSecInRealm,
   readAppCntInRealm,
 } from '../../functions';
-import {AppUsageRecord, PhoneUsageRecord} from '../../schema';
+import {AppUsageRecord, PhoneUsageRecord, CurState} from '../../schema';
 import {useAuth} from '../../providers/AuthProvider';
 
 const Container = styled.View`
@@ -21,16 +21,20 @@ const Container = styled.View`
 `;
 const StatisticsTab = () => {
   const {user} = useAuth();
-  const [isInit, setIsInit] = useState(false);
+  const [isInit, setIsInit] = useState(true);
   const [data1, setData1] = useState(null);
   const [data2, setData2] = useState(null);
   const [data3, setData3] = useState(null);
 
   useEffect(() => {
     const innerFunc = async () => {
-      setIsInit(true);
+      setIsInit(false);
       const realm = await Realm.open(
-        mkConfig(user, [AppUsageRecord.schema, PhoneUsageRecord.schema]),
+        mkConfig(user, [
+          AppUsageRecord.schema,
+          PhoneUsageRecord.schema,
+          CurState.schema,
+        ]),
       );
 
       const now = new Date();
@@ -84,7 +88,7 @@ const StatisticsTab = () => {
       setData3(tempData3);
     };
 
-    innerFunc();
+    if (isInit) innerFunc();
   }, [isInit, user]);
 
   const screenWidth = Dimensions.get('window').width;
@@ -125,11 +129,16 @@ const StatisticsTab = () => {
 
   const chartConfig = {
     backgroundGradientFrom: '#ffffff',
-    backgroundGradientFromOpacity: 0.1,
+    backgroundGradientFromOpacity: 1,
     backgroundGradientTo: '#ffffff',
     backgroundGradientToOpacity: 0.5,
-    color: (opacity = 0.5) => `rgb(0, 0, 0)`,
-    barPercentage: 0.5,
+    color: (opacity = 0.5) => '#888888',
+    labelColor: (opacity = 1) => '#000000',
+    decimalPlaces: 1,
+    barPercentage: 0.8,
+    style: {
+      borderRadius: 16,
+    },
   };
   return (
     <Container>
@@ -146,8 +155,8 @@ const StatisticsTab = () => {
               chartConfig={{
                 backgroundGradientFrom: '#ffffff',
                 backgroundGradientTo: '#ffffff',
-                decimalPlaces: 2, // optional, defaults to 2dp
-                color: (opacity = 1) => '#000000',
+                decimalPlaces: 1, // optional, defaults to 2dp
+                color: (opacity = 1) => '#888888',
                 labelColor: (opacity = 1) => '#000000',
                 style: {
                   borderRadius: 16,
