@@ -92,6 +92,13 @@ const HomeTab = ({navigation}) => {
               );
             })}
           </MissionList>
+          {todayMission.length == 0 ? (
+            <View style={{alignItems: 'center', marginTop: 30}}>
+              <Text style={{color: Colors.MAIN_COLOR, fontSize: 20}}>
+                목표 탭에서 미션을 추가하세요
+              </Text>
+            </View>
+          ) : null}
         </ScrollViews>
       )}
       <View style={styles.centeredView}>

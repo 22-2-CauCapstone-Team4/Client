@@ -298,6 +298,7 @@ export default function CreateMissionModal({
                 </View>
                 <View style={missionStyle.missionText}>
                   <TextInput
+                    style={missionStyle.textInputStyle}
                     onChangeText={saveMission}
                     placeholder="미션 입력"
                     placeholderTextColor="grey"
@@ -409,13 +410,20 @@ export default function CreateMissionModal({
                   <View>
                     {/* 시작 시간 */}
                     <View style={{marginTop: 10}}>
-                      <View>
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
                         {/* 시간 선택 영역 */}
                         <TouchableOpacity
                           onPress={onPressStartTime}
                           style={missionStyle.time}>
                           <Text style={missionStyle.timeText}>시작 시간</Text>
                         </TouchableOpacity>
+                        <Text style={{color: 'black'}}>
+                          {startTime.getHours() + ':' + startTime.getMinutes()}
+                        </Text>
                       </View>
                       <DateTimePickerModal
                         isVisible={visible}
@@ -430,14 +438,20 @@ export default function CreateMissionModal({
                     </View>
                     {/* 종료 시간 */}
                     <View>
-                      <View>
-                        <View />
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
                         {/* 시간 선택 영역 */}
                         <TouchableOpacity
                           onPress={onPressEndTime}
                           style={missionStyle.time}>
                           <Text style={missionStyle.timeText}>종료 시간</Text>
                         </TouchableOpacity>
+                        <Text style={{color: 'black'}}>
+                          {endTime.getHours() + ':' + endTime.getMinutes()}
+                        </Text>
                       </View>
                       <DateTimePickerModal
                         isVisible={visible2}
@@ -450,26 +464,9 @@ export default function CreateMissionModal({
                         {endTime.getHours()}시 {endTime.getMinutes()}분
                       </Text>
                     </View>
-                    {/* ★ 잘 저장되는지 확인했던 부분 */}
-                    {/* <TouchableOpacity
-                      onPress={() =>
-                        saveTimeLock({
-                          missionName,
-                          selectCategory,
-                          startTime,
-                          endTime,
-                          lockingType,
-                          selected,
-                        })
-                      }>
-                      <Text>test</Text>
-                    </TouchableOpacity> */}
                   </View>
                 )}
               </ScrollView>
-              {/* <TouchableOpacity onPress={setSelectedDay([...selected.keys()])}>
-                <Text>test</Text>
-              </TouchableOpacity> */}
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
@@ -510,6 +507,11 @@ export default function CreateMissionModal({
   );
 }
 const missionStyle = StyleSheet.create({
+  textInputStyle: {
+    borderColor: 'grey',
+    height: 40,
+    color: 'black',
+  },
   // CreateMissionModal.js에서 input
   missionInput: {
     height: 40,

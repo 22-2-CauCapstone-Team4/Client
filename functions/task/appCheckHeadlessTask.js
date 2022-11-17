@@ -371,11 +371,11 @@ const appCheckHeadlessTask = async (user, taskData) => {
     realm.close();
 
     // 앱 실행 코드 추가
-    // try {
-    //   await LockAppModule.viewLockScreen();
-    // } catch (err) {
-    //   console.error(err.message);
-    // }
+    try {
+      await LockAppModule.viewLockScreen();
+    } catch (err) {
+      console.error(err.message);
+    }
 
     console.log('appCheckHeadlessTask 완료');
   } catch (err) {

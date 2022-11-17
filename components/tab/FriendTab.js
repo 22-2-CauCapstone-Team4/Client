@@ -15,48 +15,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
 import FriendBox from '../box/FriendBox';
 import FriendModal from '../modal/FriendModal';
-const Container = styled.View`
-  height: 100%;
-  background-color: #ffffff;
-  padding: 20px;
-`;
+import {useDispatch, useSelector} from 'react-redux';
 
-const FriendState = styled.View`
-  border: 1px solid #f1f1f1;
-  border-radius: 600px;
-  margin: 10px 0;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-  background-color: #fcfcfc;
-  height: 30px;
-`;
-
-const StateText = styled.Text`
-  color: #373737;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 15px 0;
-`;
-
-const AddFriendBtn = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 5%;
-  right: 5%;
-  border-radius: 600px;
-`;
-
-const StyledText = styled.Text`
-  font-size: 30px;
-`;
 export default function FriendTab({navigation}) {
   const [friendState, setFriendState] = useState('whole');
   const [modalVisible, setModalVisible] = useState(false);
   const whole = () => setFriendState('whole');
   const locked = () => setFriendState('lock');
   const giveUp = () => setFriendState('quit');
-  const cheat = () => setFriendState('cheat');
-
+  const cheat = () => setFriendState('unlock');
+  const friends = useSelector(store => store.friendReducer.data);
   return (
     <Container>
       <Text style={{color: 'black'}}>친구 상태</Text>
@@ -88,7 +56,7 @@ export default function FriendTab({navigation}) {
         <TouchableOpacity onPress={cheat}>
           <Text
             style={{
-              color: friendState === 'cheat' ? Colors.MAIN_COLOR : 'black',
+              color: friendState === 'unlock' ? Colors.MAIN_COLOR : 'black',
             }}>
             금지 앱
           </Text>
@@ -96,19 +64,32 @@ export default function FriendTab({navigation}) {
       </FriendState>
       <StateText>
         {friendState == 'whole'
-          ? '전체 | 0'
+          ? '전체 | ' + friends.length
           : friendState == 'lock'
-          ? '잠금 중 | 0'
+          ? '잠금 중 | ' + friends.filter(el => el.state === 'lock').length
           : friendState == 'quit'
-          ? '포기 | 0'
-          : '금지 앱 | 0'}
+          ? '포기 | ' + friends.filter(el => el.state === 'quit').length
+          : '금지 앱 | ' + friends.filter(el => el.state === 'unlock').length}
       </StateText>
       <ScrollView>
-        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
-        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
-        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
-        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
-        <FriendBox category="✏️수업" missionName="모바일 앱"></FriendBox>
+        {friendState === 'whole'
+          ? friends.map(item => (
+              <FriendBox
+                key={item.name}
+                name={item.name}
+                state={item.state}></FriendBox>
+            ))
+          : friends
+              .filter(el => el.state === friendState)
+              .map(item => {
+                console.log(item);
+                return (
+                  <FriendBox
+                    key={item.name}
+                    name={item.name}
+                    state={item.state}></FriendBox>
+                );
+              })}
       </ScrollView>
       <AddFriendBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
@@ -167,3 +148,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+const Container = styled.View`
+  height: 100%;
+  background-color: #ffffff;
+  padding: 20px;
+`;
+
+const FriendState = styled.View`
+  border: 1px solid #f1f1f1;
+  border-radius: 600px;
+  margin: 10px 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  background-color: #fcfcfc;
+  height: 30px;
+`;
+
+const StateText = styled.Text`
+  color: #373737;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 15px 0;
+`;
+
+const AddFriendBtn = styled.TouchableOpacity`
+  position: absolute;
+  bottom: 5%;
+  right: 5%;
+  border-radius: 600px;
+`;
+
+const StyledText = styled.Text`
+  font-size: 30px;
+`;

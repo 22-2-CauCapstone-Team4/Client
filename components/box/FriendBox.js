@@ -5,6 +5,60 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
 import {baseFontSize} from 'native-base/lib/typescript/theme/tools';
 
+function FriendBox(props) {
+  return (
+    <Container>
+      <FriendContainer>
+        <TouchableOpacity
+          style={{
+            borderColor: Colors.MAIN_COLOR,
+            borderRadius: 45,
+            borderWidth: 1,
+            width: 50,
+            height: 50,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Icon name="person" color="green" size={40}></Icon>
+        </TouchableOpacity>
+        <Text style={{color: 'black'}}>{props.name}</Text>
+      </FriendContainer>
+
+      <MissionContainer>
+        <ContentContainer>
+          <View>
+            <ContentView>
+              <Category>✏️수업</Category>
+              <Category>|</Category>
+              <MissionName>모바일 앱</MissionName>
+            </ContentView>
+          </View>
+        </ContentContainer>
+        <ConditionView>
+          <Text
+            style={{
+              color:
+                props.state === 'lock'
+                  ? Colors.MAIN_COLOR
+                  : props.state === 'unlock'
+                  ? 'orange'
+                  : 'red',
+              size: 1,
+            }}>
+            {props.state === 'lock'
+              ? '미션 진행 중'
+              : props.state === 'unlock'
+              ? '금지 앱 사용 중'
+              : '포기'}
+          </Text>
+        </ConditionView>
+      </MissionContainer>
+    </Container>
+  );
+}
+
+export default FriendBox;
+
 const Container = styled.View`
   width: 100%;
   display: flex;
@@ -23,13 +77,13 @@ const ContentContainer = styled.View`
 const FriendContainer = styled.View`
   justify-contents: center;
   align-items: center;
-  height: 150px;
+  height: 100px;
   width: 60px;
   margin: 15px 5px;
 `;
 
 const MissionContainer = styled.View`
-  height: 150px;
+  height: 130px;
   width: 270px;
   border: 1px solid #f1f1f1;
   border-radius: 20px;
@@ -39,7 +93,7 @@ const MissionContainer = styled.View`
 
 const ContentView = styled.View`
   width: 180px;
-  height: 75px;
+  height: 40px;
   flex-direction: row;
   display: flex;
   flex-wrap: wrap;
@@ -66,42 +120,3 @@ const Category = styled.Text`
 const MissionName = styled.Text`
   color: black;
 `;
-
-function FriendBox(props) {
-  return (
-    <Container>
-      <FriendContainer>
-        <TouchableOpacity
-          style={{
-            borderColor: Colors.MAIN_COLOR,
-            borderRadius: 45,
-            borderWidth: 1,
-            width: 50,
-            height: 50,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Icon name="person" color="green" size={40}></Icon>
-        </TouchableOpacity>
-        <Text style={{color: 'black'}}>User01</Text>
-      </FriendContainer>
-
-      <MissionContainer>
-        <ContentContainer>
-          <View>
-            <ContentView>
-              <Category>{props.category}</Category>
-              <Category>|</Category>
-              <MissionName>{props.missionName}</MissionName>
-            </ContentView>
-          </View>
-        </ContentContainer>
-        <ConditionView>
-          <Text style={{color: 'black', size: 1}}>금지 앱 사용 중</Text>
-        </ConditionView>
-      </MissionContainer>
-    </Container>
-  );
-}
-
-export default FriendBox;
