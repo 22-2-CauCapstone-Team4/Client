@@ -273,7 +273,7 @@ function Detail({navigation}) {
         headerStyle: {
           borderBottomWidth: 1,
         },
-        tabBarStyle: {height: 55},
+        tabBarStyle: {height: 60},
         tabBarLabelStyle: {fontSize: 12},
         headerLeft: () => {
           if (route.name === '홈') {

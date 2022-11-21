@@ -12,7 +12,6 @@ import {compareToday} from '../../functions/time';
 import Colors from '../../utils/Colors';
 
 // 미션 더미 데이터에 있는 날짜와 현재 날짜 비교하는 함수
-
 const HomeTab = ({navigation}) => {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
@@ -123,6 +122,7 @@ const AddMissionBtn = styled.TouchableOpacity`
   border-radius: 600px;
 `;
 const AboutMission = styled.View`
+  margin-top: 20px;
   border: 1px solid #f1f1f1;
   border-radius: 600px;
   flex-direction: row;
@@ -130,7 +130,6 @@ const AboutMission = styled.View`
   justify-content: space-around;
   background-color: #fcfcfc;
   height: 30px;
-  margin-top: 20px;
 `;
 const MainText = styled.Text`
   color: #373737;

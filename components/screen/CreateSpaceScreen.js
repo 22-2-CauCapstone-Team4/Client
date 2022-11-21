@@ -11,11 +11,15 @@ import {
   Modal,
   Pressable,
   TextInput,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, Circle} from 'react-native-maps';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import SnackBar from 'react-native-snackbar';
+import Geolocation from 'react-native-geolocation-service';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../utils/Colors';
 import {addPlace} from '../../store/action';
@@ -24,9 +28,59 @@ import {createPlaceInRealm} from '../../functions';
 import {useAuth} from '../../providers/AuthProvider';
 import {mkConfig} from '../../functions/mkConfig';
 import Realm from 'realm';
+import {getDistance} from '../../functions/space';
+import {curr} from '../../functions/time';
+
+async function requestPermissions() {
+  if (Platform.OS === 'ios') {
+    Geolocation.requestAuthorization();
+    Geolocation.setRNConfiguration({
+      skipPermissionRequests: false,
+      authorizationLevel: 'whenInUse',
+    });
+  }
+
+  if (Platform.OS === 'android') {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+  }
+}
 
 export default function CreateSpaceScreen({navigation}) {
+  // 위치 권한 승인
+  requestPermissions();
   Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
+
+  const {user} = useAuth();
+  const dispatch = useDispatch();
+  const data = useSelector(store => store.placeReducer.data);
+  const [coord, setCoord] = useState({
+    latitude: 37.503637,
+    longitude: 126.956025,
+    latitudeDelta: 0.092,
+    longitudeDelta: 0.0421,
+  });
+  const [place, setPlace] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [valid, setVaild] = useState(true);
+  const ref = useRef();
+  const [currentLocation, setCurrentLocation] = useState({});
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        console.log(position.coords);
+        setCurrentLocation({latitude, longitude});
+      },
+      error => {
+        console.log(error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  }, []);
+
   //뒤로가기 -> 페이지 뒤로
   useEffect(() => {
     const backAction = () => {
@@ -48,19 +102,19 @@ export default function CreateSpaceScreen({navigation}) {
     ref.current?.setAddressText('Some Text');
   }, []);
 
-  const {user} = useAuth();
-  const dispatch = useDispatch();
-  const data = useSelector(store => store.placeReducer.data);
-  const [coord, setCoord] = useState({
-    latitude: 37.503637,
-    longitude: 126.956025,
-    latitudeDelta: 0.092,
-    longitudeDelta: 0.0421,
-  });
-  const [place, setPlace] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [valid, setVaild] = useState(true);
-  const ref = useRef();
+  console.log('내 위치');
+  console.log(currentLocation.latitude, currentLocation.longitude);
+  const myHome = {latitude: 37.3965393594534, longitude: 127.12254205718637};
+  console.log('내 위치에서 집까지');
+  console.log(
+    getDistance(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      myHome.latitude,
+      myHome.longitude,
+    ),
+  );
+
   // function getCoordinate() {
   //   return Geocoder.from('New York, 뉴욕 미국')
   //     .then(json => {
@@ -71,7 +125,6 @@ export default function CreateSpaceScreen({navigation}) {
   //     })
   //     .catch(error => console.warn(error));
   // }
-
   // fetch(
   //   'https://maps.googleapis.com/maps/api/geocode/json?address=' +
   //     coord.latitude +
@@ -91,6 +144,14 @@ export default function CreateSpaceScreen({navigation}) {
     <>
       <SafeAreaView style={{height: '100%', backgroundColor: 'white'}}>
         <View style={styles.buttonView}>
+          <Ionicons
+            name={'location'}
+            color="red"
+            size={22}
+            style={{marginBottom: 20}}>
+            <Text style={{color: 'black'}}>를 이용해 장소를 선택하세요</Text>
+          </Ionicons>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => setModalVisible(!modalVisible)}>
@@ -163,8 +224,39 @@ export default function CreateSpaceScreen({navigation}) {
               coordinate={{
                 latitude: coord.latitude,
                 longitude: coord.longitude,
-              }}
-            />
+              }}>
+              <Ionicons name={'location'} size={45} color="#ff5555"></Ionicons>
+            </Marker>
+            <Circle
+              center={{latitude: coord.latitude, longitude: coord.longitude}}
+              radius={50}
+              fillColor={Colors.MAIN_COLOR_INACTIVE}
+              strokeColor={Colors.MAIN_COLOR}></Circle>
+            {data.map(place => {
+              return (
+                <View key={place._id}>
+                  <Marker
+                    draggable={true}
+                    title={place.name}
+                    description={'범위: ' + '50m'}
+                    style={{color: 'black'}}
+                    coordinate={{
+                      latitude: place.lat,
+                      longitude: place.lng,
+                    }}>
+                    <Ionicons
+                      name={'location'}
+                      size={45}
+                      color={Colors.MAIN_COLOR}></Ionicons>
+                  </Marker>
+                  <Circle
+                    center={{latitude: place.lat, longitude: place.lng}}
+                    radius={50}
+                    fillColor={Colors.MAIN_COLOR_INACTIVE}
+                    strokeColor={Colors.MAIN_COLOR}></Circle>
+                </View>
+              );
+            })}
           </MapView>
         </View>
         {modalVisible ? (
@@ -270,7 +362,7 @@ const styles = StyleSheet.create({
     bottom: 30,
   },
   button: {
-    width: 250,
+    width: 275,
     height: 40,
     backgroundColor: Colors.MAIN_COLOR,
     justifyContent: 'center',
