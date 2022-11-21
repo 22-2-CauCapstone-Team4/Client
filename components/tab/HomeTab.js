@@ -130,6 +130,7 @@ const AboutMission = styled.View`
   justify-content: space-around;
   background-color: #fcfcfc;
   height: 30px;
+  margin-top: 20px;
 `;
 const MainText = styled.Text`
   color: #373737;

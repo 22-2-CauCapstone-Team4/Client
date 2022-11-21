@@ -15,15 +15,12 @@ import {
   selectCategory,
   deleteMission,
 } from '../store/action';
+import Colors from '../utils/Colors';
 import {useAuth} from '../providers/AuthProvider';
 import {Goal} from '../schema';
 import {createGoalInRealm, deleteGoalInRealm} from '../functions';
 import {mkConfig} from '../functions/mkConfig';
 import Realm from 'realm';
-
-const MissionList = styled.Text`
-  color: white;
-`;
 
 const OverallGoal = styled.TouchableHighlight`
   background-color: #0891b2;
@@ -79,23 +76,33 @@ export default function Categories() {
   };
   return (
     <>
-      <Text style={styles.blackText}>카테고리</Text>
       <View style={styles.scrollViewContainer}>
         <ScrollView horizontal={true} style={styles.scroll}>
           <OverallGoal
             style={{
-              backgroundColor: now === '⭐ 전체 목표' ? '#0891b2' : '#777',
+              backgroundColor:
+                now === '⭐ 전체 목표'
+                  ? Colors.MAIN_COLOR
+                  : Colors.MAIN_COLOR_INACTIVE,
             }}
             onPress={() => {
               dispatch(selectCategory('⭐ 전체 목표'));
             }}>
-            <MissionList>⭐ 전체 목표</MissionList>
+            <Text
+              style={{
+                color: now === '⭐ 전체 목표' ? 'white' : Colors.MAIN_COLOR,
+              }}>
+              ⭐ 전체 목표
+            </Text>
           </OverallGoal>
           {/* 삭제 */}
           {data.map(item => (
             <OverallGoal
               style={{
-                backgroundColor: now === item.name ? '#0891b2' : '#777',
+                backgroundColor:
+                  now === item.name
+                    ? Colors.MAIN_COLOR
+                    : Colors.MAIN_COLOR_INACTIVE,
               }}
               key={item._id}
               onPress={() => {
@@ -116,13 +123,19 @@ export default function Categories() {
 
                 // 삭제된 카테고리 관련 미션도 삭제
               }}>
-              <MissionList>{item.name}</MissionList>
+              <Text
+                style={{
+                  color: now === item.name ? 'white' : Colors.MAIN_COLOR,
+                }}>
+                {item.name}
+              </Text>
             </OverallGoal>
           ))}
           {/* 추가 */}
           <OverallGoal>
             <TextInput
               placeholder="+ 추가"
+              placeholderTextColor="white"
               style={styles.inputStyle}
               onChangeText={text => setCategoryText(text.trim())}
               onPressIn={() => setCategoryText('')}

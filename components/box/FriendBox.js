@@ -63,6 +63,8 @@ const Container = styled.View`
   width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ContentContainer = styled.View`
@@ -70,12 +72,11 @@ const ContentContainer = styled.View`
   margin-top: 5px;
   display: flex;
   flex-direction: row;
-  justify-contents: center;
   align-items: center;
 `;
 
 const FriendContainer = styled.View`
-  justify-contents: center;
+  justify-content: center;
   align-items: center;
   height: 100px;
   width: 60px;
@@ -83,7 +84,7 @@ const FriendContainer = styled.View`
 `;
 
 const MissionContainer = styled.View`
-  height: 130px;
+  height: 100px;
   width: 270px;
   border: 1px solid #f1f1f1;
   border-radius: 20px;
@@ -100,7 +101,6 @@ const ContentView = styled.View`
 `;
 
 const ConditionView = styled.View`
-  margin-top: 20px;
   padding: 5px 15px;
   width: 100%;
   display: flex;

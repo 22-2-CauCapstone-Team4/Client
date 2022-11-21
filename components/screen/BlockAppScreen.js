@@ -159,13 +159,25 @@ export default function BlockApp({navigation}) {
           }}>
           미션 수행 시 금지할 앱을 선택해주세요.
         </Text>
-        <FlatList
-          style={{marginTop: 30}}
-          numColumns={numColumns}
-          data={apps}
-          renderItem={this._renderItems}
-          keyExtractor={item => item.packageName}
-        />
+        <View
+          style={{
+            padding: 5,
+            marginTop: 25,
+            borderLeftWidth: 1,
+            borderLeftColor: Colors.MAIN_COLOR,
+            borderRightWidth: 1,
+            borderRightColor: Colors.MAIN_COLOR,
+            borderTopWidth: 1,
+            borderTopColor: Colors.MAIN_COLOR,
+            borderRadius: 25,
+          }}>
+          <FlatList
+            numColumns={numColumns}
+            data={apps}
+            renderItem={this._renderItems}
+            keyExtractor={item => item.packageName}
+          />
+        </View>
       </SafeAreaView>
     </>
   );
@@ -178,7 +190,7 @@ const styled = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     borderStyle: 'solid',
-    borderColor: 'black',
+    borderColor: 'grey',
     borderWidth: 1,
     width: 80,
     height: 80,

@@ -64,8 +64,20 @@ const GoalTab = ({navigation}) => {
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></CreateMissionModal>
       </View>
-      <AddMissionBtn onPress={() => setModalVisible(true)}>
+      <AddMissionBtn
+        onPress={() => setModalVisible(true)}
+        style={{alignItems: 'center', justifyContent: 'center'}}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 12,
+            position: 'absolute',
+            bottom: '-15%',
+            right: '5%',
+          }}>
+          미션 추가
+        </Text>
       </AddMissionBtn>
     </Container>
   );
