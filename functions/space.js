@@ -14,5 +14,5 @@ export function getDistance(latFrom, lngFrom, latTo, lngTo) {
       Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c; // Distance in km
-  return d;
+  return d.toFixed(3);
 }

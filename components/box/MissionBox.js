@@ -1,9 +1,13 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Text, View, StyleSheet, Switch} from 'react-native';
 import styled from 'styled-components/native';
-import Colors from '../../utils/Colors';
+import Geolocation from 'react-native-geolocation-service';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import Colors from '../../utils/Colors';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
+import {useDispatch, useSelector} from 'react-redux';
+import {getDistance} from '../../functions/space';
 
 function MissionBox(props) {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -14,6 +18,10 @@ function MissionBox(props) {
   const [endMissionTime, setEndMissionTime] = useState(
     compareTimeBeforeStart(props.mission.time.endTime),
   );
+  const missionLocation = useSelector(store => store.placeReducer.data).filter(
+    place => place.name === props.mission.space.place,
+  );
+  const [currentLocation, setCurrentLocation] = useState({});
   const sixty = useRef(new Date().getUTCSeconds());
   useEffect(() => {
     sixty.current = setTimeout(() => {
@@ -24,7 +32,26 @@ function MissionBox(props) {
     }, 1000);
   }, [leftTime]);
 
-  function missionStateMessage() {
+  useEffect(() => {
+    setTimeout(() => {
+      if (props.mission.type === 'space') {
+        Geolocation.getCurrentPosition(
+          position => {
+            const {latitude, longitude} = position.coords;
+            // console.log('현재 위치');
+            // console.log(position.coords);
+            setCurrentLocation({latitude, longitude});
+          },
+          error => {
+            console.log(error.message);
+          },
+          {enableHighAccuracy: true, timeout: 5000, maximumAge: 10000},
+        );
+      }
+    }, 5000);
+  }, [currentLocation]);
+
+  function timeStateMessage() {
     // 미션 시작 시간 전
     if (leftTime[0] > 0 || leftTime[1] > 0) {
       return (
@@ -45,6 +72,28 @@ function MissionBox(props) {
       }
     }
   }
+  const db = useSelector(store => store.placeReducer.data);
+  function spaceStateMessage() {
+    // console.log('디비');
+    // console.log(db);
+    // console.log('미션 장소 정보');
+    // console.log(missionLocation);
+    if (missionLocation.length == 0) {
+      return <LeftCondition>거리 계산 중</LeftCondition>;
+    } else {
+      const distance = getDistance(
+        missionLocation[0].lat,
+        missionLocation[0].lng,
+        currentLocation.latitude,
+        currentLocation.longitude,
+      );
+      return distance > 1 ? (
+        <LeftCondition>{distance}km 남음</LeftCondition>
+      ) : (
+        <LeftCondition>{distance * 1000}m 남음</LeftCondition>
+      );
+    }
+  }
 
   return (
     <Container>
@@ -57,7 +106,9 @@ function MissionBox(props) {
           </ContentView>
         </View>
         <LeftView>
-          {props.mission.type === 'time' ? missionStateMessage() : null}
+          {props.mission.type === 'time'
+            ? timeStateMessage()
+            : spaceStateMessage()}
         </LeftView>
       </ContentContainer>
       <ConditionView>

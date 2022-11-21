@@ -302,7 +302,6 @@ export default function CreateMissionModal({
                     data={category.map(el => el.name)}
                     onSelect={selectedItem => {
                       setSelectCategory(selectedItem);
-                      console.log(selectedItem);
                     }}
                   />
                 </View>
@@ -385,7 +384,7 @@ export default function CreateMissionModal({
                     <View>
                       <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
-                          defaultButtonText="공간선택"
+                          defaultButtonText="장소 선택"
                           buttonStyle={{
                             borderRadius: 25,
                             height: 40,

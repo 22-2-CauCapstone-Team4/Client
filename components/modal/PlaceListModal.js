@@ -88,9 +88,9 @@ export default function PlaceListModal({
                 </View>
               </View>
 
-              <View style={{flexDirection: 'row'}}>
+              <View style={{flexDirection: 'row', marginTop: 15}}>
                 <Pressable
-                  style={[styles.button, styles.buttonClose]}
+                  style={[style.button, styles.buttonClose, {marginRight: 30}]}
                   onPress={() => {
                     navigation.navigate('CreateSpace');
                     setModalVisible(!modalVisible);
@@ -98,7 +98,7 @@ export default function PlaceListModal({
                   <Text style={styles.textStyle}>추가</Text>
                 </Pressable>
                 <Pressable
-                  style={[styles.button, styles.buttonClose]}
+                  style={[style.button, styles.buttonClose]}
                   onPress={() => setModalVisible(!modalVisible)}>
                   <Text style={styles.textStyle}>닫기</Text>
                 </Pressable>
@@ -112,6 +112,12 @@ export default function PlaceListModal({
 }
 
 const style = StyleSheet.create({
+  button: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    margin: 5,
+  },
   lineStyle: {
     width: '100%',
     borderWidth: 0.5,
@@ -125,8 +131,8 @@ const style = StyleSheet.create({
     marginBottom: 5,
   },
   place: {
-    width: 150,
-    height: 36,
+    width: 250,
+    height: 40,
     backgroundColor: '#0891b2',
     borderRadius: 600,
     justifyContent: 'center',
@@ -135,16 +141,22 @@ const style = StyleSheet.create({
   },
   scrollView: {
     alignItems: 'center',
-    width: 180,
+    width: '100%',
     borderRadius: 20,
     borderColor: 'grey',
     borderWidth: 0.5,
     padding: 10,
     marginBottom: 5,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
   modalView: {
     margin: 20,
-    width: '65%',
+    width: '90%',
     height: '50%',
     backgroundColor: 'white',
     borderRadius: 20,

@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import Colors from './Colors';
 export const styles = StyleSheet.create({
   // 중앙 정렬
   makeCenter: {
@@ -58,12 +59,12 @@ export const styles = StyleSheet.create({
 
   //모달 버튼 색깔
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
 
   // 모달 버튼 텍스트 스타일
   textStyle: {
-    color: 'white',
+    color: Colors.MAIN_COLOR,
     fontWeight: 'bold',
     textAlign: 'center',
   },

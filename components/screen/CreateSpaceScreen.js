@@ -18,6 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import MapView, {Marker, Circle} from 'react-native-maps';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import SnackBar from 'react-native-snackbar';
+import SelectDropdown from 'react-native-select-dropdown';
 import Geolocation from 'react-native-geolocation-service';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -61,6 +62,7 @@ export default function CreateSpaceScreen({navigation}) {
     latitudeDelta: 0.092,
     longitudeDelta: 0.0421,
   });
+  const [range, setRange] = useState(0.05); // 범위 50m로 디폴트
   const [place, setPlace] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [valid, setVaild] = useState(true);
@@ -71,7 +73,8 @@ export default function CreateSpaceScreen({navigation}) {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log(position.coords);
+        // 현재위치 좌표뽑기
+        //console.log(position.coords);
         setCurrentLocation({latitude, longitude});
       },
       error => {
@@ -101,45 +104,6 @@ export default function CreateSpaceScreen({navigation}) {
   useEffect(() => {
     ref.current?.setAddressText('Some Text');
   }, []);
-
-  console.log('내 위치');
-  console.log(currentLocation.latitude, currentLocation.longitude);
-  const myHome = {latitude: 37.3965393594534, longitude: 127.12254205718637};
-  console.log('내 위치에서 집까지');
-  console.log(
-    getDistance(
-      currentLocation.latitude,
-      currentLocation.longitude,
-      myHome.latitude,
-      myHome.longitude,
-    ),
-  );
-
-  // function getCoordinate() {
-  //   return Geocoder.from('New York, 뉴욕 미국')
-  //     .then(json => {
-  //       var location = json.results[0].geometry.location;
-  //       console.log('location is///');
-  //       console.log([location.lat, location.lng]);
-  //       return [location.lat, location.lng];
-  //     })
-  //     .catch(error => console.warn(error));
-  // }
-  // fetch(
-  //   'https://maps.googleapis.com/maps/api/geocode/json?address=' +
-  //     coord.latitude +
-  //     ',' +
-  //     coord.longitude +
-  //     '&key=' +
-  //     'AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k' +
-  //     '&language=ko',
-  // )
-  //   .then(response => response.json())
-  //   .then(responseJson => {
-  //     console.log('주소 정보');
-  //     console.log('udonPeople ' + responseJson.results[0].formatted_address);
-  //   })
-  //   .catch(err => console.log('udonPeople error : ' + err));
   return (
     <>
       <SafeAreaView style={{height: '100%', backgroundColor: 'white'}}>
@@ -162,7 +126,10 @@ export default function CreateSpaceScreen({navigation}) {
           <GooglePlacesAutocomplete
             textInputProps={{
               placeholderTextColor: Colors.MAIN_COLOR,
+              backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+              color: Colors.MAIN_COLOR,
               returnKeyType: 'search',
+              borderBottomColor: Colors.MAIN_COLOR_INACTIVE,
             }}
             GooglePlacesSearchQuery={{rankby: 'distance'}}
             placeholder="장소를 검색하세요"
@@ -229,9 +196,9 @@ export default function CreateSpaceScreen({navigation}) {
             </Marker>
             <Circle
               center={{latitude: coord.latitude, longitude: coord.longitude}}
-              radius={50}
-              fillColor={Colors.MAIN_COLOR_INACTIVE}
-              strokeColor={Colors.MAIN_COLOR}></Circle>
+              radius={range * 1000}
+              fillColor="#ff555544"
+              strokeColor="#ff5555"></Circle>
             {data.map(place => {
               return (
                 <View key={place._id}>
@@ -252,7 +219,7 @@ export default function CreateSpaceScreen({navigation}) {
                   <Circle
                     center={{latitude: place.lat, longitude: place.lng}}
                     radius={50}
-                    fillColor={Colors.MAIN_COLOR_INACTIVE}
+                    fillColor={Colors.MAP_CIRCLE_COLOR}
                     strokeColor={Colors.MAIN_COLOR}></Circle>
                 </View>
               );
@@ -284,6 +251,22 @@ export default function CreateSpaceScreen({navigation}) {
                     onPressIn={() => setPlace('')}>
                     {place}
                   </TextInput>
+                  <SelectDropdown
+                    defaultButtonText="범위 선택"
+                    buttonStyle={{
+                      borderRadius: 25,
+                      height: 40,
+                      width: '100%',
+                      backgroundColor: Colors.MAIN_COLOR,
+                    }}
+                    buttonTextStyle={{color: 'white'}}
+                    data={['25m', '50m', '100m', '250m']}
+                    defaultValueByIndex={1}
+                    onSelect={value => {
+                      //km 단위로 범위 저장
+                      setRange(parseInt(value.split('m')[0]) / 1000);
+                    }}
+                  />
                 </View>
                 <View style={{alignItems: 'center'}}>
                   <View style={{flexDirection: 'row', marginBottom: 5}}>
@@ -297,6 +280,8 @@ export default function CreateSpaceScreen({navigation}) {
                             owner_id: user.id,
                             lat: coord.latitude,
                             lng: coord.longitude,
+                            // 범위 추가
+                            range: range,
                           });
                           Realm.open(mkConfig(user, [Place.schema])).then(
                             async realm => {
@@ -375,12 +360,12 @@ const styles = StyleSheet.create({
     fontFamily: 'bold',
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
 
   // 모달 버튼 텍스트 스타일
   textStyle: {
-    color: 'white',
+    color: Colors.MAIN_COLOR,
     fontWeight: 'bold',
     textAlign: 'center',
   },
