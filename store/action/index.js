@@ -27,7 +27,14 @@ export const selectCategory = item => {
   };
 };
 
-//MISSION
+// MISSION
+export const initMission = item => {
+  return {
+    type: 'INIT_MISSION',
+    payload: item,
+  };
+};
+
 export const addMission = item => {
   return {
     type: 'ADD_MISSION',

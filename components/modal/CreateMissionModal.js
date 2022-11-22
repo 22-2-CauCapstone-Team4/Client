@@ -20,17 +20,23 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {addMission} from '../../store/action';
+import {createMissionInRealm, mkTimeMissionObj} from '../../functions';
+import {Mission, Goal, Place} from '../../schema';
+import {mkConfig} from '../../functions/mkConfig';
+import {useAuth} from '../../providers/AuthProvider';
+
+import Realm from 'realm';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
   setModalVisible,
 }) {
   const dispatch = useDispatch();
-  const missionData = useSelector(store => store.missionReducer.missionData);
+  // const missionData = useSelector(store => store.missionReducer.missionData);
   //console.log('미션 정보');
   //console.log(missionData);
   // ★ 시간 잠금 저장
-  const [saveTime, setSaveTime] = useState();
+  // const [saveTime, setSaveTime] = useState();
   // ★ 시간 잠금 데이터 저장 함수
   const saveTimeLock = (
     missionName,
@@ -39,34 +45,34 @@ export default function CreateMissionModal({
     endTime,
     lockingType,
   ) => {
-    setSaveTime({
-      id: missionName, // 미션 이름
-      category: selectCategory, // 카테고리 이름
-      name: missionName, // 미션 이름
-      date: `${new Date(startTime).getFullYear()}-${
-        new Date(startTime).getMonth() + 1
-      }-${new Date(startTime).getDate()}`, // 년, 월, 일
-      type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
-      time: {
-        // 시작시간, 종료시간
-        startTime: `${new Date(startTime).getHours()}:${new Date(
-          startTime,
-        ).getMinutes()}`,
-        endTime: `${new Date(endTime).getHours()}:${new Date(
-          endTime,
-        ).getMinutes()}`,
-      },
-      dayOfWeek: {}, // ＠ 요일 데이터
-      space: {},
-    });
+    //   setSaveTime({
+    //     id: missionName, // 미션 이름
+    //     category: selectCategory.name, // 카테고리 이름
+    //     name: missionName, // 미션 이름
+    //     date: `${new Date(startTime).getFullYear()}-${
+    //       new Date(startTime).getMonth() + 1
+    //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
+    //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
+    //     time: {
+    //       // 시작시간, 종료시간
+    //       startTime: `${new Date(startTime).getHours()}:${new Date(
+    //         startTime,
+    //       ).getMinutes()}`,
+    //       endTime: `${new Date(endTime).getHours()}:${new Date(
+    //         endTime,
+    //       ).getMinutes()}`,
+    //     },
+    //     dayOfWeek: {}, // ＠ 요일 데이터
+    //     space: {},
+    //   });
     return {
       id: missionName, // 미션 이름
-      category: selectCategory, // 카테고리 이름
+      category: selectCategory.name, // 카테고리 이름
       name: missionName, // 미션 이름
       date: `${new Date(startTime).getFullYear()}-${
         new Date(startTime).getMonth() + 1
       }-${new Date(startTime).getDate()}`, // 년, 월, 일
-      type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
+      type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
       time: {
         // 시작시간, 종료시간
         startTime: `${new Date(startTime).getHours()}:${new Date(
@@ -80,6 +86,7 @@ export default function CreateMissionModal({
       space: {},
     };
   };
+
   //console.log('시간 데이터');
   //console.log(saveTime);
   // ★ 공간 잠금 저장
@@ -91,7 +98,7 @@ export default function CreateMissionModal({
   //     category: '운동',
   //     name: '조깅',
   //     date: '오늘날짜',
-  //     type: 'space',
+  //     type: 'PLACE',
   //     time: {},
   //     space: {type: 'outside', place: '집'},
   //   },
@@ -115,7 +122,7 @@ export default function CreateMissionModal({
   //       date: `${startTime.getFullYear()}-${
   //         startTime.getMonth() + 1
   //       }-${startTime.getDate()}`, // 년, 월, 일
-  //       type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
+  //       type: {lockingType} ? 'PLACE' : 'TIME', // false: 시간 잠금, true: 공간 잠금
   //       time: {},
   //       space: {
   //         type:
@@ -132,6 +139,8 @@ export default function CreateMissionModal({
   //   console.log(saveSpace);
   // };
   // 카테고리
+
+  const {user} = useAuth();
 
   const category = useSelector(store => store.categoryReducer.data); // ★ 카테고리 데이터
   const space = useSelector(store => store.placeReducer.data); // ★ 공간 데이터
@@ -291,8 +300,10 @@ export default function CreateMissionModal({
                     defaultButtonText="카테고리"
                     data={category.map(el => el.name)}
                     onSelect={selectedItem => {
-                      setSelectCategory(selectedItem);
-                      console.log(selectedItem);
+                      setSelectCategory(
+                        category.find(ele => ele.name === selectedItem),
+                      );
+                      console.log(selectCategory);
                     }}
                   />
                 </View>
@@ -473,14 +484,16 @@ export default function CreateMissionModal({
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => {
-                    saveTimeLock(
+                  onPress={async () => {
+                    const mission = mkTimeMissionObj(
+                      user,
                       missionName,
                       selectCategory,
                       startTime,
                       endTime,
                       lockingType,
                     );
+
                     dispatch(
                       addMission(
                         saveTimeLock(
@@ -493,6 +506,16 @@ export default function CreateMissionModal({
                       ),
                     );
                     setModalVisible(!modalVisible);
+
+                    const realm = await Realm.open(
+                      mkConfig(user, [
+                        Mission.schema,
+                        Goal.schema,
+                        Place.schema,
+                      ]),
+                    );
+                    await createMissionInRealm(user, realm, mission);
+                    realm.close();
                   }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>

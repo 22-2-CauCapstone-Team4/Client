@@ -30,6 +30,7 @@ import {
   addApps,
   addBlockedApps,
   initCategory,
+  initMission,
   initPlace,
 } from '../../store/action';
 import Realm from 'realm';
@@ -78,32 +79,19 @@ function Detail({navigation}) {
           ProhibitedApp.schema,
           Goal.schema,
           Place.schema,
-          // Mission.schema,
+          Mission.schema,
         ]),
       );
 
-      let [tempApps, tempBlockedApps, tempGoals, tempPlaces] =
+      let [tempApps, tempBlockedApps, tempGoals, tempPlaces, tempMissions] =
         await Promise.all([
           AppListModule.getAppList(),
           readProhibitedAppsInRealm(user, realm),
           readGoalsInRealm(user, realm),
           readPlacesInRealm(user, realm),
+          readMissionsInRealm(user, realm),
         ]);
 
-      // // mission create 테스트
-      // const tempMission = new Mission({
-      //   owner_id: user.id,
-      //   name: 'test',
-      //   goal: tempGoals[0],
-      //   kind: Mission.KIND.TIME,
-      //   date: new Date(),
-      // });
-      // const mission = await createMissionInRealm(user, realm, tempMission);
-
-      // // mission read 테스트
-      // const readMission = readMissionsInRealm(user, realm);
-
-      // console.log('mission 테스트 결과', mission, readMission);
       realm.close();
 
       tempApps = tempApps.appList;
@@ -119,7 +107,7 @@ function Detail({navigation}) {
 
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
-
+      dispatch(initMission(tempMissions));
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

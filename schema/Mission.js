@@ -13,7 +13,7 @@ class Mission {
     isActive,
     isRepeated = false,
     kind,
-    place,
+    // place,
   }) {
     this._id = id;
     this.owner_id = owner_id;
@@ -26,7 +26,7 @@ class Mission {
     this.isActive = isActive;
     this.isRepeated = isRepeated;
     this.kind = kind;
-    this.place = place;
+    // if (place) this.place = place;
   }
 
   static KIND = {
@@ -40,15 +40,15 @@ class Mission {
       _id: 'objectId',
       date: 'date?',
       dayOfTheWeek: {type: 'int?', default: 0},
-      endTime: {type: 'int?', default: 0},
-      goal: 'Goal',
+      endTime: {type: 'int?'},
+      goal: 'Goal?',
       isActive: {type: 'bool', default: false},
       isRepeated: {type: 'bool', default: false},
       kind: 'string',
       name: 'string',
       owner_id: 'string',
-      place: 'Place',
-      startTime: {type: 'int?', default: 0},
+      // place: 'Place?',
+      startTime: {type: 'int?'},
     },
     primaryKey: '_id',
   };

@@ -4,6 +4,36 @@ import {Goal} from '../../schema';
 import {Mission} from '../../schema/Mission';
 import {mkConfig} from '../mkConfig';
 
+// db 저장용 객체 생성
+const mkTimeMissionObj = (
+  user,
+  missionName,
+  selectCategory,
+  startTime,
+  endTime,
+  lockingType,
+) => {
+  // date 설정
+  const date = new Date(startTime);
+  date.setHours(0, 0, 0, 0);
+
+  const tempObj = {
+    owner_id: user.id,
+    name: missionName,
+    goal: selectCategory,
+    kind: {lockingType} ? 'TIME' : 'PLACE',
+    date,
+  };
+
+  if (startTime)
+    tempObj.startTime = startTime.getHours() * 60 + startTime.getMinutes();
+  if (endTime) tempObj.endTime = endTime.getHours() * 60 + endTime.getMinutes();
+
+  const mission = new Mission(tempObj);
+
+  return mission;
+};
+
 const readMissions = async (user, realm) => {
   console.log('read my missions');
   let result = null;
@@ -29,14 +59,32 @@ const createMission = async (user, realm, mission) => {
   let result = null;
 
   try {
-    console.log('쓰기 시작');
+    console.log('목표, 장소 객체 읽어오기');
+    let goal,
+      place = false;
+
+    goal = realm.objects('Goal').filtered(`_id == oid(${mission.goal._id})`);
+    goal = goal[0];
+
+    if (mission.type === Mission.KIND.PLACE) {
+      place = realm
+        .objects('Place')
+        .filtered(`_id == oid(${mission.place._id})`);
+      place = place[0];
+    }
+
+    if (place) console.log('쓰기 시작');
 
     realm.write(() => {
-      const newMission = realm.create('Mission', mission);
+      const newMission = realm.create('Mission', {
+        ...mission,
+        goal,
+        // place: place ? place : null,
+      });
       result = JSON.parse(JSON.stringify(newMission));
     });
 
-    console.log('업데이트 결과', result);
+    console.log('생성 결과', result);
   } catch (err) {
     console.log(err.message);
 
@@ -69,7 +117,7 @@ const updateMission = async (user, realm, mission) => {
       result = JSON.parse(JSON.stringify(newMission));
     });
 
-    console.log('생성 결과', result);
+    console.log('업데이트 결과', result);
   } catch (err) {
     console.log(err.message);
 
@@ -107,4 +155,10 @@ const deleteMission = async (user, realm, mission) => {
   }
 };
 
-export {readMissions, createMission, updateMission, deleteMission};
+export {
+  readMissions,
+  createMission,
+  updateMission,
+  deleteMission,
+  mkTimeMissionObj,
+};

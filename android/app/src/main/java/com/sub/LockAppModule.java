@@ -69,6 +69,8 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
         if (checkPermission(context)) {
             // Intent intent = new Intent(context, MainActivity.class);
             Intent intent = new Intent(context, MissionActivity.class);
+
+
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
