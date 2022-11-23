@@ -11,6 +11,7 @@ import {
   FlatList,
   SafeAreaView,
 } from 'react-native';
+import SnackBar from 'react-native-snackbar';
 import {styles} from '../../utils/styles';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -24,9 +25,9 @@ import {createMissionInRealm, mkMissionObjToRealmObj} from '../../functions';
 import {Mission, Goal, Place} from '../../schema';
 import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
-
 import Realm from 'realm';
 import {mkMissionRealmObjToObj} from '../../functions/crud/Mission';
+import {withTheme} from 'styled-components';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -154,6 +155,7 @@ export default function CreateMissionModal({
   };
   // 시간, 공간 잠금
   const [lockingType, setLockingType] = useState(false); // 시간잠금 or 공간잠금 state
+  // false가 시간 잠금
   const lockTime = () => {
     if (lockingType === true) setLockingType(!lockingType);
   };
@@ -212,15 +214,37 @@ export default function CreateMissionModal({
     // 취소 시
     setVisible2(false); // 모달 close
   };
-  // ＠ 요일 선택
-  const [selected, setSelected] = React.useState(new Map());
-  const [selectedDay, setSelectedDay] = useState('');
 
-  const dayOfWeekSave = selected => {
-    setSelectedDay([...selected.keys()]);
-    console.log(selectedDay);
+  // --- 출발 시간 ---
+  const [departureTime, onChangeDate3] = useState(new Date()); // 선택 날짜
+  const [mode3, setMode3] = useState('date'); // 모달 유형
+  const [visible3, setVisible3] = useState(false); // 모달 노출 여부
+
+  const onPressDepartureTime = () => {
+    setMode3('time');
+    setVisible3(true);
   };
-  const Data = [
+
+  const onConfirmDepartureTime = selectedDate => {
+    // 날짜 또는 시간 선택 시
+    setVisible3(false); // 모달 close
+    onChangeDate3(selectedDate); // 선택한 날짜 변경
+    console.log(`departure time : ${selectedDate}`);
+  };
+  const onCancel3 = () => {
+    // 취소 시
+    setVisible3(false); // 모달 close
+  };
+
+  // ＠ 요일 선택
+  const [selected, setSelected] = React.useState([]);
+  // const [selectedDay, setSelectedDay] = useState('');
+
+  // const dayOfWeekSave = selected => {
+  //   setSelectedDay([...selected.keys()]);
+  //   console.log(selectedDay);
+  // };
+  const dayOfWeekData = [
     //＠ 요일 데이터
     {
       id: 0,
@@ -252,30 +276,31 @@ export default function CreateMissionModal({
     },
   ];
   // ＠ 이후 쭉 요일 관련 함수
+  // 수정 -> 배열에서 id값만 가지고 있도록
   const onSelect = useCallback(
     id => {
-      const newSelected = new Map(selected);
-      newSelected.set(id, !selected.get(id));
-      setSelected(newSelected);
+      if (selected.includes(id)) setSelected(selected.filter(ele => ele != id));
+      else setSelected([...selected, id]);
     },
     [selected],
   );
   const Item = ({id, title, selected, onSelect}) => {
     return (
       <TouchableOpacity
-        onPress={() => onSelect(id, title)}
+        onPress={() => onSelect(id)}
         style={{
-          backgroundColor: selected ? 'grey' : 'white',
+          backgroundColor: selected ? Colors.MAIN_COLOR : 'white',
           margin: 1,
           marginTop: 10,
           borderWidth: 1,
           borderRadius: 25,
+          borderColor: Colors.MAIN_COLOR,
           width: 35,
           height: 35,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text style={{color: 'black'}}>{title}</Text>
+        <Text style={{color: selected ? 'white' : 'black'}}>{title}</Text>
       </TouchableOpacity>
     );
   };
@@ -298,7 +323,14 @@ export default function CreateMissionModal({
               <ScrollView>
                 <View style={{alignItems: 'center'}}>
                   <SelectDropdown
-                    defaultButtonText="카테고리"
+                    defaultButtonText="카테고리 선택"
+                    buttonStyle={{
+                      borderRadius: 25,
+                      height: 40,
+                      width: '100%',
+                      backgroundColor: Colors.MAIN_COLOR,
+                    }}
+                    buttonTextStyle={{color: 'white'}}
                     data={category.map(el => el.name)}
                     onSelect={selectedItem => {
                       setSelectCategory(
@@ -310,6 +342,7 @@ export default function CreateMissionModal({
                 </View>
                 <View style={missionStyle.missionText}>
                   <TextInput
+                    style={missionStyle.textInputStyle}
                     onChangeText={saveMission}
                     placeholder="미션 입력"
                     placeholderTextColor="grey"
@@ -317,7 +350,21 @@ export default function CreateMissionModal({
                 </View>
                 <View style={missionStyle.inputRow}>
                   <Text style={missionStyle.selectCalendar}>
-                    {startTime.getMonth() + 1}월 {startTime.getDate()}일
+                    {selected.length === 0
+                      ? `${startTime.getMonth() + 1}월 ${startTime.getDate()}일`
+                      : selected.length === 7
+                      ? '매일 반복'
+                      : selected.length === 5 &&
+                        !selected.includes(0) &&
+                        !selected.includes(6)
+                      ? '주중 반복'
+                      : selected.length === 2 &&
+                        selected.includes(0) &&
+                        selected.includes(6)
+                      ? '주말 반복'
+                      : `매주 ${['일', '월', '화', '수', '목', '금', '토']
+                          .filter((ele, ind) => selected.includes(ind))
+                          .join(', ')} 반복`}
                   </Text>
                   <TouchableOpacity onPress={onPressDate}>
                     <Ionicons
@@ -337,12 +384,12 @@ export default function CreateMissionModal({
                 <View>
                   <FlatList
                     horizontal
-                    data={Data}
+                    data={dayOfWeekData}
                     renderItem={({item}) => (
                       <Item
                         id={item.id}
                         title={item.title}
-                        selected={!!selected.get(item.id)}
+                        selected={selected.includes(item.id)}
                         onSelect={onSelect}
                       />
                     )}
@@ -362,7 +409,7 @@ export default function CreateMissionModal({
                             : Colors.MAIN_COLOR,
                         },
                       ]}>
-                      시간잠금
+                      시간 잠금
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={lockSpace}>
@@ -375,7 +422,7 @@ export default function CreateMissionModal({
                             : Colors.GREY,
                         },
                       ]}>
-                      공간잠금
+                      공간 잠금
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -386,7 +433,14 @@ export default function CreateMissionModal({
                     <View>
                       <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
-                          defaultButtonText="공간선택"
+                          defaultButtonText="공간 선택"
+                          buttonStyle={{
+                            borderRadius: 25,
+                            height: 40,
+                            width: '100%',
+                            backgroundColor: Colors.MAIN_COLOR,
+                          }}
+                          buttonTextStyle={{color: 'white'}}
                           data={space.map(el => el.name)}
                           onSelect={selectedItem => {
                             setSelectSpace(selectedItem);
@@ -404,7 +458,40 @@ export default function CreateMissionModal({
                         }}
                         value={moveSpace}
                       />
+                      {
+                        // 레이아웃 수정 필요
+                        /* 출발 시간 */ moveSpace && (
+                          <View style={{marginTop: 10}}>
+                            <View
+                              style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                              {/* 시간 선택 영역 */}
+                              <TouchableOpacity
+                                onPress={onPressDepartureTime}
+                                style={missionStyle.time}>
+                                <Text style={missionStyle.timeText}>
+                                  출발 시간
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                            <DateTimePickerModal
+                              isVisible={visible3}
+                              mode={mode3}
+                              onConfirm={onConfirmDepartureTime}
+                              onCancel={onCancel3}
+                              date={departureTime}
+                            />
+                            <Text style={missionStyle.timeData}>
+                              {departureTime.getHours()}시
+                              {departureTime.getMinutes()}분
+                            </Text>
+                          </View>
+                        )
+                      }
                     </View>
+
                     <View style={missionStyle.toggleBtn}>
                       <Text style={missionStyle.spaceText}>공간 안</Text>
                       <Switch
@@ -421,7 +508,11 @@ export default function CreateMissionModal({
                   <View>
                     {/* 시작 시간 */}
                     <View style={{marginTop: 10}}>
-                      <View>
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
                         {/* 시간 선택 영역 */}
                         <TouchableOpacity
                           onPress={onPressStartTime}
@@ -442,8 +533,11 @@ export default function CreateMissionModal({
                     </View>
                     {/* 종료 시간 */}
                     <View>
-                      <View>
-                        <View />
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
                         {/* 시간 선택 영역 */}
                         <TouchableOpacity
                           onPress={onPressEndTime}
@@ -462,38 +556,25 @@ export default function CreateMissionModal({
                         {endTime.getHours()}시 {endTime.getMinutes()}분
                       </Text>
                     </View>
-                    {/* ★ 잘 저장되는지 확인했던 부분 */}
-                    {/* <TouchableOpacity
-                      onPress={() =>
-                        saveTimeLock({
-                          missionName,
-                          selectCategory,
-                          startTime,
-                          endTime,
-                          lockingType,
-                          selected,
-                        })
-                      }>
-                      <Text>test</Text>
-                    </TouchableOpacity> */}
                   </View>
                 )}
               </ScrollView>
-              {/* <TouchableOpacity onPress={setSelectedDay([...selected.keys()])}>
-                <Text>test</Text>
-              </TouchableOpacity> */}
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={async () => {
-                    const mission = mkMissionObjToRealmObj(
+                    const mission = mkMissionObjToRealmObj({
                       user,
                       missionName,
                       selectCategory,
-                      startTime,
+                      startTime: lockingType ? startTime : departureTime,
                       endTime,
                       lockingType,
-                    );
+                      dayOfWeek: selected,
+                      space: space.find(ele => ele.name === selectSpace),
+                      spaceIn,
+                      moveSpace,
+                    });
 
                     dispatch(addMission(mkMissionRealmObjToObj(mission)));
                     setModalVisible(!modalVisible);
@@ -507,6 +588,11 @@ export default function CreateMissionModal({
                     );
                     await createMissionInRealm(user, realm, mission);
                     realm.close();
+
+                    SnackBar.show({
+                      text: '미션 생성이 완료되었습니다. ',
+                      duration: SnackBar.LENGTH_SHORT,
+                    });
                   }}>
                   <Text style={styles.textStyle}>확인</Text>
                 </Pressable>
@@ -524,6 +610,11 @@ export default function CreateMissionModal({
   );
 }
 const missionStyle = StyleSheet.create({
+  textInputStyle: {
+    borderColor: 'grey',
+    height: 40,
+    color: 'black',
+  },
   // CreateMissionModal.js에서 input
   missionInput: {
     height: 40,
@@ -602,9 +693,9 @@ const missionStyle = StyleSheet.create({
   // 날짜, 시간 설정 style
   time: {
     alignItems: 'center',
-    backgroundColor: '#81b0ff',
+    backgroundColor: Colors.MAIN_COLOR,
     width: '100%',
-    height: 30,
+    height: 40,
     justifyContent: 'center',
     borderRadius: 200,
   },
@@ -615,6 +706,7 @@ const missionStyle = StyleSheet.create({
   timeData: {
     textAlign: 'center',
     fontSize: 20,
+    color: 'black',
   },
   resultData: {
     textAlign: 'center',

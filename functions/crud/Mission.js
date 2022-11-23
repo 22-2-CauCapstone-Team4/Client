@@ -2,29 +2,56 @@
 import {Mission} from '../../schema/Mission';
 
 // db 저장용 객체 생성
-const mkMissionObjToRealmObj = (
+const mkMissionObjToRealmObj = ({
   user,
   missionName,
   selectCategory,
   startTime,
   endTime,
   lockingType,
-) => {
+  dayOfWeek,
+  space,
+  spaceIn,
+  moveSpace,
+}) => {
   // date 설정
   const date = new Date(startTime);
   date.setHours(0, 0, 0, 0);
+
+  // 반복
+  let isRepeated = false,
+    dayOfWeekBitmask = 0;
+  if (Array.isArray(dayOfWeek) && dayOfWeek.length !== 0) {
+    // 빈 배열 아닌 경우, 반복 true
+    isRepeated = true;
+
+    dayOfWeek.forEach(dayInt => {
+      dayOfWeekBitmask = dayOfWeekBitmask | (1 << dayInt);
+    });
+
+    console.log('요일 정보 존재, bitmask =', dayOfWeekBitmask);
+  }
 
   const tempObj = {
     owner_id: user.id,
     name: missionName,
     goal: selectCategory,
-    kind: {lockingType} ? 'TIME' : 'PLACE',
-    date,
+    type: !lockingType
+      ? Mission.TYPE.TIME
+      : spaceIn && !moveSpace
+      ? Mission.TYPE.IN_PLACE
+      : !spaceIn && moveSpace
+      ? Mission.TYPE.MOVE_PLACE
+      : Mission.TYPE.BOTH_PLACE,
+    isRepeated,
   };
 
   if (startTime)
     tempObj.startTime = startTime.getHours() * 60 + startTime.getMinutes();
   if (endTime) tempObj.endTime = endTime.getHours() * 60 + endTime.getMinutes();
+  if (isRepeated) tempObj.dayOfTheWeek = dayOfWeekBitmask;
+  else tempObj.date = date;
+  if (tempObj.type !== Mission.TYPE.TIME) tempObj.place = space;
 
   const mission = new Mission(tempObj);
 
@@ -40,20 +67,53 @@ const mkMissionObjToRealmObj = (
 const mkMissionRealmObjToObj = mission => {
   const date = new Date(mission.date);
 
-  return {
+  let dayOfWeekArr = [];
+  for (let i = 0; i < 7; i++) {
+    if (mission.dayOfTheWeek & (1 << i)) {
+      dayOfWeekArr.push(i);
+    }
+  }
+
+  // 반복 요일 정보 문자열 설정
+  const dayOfWeekStr =
+    dayOfWeekArr.length === 7
+      ? '매일 반복'
+      : dayOfWeekArr.length === 5 &&
+        !dayOfWeekArr.includes(0) &&
+        !dayOfWeekArr.includes(6)
+      ? '주중 반복'
+      : dayOfWeekArr.length === 2 &&
+        dayOfWeekArr.includes(0) &&
+        dayOfWeekArr.includes(6)
+      ? '주말 반복'
+      : `매주 ${['일', '월', '화', '수', '목', '금', '토']
+          .filter((ele, ind) => dayOfWeekArr.includes(ind))
+          .join(', ')} 반복`;
+
+  const tempObj = {
     id: mission._id, // 미션 id
     category: mission.goal.name, // 카테고리 이름
     name: mission.name, // 미션 이름
-    date: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`, // 년, 월, 일
-    type: mission.kind, // false: 시간 잠금, true: 공간 잠금
+    type: mission.type, // false: 시간 잠금, true: 공간 잠금
     time: {
       // 시작시간, 종료시간
       startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
       endTime: `${mission.endTime / 60}:${mission.endTime % 60}`,
     },
-    dayOfWeek: {}, // ＠ 요일 데이터
-    space: {},
+    dayOfWeek: dayOfWeekArr, // ＠ 요일 데이터,
   };
+
+  if (mission.place) tempObj.space = mission.place.name;
+  if (mission.isRepeated) {
+    tempObj.dayOfWeek = dayOfWeekArr;
+    tempObj.date = dayOfWeekStr;
+  } else {
+    tempObj.date = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`; // 년, 월, 일
+  }
+
+  return tempObj;
 };
 
 const readMissions = async (user, realm) => {
@@ -88,20 +148,21 @@ const createMission = async (user, realm, mission) => {
     goal = realm.objects('Goal').filtered(`_id == oid(${mission.goal._id})`);
     goal = goal[0];
 
-    if (mission.type === Mission.KIND.PLACE) {
+    console.log(mission.type);
+    if (mission.type !== Mission.TYPE.TIME) {
       place = realm
         .objects('Place')
         .filtered(`_id == oid(${mission.place._id})`);
       place = place[0];
     }
 
-    if (place) console.log('쓰기 시작');
+    console.log('쓰기 시작');
 
     realm.write(() => {
+      if (mission.type !== Mission.TYPE.TIME) mission.place = place;
       const newMission = realm.create('Mission', {
         ...mission,
         goal,
-        // place: place ? place : null,
       });
       result = JSON.parse(JSON.stringify(newMission));
     });

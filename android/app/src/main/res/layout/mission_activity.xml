@@ -126,15 +126,14 @@
                 android:background="@drawable/btn_blue"
                 android:text="10분 사용"
                 android:textColor="#058eb0"
-                android:textSize="16dp"
-                />
+                android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/leftText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="1분 뒤 사용 가능"
+                android:text="사용 가능"
                 android:textColor="#ee0000" />
         </LinearLayout>
 
@@ -151,7 +150,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_blue"
-                android:text="포기"
+                android:text="어플로 돌아가기"
                 android:textColor="#058eb0"
                 android:textSize="16dp" />
         </LinearLayout>
