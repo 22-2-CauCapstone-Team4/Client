@@ -6,7 +6,8 @@ import {
   createMission,
   updateMission,
   deleteMission,
-  mkTimeMissionObj,
+  mkMissionObjToRealmObj,
+  mkMissionRealmObjToObj,
 } from './Mission';
 
 import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
@@ -26,7 +27,8 @@ module.exports = {
   createMissionInRealm: createMission,
   updateMissionInRealm: updateMission,
   deleteMissionInRealm: deleteMission,
-  mkTimeMissionObj,
+  mkMissionObjToRealmObj,
+  mkMissionRealmObjToObj,
   readUsageInRealm: readUsage,
   readAppSecInRealm: readAppSec,
   readAppCntInRealm: readAppCnt,

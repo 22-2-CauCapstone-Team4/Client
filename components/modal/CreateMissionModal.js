@@ -20,12 +20,13 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {addMission} from '../../store/action';
-import {createMissionInRealm, mkTimeMissionObj} from '../../functions';
+import {createMissionInRealm, mkMissionObjToRealmObj} from '../../functions';
 import {Mission, Goal, Place} from '../../schema';
 import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
 
 import Realm from 'realm';
+import {mkMissionRealmObjToObj} from '../../functions/crud/Mission';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -38,54 +39,54 @@ export default function CreateMissionModal({
   // ★ 시간 잠금 저장
   // const [saveTime, setSaveTime] = useState();
   // ★ 시간 잠금 데이터 저장 함수
-  const saveTimeLock = (
-    missionName,
-    selectCategory,
-    startTime,
-    endTime,
-    lockingType,
-  ) => {
-    //   setSaveTime({
-    //     id: missionName, // 미션 이름
-    //     category: selectCategory.name, // 카테고리 이름
-    //     name: missionName, // 미션 이름
-    //     date: `${new Date(startTime).getFullYear()}-${
-    //       new Date(startTime).getMonth() + 1
-    //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
-    //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
-    //     time: {
-    //       // 시작시간, 종료시간
-    //       startTime: `${new Date(startTime).getHours()}:${new Date(
-    //         startTime,
-    //       ).getMinutes()}`,
-    //       endTime: `${new Date(endTime).getHours()}:${new Date(
-    //         endTime,
-    //       ).getMinutes()}`,
-    //     },
-    //     dayOfWeek: {}, // ＠ 요일 데이터
-    //     space: {},
-    //   });
-    return {
-      id: missionName, // 미션 이름
-      category: selectCategory.name, // 카테고리 이름
-      name: missionName, // 미션 이름
-      date: `${new Date(startTime).getFullYear()}-${
-        new Date(startTime).getMonth() + 1
-      }-${new Date(startTime).getDate()}`, // 년, 월, 일
-      type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
-      time: {
-        // 시작시간, 종료시간
-        startTime: `${new Date(startTime).getHours()}:${new Date(
-          startTime,
-        ).getMinutes()}`,
-        endTime: `${new Date(endTime).getHours()}:${new Date(
-          endTime,
-        ).getMinutes()}`,
-      },
-      dayOfWeek: {}, // ＠ 요일 데이터
-      space: {},
-    };
-  };
+  // const saveTimeLock = (
+  //   missionName,
+  //   selectCategory,
+  //   startTime,
+  //   endTime,
+  //   lockingType,
+  // ) => {
+  //   setSaveTime({
+  //     id: missionName, // 미션 이름
+  //     category: selectCategory.name, // 카테고리 이름
+  //     name: missionName, // 미션 이름
+  //     date: `${new Date(startTime).getFullYear()}-${
+  //       new Date(startTime).getMonth() + 1
+  //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
+  //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
+  //     time: {
+  //       // 시작시간, 종료시간
+  //       startTime: `${new Date(startTime).getHours()}:${new Date(
+  //         startTime,
+  //       ).getMinutes()}`,
+  //       endTime: `${new Date(endTime).getHours()}:${new Date(
+  //         endTime,
+  //       ).getMinutes()}`,
+  //     },
+  //     dayOfWeek: {}, // ＠ 요일 데이터
+  //     space: {},
+  //   });
+  //   return {
+  //     id: missionName, // 미션 이름
+  //     category: selectCategory.name, // 카테고리 이름
+  //     name: missionName, // 미션 이름
+  //     date: `${new Date(startTime).getFullYear()}-${
+  //       new Date(startTime).getMonth() + 1
+  //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
+  //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
+  //     time: {
+  //       // 시작시간, 종료시간
+  //       startTime: `${new Date(startTime).getHours()}:${new Date(
+  //         startTime,
+  //       ).getMinutes()}`,
+  //       endTime: `${new Date(endTime).getHours()}:${new Date(
+  //         endTime,
+  //       ).getMinutes()}`,
+  //     },
+  //     dayOfWeek: {}, // ＠ 요일 데이터
+  //     space: {},
+  //   };
+  // };
 
   //console.log('시간 데이터');
   //console.log(saveTime);
@@ -485,7 +486,7 @@ export default function CreateMissionModal({
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={async () => {
-                    const mission = mkTimeMissionObj(
+                    const mission = mkMissionObjToRealmObj(
                       user,
                       missionName,
                       selectCategory,
@@ -494,17 +495,7 @@ export default function CreateMissionModal({
                       lockingType,
                     );
 
-                    dispatch(
-                      addMission(
-                        saveTimeLock(
-                          missionName,
-                          selectCategory,
-                          startTime,
-                          endTime,
-                          lockingType,
-                        ),
-                      ),
-                    );
+                    dispatch(addMission(mkMissionRealmObjToObj(mission)));
                     setModalVisible(!modalVisible);
 
                     const realm = await Realm.open(

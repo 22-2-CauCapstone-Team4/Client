@@ -1,7 +1,4 @@
 /* eslint-disable curly */
-import Realm from 'realm';
-import {Goal} from '../../schema';
-import {mkConfig} from '../mkConfig';
 
 const readGoals = async (user, realm, getRealmObj = false) => {
   console.log('read my goals');

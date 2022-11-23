@@ -17,7 +17,8 @@ import {
   readUsageInRealm,
   readAppSecInRealm,
   readAppCntInRealm,
-  mkTimeMissionObj,
+  mkMissionObjToRealmObj,
+  mkMissionRealmObjToObj,
 } from './crud';
 import {appCheckHeadlessTask, startServiceTask} from './task';
 
@@ -38,7 +39,8 @@ module.exports = {
   createMissionInRealm,
   updateMissionInRealm,
   deleteMissionInRealm,
-  mkTimeMissionObj,
+  mkMissionObjToRealmObj,
+  mkMissionRealmObjToObj,
   readUsageInRealm,
   readAppSecInRealm,
   readAppCntInRealm,

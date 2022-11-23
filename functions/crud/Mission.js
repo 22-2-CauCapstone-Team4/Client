@@ -1,11 +1,8 @@
 /* eslint-disable curly */
-import Realm from 'realm';
-import {Goal} from '../../schema';
 import {Mission} from '../../schema/Mission';
-import {mkConfig} from '../mkConfig';
 
 // db 저장용 객체 생성
-const mkTimeMissionObj = (
+const mkMissionObjToRealmObj = (
   user,
   missionName,
   selectCategory,
@@ -32,6 +29,31 @@ const mkTimeMissionObj = (
   const mission = new Mission(tempObj);
 
   return mission;
+};
+
+// time: {
+//       // 시작시간, 종료시간
+//       startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
+//       endTime: `${mission.endTime / 60}:${mission.endTime % 60}`,
+//     },
+
+const mkMissionRealmObjToObj = mission => {
+  const date = new Date(mission.date);
+
+  return {
+    id: mission._id, // 미션 id
+    category: mission.goal.name, // 카테고리 이름
+    name: mission.name, // 미션 이름
+    date: `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`, // 년, 월, 일
+    type: mission.kind, // false: 시간 잠금, true: 공간 잠금
+    time: {
+      // 시작시간, 종료시간
+      startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
+      endTime: `${mission.endTime / 60}:${mission.endTime % 60}`,
+    },
+    dayOfWeek: {}, // ＠ 요일 데이터
+    space: {},
+  };
 };
 
 const readMissions = async (user, realm) => {
@@ -160,5 +182,6 @@ export {
   createMission,
   updateMission,
   deleteMission,
-  mkTimeMissionObj,
+  mkMissionObjToRealmObj,
+  mkMissionRealmObjToObj,
 };

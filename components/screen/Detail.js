@@ -24,7 +24,7 @@ import {
   readGoalsInRealm,
   readPlacesInRealm,
   readMissionsInRealm,
-  createMissionInRealm,
+  mkMissionRealmObjToObj,
 } from '../../functions';
 import {
   addApps,
@@ -60,14 +60,7 @@ function Detail({navigation}) {
     }
 
     if (checkStatus === Status.NOT_YET) checkPermissionAlert();
-  }, [
-    Status.NOT_YET,
-    checkPermissionAlert,
-    checkStatus,
-    isInit,
-    loadApps,
-    user,
-  ]);
+  });
 
   const loadApps = React.useCallback(async () => {
     setIsInit(false);
@@ -83,9 +76,20 @@ function Detail({navigation}) {
         ]),
       );
 
-      let [tempApps, tempBlockedApps, tempGoals, tempPlaces, tempMissions] =
+      let tempApps;
+      AppListModule.getAppList().then(result => {
+        tempApps = result;
+        tempApps = tempApps.appList;
+        tempApps.sort(function (a, b) {
+          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          else if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+          else return 0;
+        });
+        dispatch(addApps(tempApps));
+      });
+
+      let [tempBlockedApps, tempGoals, tempPlaces, tempMissions] =
         await Promise.all([
-          AppListModule.getAppList(),
           readProhibitedAppsInRealm(user, realm),
           readGoalsInRealm(user, realm),
           readPlacesInRealm(user, realm),
@@ -94,20 +98,16 @@ function Detail({navigation}) {
 
       realm.close();
 
-      tempApps = tempApps.appList;
-      tempApps.sort(function (a, b) {
-        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-        else if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-        else return 0;
-      });
-      dispatch(addApps(tempApps));
-
       dispatch(addBlockedApps(tempBlockedApps));
       setBlockedApps(tempBlockedApps);
 
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
-      dispatch(initMission(tempMissions));
+      dispatch(
+        initMission(
+          tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
+        ),
+      );
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

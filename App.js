@@ -51,7 +51,7 @@ function App() {
               component={MenuDrawer}
               options={{headerShown: false}}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
               name="DirectCreateMission"
               component={DirectCreateMissionScreen}
               options={{headerShown: false}}
@@ -70,7 +70,7 @@ function App() {
               name="Friend"
               component={FriendScreen}
               options={{headerShown: false}}
-            />
+            /> */}
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
