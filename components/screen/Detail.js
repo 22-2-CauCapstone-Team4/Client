@@ -261,6 +261,19 @@ function Detail({navigation}) {
         headerStyle: {
           borderBottomWidth: 1,
         },
+        tabBarStyle: {height: 60},
+        tabBarLabelStyle: {fontSize: 14},
+        headerLeft: () => {
+          if (route.name === '홈') {
+            return (
+              <TouchableOpacity
+                style={[{marginLeft: 10}]}
+                onPress={() => navigation.openDrawer()}>
+                <Icon name={'menu'} size={30} color={'black'} />
+              </TouchableOpacity>
+            );
+          }
+        },
         headerRight: () => {
           if (route.name === '홈') {
             return (

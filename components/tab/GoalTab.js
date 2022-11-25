@@ -10,6 +10,7 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
+import Colors from '../../utils/Colors';
 import {StyleSheet} from 'react-native';
 import Categories from '../Categories';
 import GoalCategoryBox from '../box/GoalCategoryBox';
@@ -64,18 +65,29 @@ const GoalTab = ({navigation}) => {
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></CreateMissionModal>
       </View>
-      <AddMissionBtn onPress={() => setModalVisible(true)}>
-        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
+      <AddMissionBtn
+        onPress={() => setModalVisible(true)}
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Ionicons name="add-circle" size={45} color={'#0891b2'}></Ionicons>
+        <Text
+          style={{
+            color: Colors.MAIN_COLOR,
+            fontSize: 10,
+          }}>
+          미션 추가
+        </Text>
       </AddMissionBtn>
     </Container>
   );
 };
 
-const AddMissionBtn = styled.Pressable`
+const AddMissionBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 5%;
   right: 5%;
-  border-radius: 600px;
 `;
 const Container = styled.View`
   height: 100%;

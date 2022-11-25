@@ -11,11 +11,16 @@ import {
   Modal,
   Pressable,
   TextInput,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, Circle} from 'react-native-maps';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import SnackBar from 'react-native-snackbar';
+import SelectDropdown from 'react-native-select-dropdown';
+import Geolocation from 'react-native-geolocation-service';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../utils/Colors';
 import {addPlace} from '../../store/action';
@@ -24,9 +29,61 @@ import {createPlaceInRealm} from '../../functions';
 import {useAuth} from '../../providers/AuthProvider';
 import {mkConfig} from '../../functions/mkConfig';
 import Realm from 'realm';
+import {getDistance} from '../../functions/space';
+import {curr} from '../../functions/time';
+
+async function requestPermissions() {
+  if (Platform.OS === 'ios') {
+    Geolocation.requestAuthorization();
+    Geolocation.setRNConfiguration({
+      skipPermissionRequests: false,
+      authorizationLevel: 'whenInUse',
+    });
+  }
+
+  if (Platform.OS === 'android') {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+  }
+}
 
 export default function CreateSpaceScreen({navigation}) {
+  // 위치 권한 승인
+  requestPermissions();
   Geocoder.init('AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k', {language: 'ko'});
+
+  const {user} = useAuth();
+  const dispatch = useDispatch();
+  const data = useSelector(store => store.placeReducer.data);
+  const [coord, setCoord] = useState({
+    latitude: 37.503637,
+    longitude: 126.956025,
+    latitudeDelta: 0.092,
+    longitudeDelta: 0.0421,
+  });
+  const [range, setRange] = useState(0.05); // 범위 50m로 디폴트
+  const [place, setPlace] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [valid, setVaild] = useState(true);
+  const ref = useRef();
+  const [currentLocation, setCurrentLocation] = useState({});
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        // 현재위치 좌표뽑기
+        //console.log(position.coords);
+        setCurrentLocation({latitude, longitude});
+      },
+      error => {
+        console.log(error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  }, []);
+
   //뒤로가기 -> 페이지 뒤로
   useEffect(() => {
     const backAction = () => {
@@ -48,49 +105,23 @@ export default function CreateSpaceScreen({navigation}) {
     ref.current?.setAddressText('Some Text');
   }, []);
 
-  const {user} = useAuth();
-  const dispatch = useDispatch();
-  const data = useSelector(store => store.placeReducer.data);
-  const [coord, setCoord] = useState({
-    latitude: 37.503637,
-    longitude: 126.956025,
-    latitudeDelta: 0.092,
-    longitudeDelta: 0.0421,
-  });
-  const [place, setPlace] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [valid, setVaild] = useState(true);
-  const ref = useRef();
-  // function getCoordinate() {
-  //   return Geocoder.from('New York, 뉴욕 미국')
-  //     .then(json => {
-  //       var location = json.results[0].geometry.location;
-  //       console.log('location is///');
-  //       console.log([location.lat, location.lng]);
-  //       return [location.lat, location.lng];
-  //     })
-  //     .catch(error => console.warn(error));
-  // }
+  function openModalResetRange() {
+    setRange(0.05);
+    setModalVisible(!modalVisible);
+  }
 
-  // fetch(
-  //   'https://maps.googleapis.com/maps/api/geocode/json?address=' +
-  //     coord.latitude +
-  //     ',' +
-  //     coord.longitude +
-  //     '&key=' +
-  //     'AIzaSyDLuSEtxXzOHHRsmHCKCk_EyJHGncgfa-k' +
-  //     '&language=ko',
-  // )
-  //   .then(response => response.json())
-  //   .then(responseJson => {
-  //     console.log('주소 정보');
-  //     console.log('udonPeople ' + responseJson.results[0].formatted_address);
-  //   })
-  //   .catch(err => console.log('udonPeople error : ' + err));
   return (
     <>
       <SafeAreaView style={{height: '100%', backgroundColor: 'white'}}>
         <View style={styles.buttonView}>
+          <Ionicons
+            name={'location'}
+            color="red"
+            size={22}
+            style={{marginBottom: 20}}>
+            <Text style={{color: 'black'}}>를 이용해 장소를 선택하세요</Text>
+          </Ionicons>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => setModalVisible(!modalVisible)}>
@@ -101,7 +132,10 @@ export default function CreateSpaceScreen({navigation}) {
           <GooglePlacesAutocomplete
             textInputProps={{
               placeholderTextColor: Colors.MAIN_COLOR,
+              backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+              color: Colors.MAIN_COLOR,
               returnKeyType: 'search',
+              borderBottomColor: Colors.MAIN_COLOR_INACTIVE,
             }}
             GooglePlacesSearchQuery={{rankby: 'distance'}}
             placeholder="장소를 검색하세요"
@@ -163,8 +197,39 @@ export default function CreateSpaceScreen({navigation}) {
               coordinate={{
                 latitude: coord.latitude,
                 longitude: coord.longitude,
-              }}
-            />
+              }}>
+              <Ionicons name={'location'} size={45} color="#ff5555"></Ionicons>
+            </Marker>
+            <Circle
+              center={{latitude: coord.latitude, longitude: coord.longitude}}
+              radius={range * 1000}
+              fillColor="#ff555544"
+              strokeColor="#ff5555"></Circle>
+            {data.map(place => {
+              return (
+                <View key={place._id}>
+                  <Marker
+                    draggable={true}
+                    title={place.name}
+                    description={'범위: ' + '50m'}
+                    style={{color: 'black'}}
+                    coordinate={{
+                      latitude: place.lat,
+                      longitude: place.lng,
+                    }}>
+                    <Ionicons
+                      name={'location'}
+                      size={45}
+                      color={Colors.MAIN_COLOR}></Ionicons>
+                  </Marker>
+                  <Circle
+                    center={{latitude: place.lat, longitude: place.lng}}
+                    radius={50}
+                    fillColor={Colors.MAP_CIRCLE_COLOR}
+                    strokeColor={Colors.MAIN_COLOR}></Circle>
+                </View>
+              );
+            })}
           </MapView>
         </View>
         {modalVisible ? (
@@ -192,6 +257,21 @@ export default function CreateSpaceScreen({navigation}) {
                     onPressIn={() => setPlace('')}>
                     {place}
                   </TextInput>
+                  <SelectDropdown
+                    defaultButtonText="범위 선택"
+                    buttonStyle={{
+                      borderRadius: 25,
+                      height: 40,
+                      width: '100%',
+                      backgroundColor: Colors.MAIN_COLOR,
+                    }}
+                    buttonTextStyle={{color: 'white'}}
+                    data={['25m', '50m', '100m', '250m']}
+                    onSelect={value => {
+                      //km 단위로 범위 저장
+                      setRange(parseInt(value.split('m')[0]) / 1000);
+                    }}
+                  />
                 </View>
                 <View style={{alignItems: 'center'}}>
                   <View style={{flexDirection: 'row', marginBottom: 5}}>
@@ -205,6 +285,8 @@ export default function CreateSpaceScreen({navigation}) {
                             owner_id: user.id,
                             lat: coord.latitude,
                             lng: coord.longitude,
+                            // 범위 추가
+                            range: range,
                           });
                           Realm.open(mkConfig(user, [Place.schema])).then(
                             async realm => {
@@ -270,7 +352,7 @@ const styles = StyleSheet.create({
     bottom: 30,
   },
   button: {
-    width: 250,
+    width: 275,
     height: 40,
     backgroundColor: Colors.MAIN_COLOR,
     justifyContent: 'center',
@@ -283,12 +365,12 @@ const styles = StyleSheet.create({
     fontFamily: 'bold',
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
 
   // 모달 버튼 텍스트 스타일
   textStyle: {
-    color: 'white',
+    color: Colors.MAIN_COLOR,
     fontWeight: 'bold',
     textAlign: 'center',
   },

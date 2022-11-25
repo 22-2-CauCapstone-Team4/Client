@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -17,7 +18,7 @@ import {useAuth} from '../../providers/AuthProvider';
 import {deletePlace, deleteMission} from '../../store/action/index';
 import {deletePlaceInRealm} from '../../functions';
 import {mkConfig} from '../../functions/mkConfig';
-import {Place} from '../../schema';
+import {Place, Mission, Goal} from '../../schema';
 import Realm from 'realm';
 
 export default function PlaceListModal({
@@ -58,28 +59,42 @@ export default function PlaceListModal({
                         key={item._id}
                         style={style.place}
                         onLongPress={async () => {
-                          Realm.open(mkConfig(user, [Place.schema])).then(
-                            async realm => {
-                              await deletePlaceInRealm(user, item);
-                              realm.close();
-                            },
-                          );
+                          Alert.alert(
+                            '장소 삭제',
+                            `장소 "${item.name}" 을/를 삭제하시겠습니까?\n연관된 미션 또한 함께 삭제됩니다. `,
+                            [
+                              {
+                                text: '삭제',
+                                onPress: () => {
+                                  Realm.open(
+                                    mkConfig(user, [
+                                      Place.schema,
+                                      Mission.schema,
+                                      Goal.schema,
+                                    ]),
+                                  ).then(async realm => {
+                                    await deletePlaceInRealm(user, realm, item);
+                                    realm.close();
+                                  });
 
-                          dispatch(
-                            deletePlace(
-                              place.filter(el => el.name !== item.name),
-                            ),
+                                  dispatch(
+                                    deletePlace(
+                                      place.filter(el => el.name !== item.name),
+                                    ),
+                                  );
+                                  //미션 삭제
+                                  dispatch(
+                                    deleteMission(
+                                      mission.filter(
+                                        el => el.space !== item.name,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              },
+                              {text: '취소'},
+                            ],
                           );
-                          //미션 삭제
-                          dispatch(
-                            deleteMission(
-                              mission.filter(
-                                el => el.space.place !== item.name,
-                              ),
-                            ),
-                          );
-                          // console.log('place');
-                          // console.log(place);
                         }}>
                         <Text style={{color: 'white'}}>{item.name}</Text>
                       </TouchableOpacity>
@@ -88,9 +103,9 @@ export default function PlaceListModal({
                 </View>
               </View>
 
-              <View style={{flexDirection: 'row'}}>
+              <View style={{flexDirection: 'row', marginTop: 15}}>
                 <Pressable
-                  style={[styles.button, styles.buttonClose]}
+                  style={[style.button, styles.buttonClose, {marginRight: 30}]}
                   onPress={() => {
                     navigation.navigate('CreateSpace');
                     setModalVisible(!modalVisible);
@@ -98,7 +113,7 @@ export default function PlaceListModal({
                   <Text style={styles.textStyle}>추가</Text>
                 </Pressable>
                 <Pressable
-                  style={[styles.button, styles.buttonClose]}
+                  style={[style.button, styles.buttonClose]}
                   onPress={() => setModalVisible(!modalVisible)}>
                   <Text style={styles.textStyle}>닫기</Text>
                 </Pressable>
@@ -112,6 +127,12 @@ export default function PlaceListModal({
 }
 
 const style = StyleSheet.create({
+  button: {
+    borderRadius: 20,
+    padding: 15,
+    elevation: 2,
+    margin: 5,
+  },
   lineStyle: {
     width: '100%',
     borderWidth: 0.5,
@@ -125,8 +146,8 @@ const style = StyleSheet.create({
     marginBottom: 5,
   },
   place: {
-    width: 150,
-    height: 36,
+    width: 250,
+    height: 40,
     backgroundColor: '#0891b2',
     borderRadius: 600,
     justifyContent: 'center',
@@ -135,16 +156,22 @@ const style = StyleSheet.create({
   },
   scrollView: {
     alignItems: 'center',
-    width: 180,
+    width: '100%',
     borderRadius: 20,
     borderColor: 'grey',
     borderWidth: 0.5,
     padding: 10,
     marginBottom: 5,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
   modalView: {
     margin: 20,
-    width: '65%',
+    width: '90%',
     height: '50%',
     backgroundColor: 'white',
     borderRadius: 20,

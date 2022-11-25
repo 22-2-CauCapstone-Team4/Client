@@ -1,13 +1,18 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {Text, View, StyleSheet, Switch} from 'react-native';
+import {Text, View, StyleSheet, Switch, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
-import Colors from '../../utils/Colors';
+import Geolocation from 'react-native-geolocation-service';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import Colors from '../../utils/Colors';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
+import {useDispatch, useSelector} from 'react-redux';
+import {getDistance} from '../../functions/space';
 
 function MissionBox(props) {
   const [isEnabled, setIsEnabled] = useState(true);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  //TIME
   const [leftTime, setLeftTime] = useState(
     compareTimeBeforeStart(props.mission.time.startTime),
   );
@@ -15,6 +20,15 @@ function MissionBox(props) {
     compareTimeBeforeStart(props.mission.time.endTime),
   );
   const sixty = useRef(new Date().getUTCSeconds());
+  //SPACE
+  const missionLocation = useSelector(store => store.placeReducer.data).filter(
+    place => place.name === props.mission.space.place,
+  );
+  const [currentLocation, setCurrentLocation] = useState({});
+  const [missionState, setMissionState] = useState(props.mission.state);
+
+  const missionData = useSelector(store => store.missionReducer.missionData);
+
   useEffect(() => {
     sixty.current = setTimeout(() => {
       if (props.mission.type === 'time') {
@@ -22,9 +36,56 @@ function MissionBox(props) {
         setEndMissionTime(compareTimeBeforeStart(props.mission.time.endTime));
       }
     }, 1000);
-  }, [leftTime]);
+    // console.log('sixty', sixty);
+    // 미션 진행 중으로 상태 변화
+    if (missionState === 'none' && isEnabled) {
+      if (props.mission.type === 'time' && leftTime[1] <= 0) {
+        setMissionState('start');
+      } else if (
+        props.mission.type === 'space' &&
+        missionLocation.length != 0 &&
+        getDistance(
+          missionLocation[0].lat,
+          missionLocation[0].lng,
+          currentLocation.latitude,
+          currentLocation.longitude,
+        ) *
+          1000 -
+          50 <
+          0
+      ) {
+        setMissionState('start');
+      }
+    }
+  }, [leftTime, currentLocation]);
+  useEffect(() => {
+    //console.log('is created');
+    const watchId = Geolocation.watchPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        if (props.mission.type === 'space') {
+          setCurrentLocation({latitude, longitude});
+        }
+      },
+      error => {
+        console.log(error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        distanceFilter: 0,
+        interval: 2000,
+        fastestInterval: 2000,
+      },
+    );
+    return () => {
+      if (watchId != null) {
+        Geolocation.clearWatch(watchId);
+        //console.log('is deleted');
+      }
+    };
+  }, []);
 
-  function missionStateMessage() {
+  function timeStateMessage() {
     // 미션 시작 시간 전
     if (leftTime[0] > 0 || leftTime[1] > 0) {
       return (
@@ -45,7 +106,38 @@ function MissionBox(props) {
       }
     }
   }
-
+  const db = useSelector(store => store.placeReducer.data);
+  function spaceStateMessage() {
+    // console.log('디비');
+    // console.log(db);
+    // console.log('미션 장소 정보');
+    // console.log(missionLocation);
+    if (missionLocation.length == 0) {
+      return <LeftCondition>거리 계산 중</LeftCondition>;
+    } else {
+      const distance = getDistance(
+        missionLocation[0].lat,
+        missionLocation[0].lng,
+        currentLocation.latitude,
+        currentLocation.longitude,
+      );
+      if (isNaN(distance)) return <LeftCondition>거리 계산 중</LeftCondition>;
+      else if (missionState === 'none') {
+        return distance > 1 ? (
+          <LeftCondition>{distance}km 남음</LeftCondition>
+        ) : (
+          <LeftCondition>{distance * 1000}m 남음</LeftCondition>
+        );
+      } else if (missionState === 'start') {
+        return (
+          <LeftCondition style={{color: 'orange'}}>미션 진행 중</LeftCondition>
+        );
+      }
+    }
+  }
+  // console.log(missionState);
+  // console.log(props.mission.state);
+  // console.log('미션 상태', missionState);
   return (
     <Container>
       <ContentContainer>
@@ -57,7 +149,9 @@ function MissionBox(props) {
           </ContentView>
         </View>
         <LeftView>
-          {props.mission.type === 'time' ? missionStateMessage() : null}
+          {props.mission.type === 'time'
+            ? timeStateMessage()
+            : spaceStateMessage()}
         </LeftView>
       </ContentContainer>
       <ConditionView>
@@ -85,21 +179,35 @@ function MissionBox(props) {
             </Text>
           </View>
         )}
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text
-            style={{
-              color: isEnabled ? Colors.MAIN_COLOR : 'grey',
-              marginRight: 7,
-            }}>
-            {isEnabled ? 'ON' : 'OFF'}
-          </Text>
-          <Switch
-            style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
-            trackColor={{false: '#767577', true: Colors.MAIN_COLOR}}
-            thumbColor={isEnabled ? '#ffffff' : '#222222'}
-            onValueChange={toggleSwitch}
-            value={isEnabled}></Switch>
-        </View>
+        {missionState === 'none' ? (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text
+              style={{
+                color: isEnabled ? Colors.MAIN_COLOR : 'grey',
+                marginRight: 7,
+              }}>
+              {isEnabled ? 'ON' : 'OFF'}
+            </Text>
+            <Switch
+              style={{transform: [{scaleX: 1.2}, {scaleY: 1.2}]}}
+              trackColor={{false: '#767577', true: Colors.MAIN_COLOR}}
+              thumbColor={isEnabled ? '#ffffff' : '#222222'}
+              onValueChange={toggleSwitch}
+              value={isEnabled}></Switch>
+          </View>
+        ) : null}
+        {missionState === 'start' ? (
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity style={[styles.quitBtn, {marginRight: 5}]}>
+              <Text style={{color: Colors.MAIN_COLOR, fontSize: 10}}>
+                10분 사용
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.quitBtn}>
+              <Text style={{color: Colors.MAIN_COLOR, fontSize: 10}}>포기</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </ConditionView>
     </Container>
   );
@@ -108,6 +216,14 @@ function MissionBox(props) {
 export default MissionBox;
 
 const styles = StyleSheet.create({
+  quitBtn: {
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 55,
+    height: 25,
+    borderRadius: 25,
+  },
   info: {
     color: Colors.MAIN_COLOR,
     fontSize: 12,
@@ -145,7 +261,7 @@ const ContentView = styled.View`
 `;
 
 const ConditionView = styled.View`
-  padding: 10px;
+  padding: 0px 0px 10px 0px;
   width: 100%;
   display: flex;
   flex-direction: row;

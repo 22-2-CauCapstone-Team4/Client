@@ -63,7 +63,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
       }
 
       // phone on, off 처리
-      console.log(isPhoneOn, isPhoneOff);
+      // console.log(isPhoneOn, isPhoneOff);
       if (isPhoneOn) {
         console.log('1. phone on');
         curState.startPhoneTime = now;

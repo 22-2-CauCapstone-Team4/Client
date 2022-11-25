@@ -12,7 +12,6 @@ import {compareToday} from '../../functions/time';
 import Colors from '../../utils/Colors';
 
 // 미션 더미 데이터에 있는 날짜와 현재 날짜 비교하는 함수
-
 const HomeTab = ({navigation}) => {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
@@ -26,7 +25,6 @@ const HomeTab = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
-
   return (
     <View style={styles.tabContainer}>
       <AboutMission>
@@ -123,6 +121,7 @@ const AddMissionBtn = styled.TouchableOpacity`
   border-radius: 600px;
 `;
 const AboutMission = styled.View`
+  margin-top: 20px;
   border: 1px solid #f1f1f1;
   border-radius: 600px;
   flex-direction: row;
@@ -164,8 +163,9 @@ const styles = StyleSheet.create({
   // 경계선
   lineStyle: {
     borderWidth: 0.5,
-    borderColor: Colors.MAIN_COLOR,
+    borderColor: Colors.MAIN_COLOR_INACTIVE,
     margin: 10,
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
 
   missionTypeText: {

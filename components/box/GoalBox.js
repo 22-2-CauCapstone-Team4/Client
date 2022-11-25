@@ -1,15 +1,34 @@
 // 목표 탭에서 전체목표가 아닌 특정 카테고리를 눌렀을 때 표시되는 해당 카테고리 미션 컴포넌트
 
-import React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, Modal} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Alert,
+} from 'react-native';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {Mission} from '../../schema';
+import {Mission, Goal, Place} from '../../schema';
 import Colors from '../../utils/Colors';
+import {deleteMission} from '../../store/action';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
+import GoalBoxSettingModal from '../modal/GoalBoxSettingModal';
+import Realm from 'realm';
+import {deleteMissionInRealm} from '../../functions';
+import {mkConfig} from '../../functions/mkConfig';
+import {useAuth} from '../../providers/AuthProvider';
 
 function GoalBox(props) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const missionData = useSelector(store => store.missionReducer.missionData);
+  const {user} = useAuth();
+  // console.log('미션', missionData);
   return (
     <Container>
       <View
@@ -40,14 +59,54 @@ function GoalBox(props) {
                 {props.mission.type === Mission.TYPE.TIME ? '시간' : '공간'}
               </Ionicons>
             </ContentView>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  '미션 삭제',
+                  `미션 "${props.mission.name}" 을/를 삭제하시겠습니까?`,
+                  [
+                    {
+                      text: '삭제',
+                      onPress: () => {
+                        dispatch(
+                          deleteMission(
+                            missionData.filter(
+                              item => item.id !== props.mission.id,
+                            ),
+                          ),
+                        );
+
+                        Realm.open(
+                          mkConfig(user, [
+                            Mission.schema,
+                            Goal.schema,
+                            Place.schema,
+                          ]),
+                        ).then(async realm => {
+                          await deleteMissionInRealm(
+                            user,
+                            realm,
+                            props.mission.id,
+                          );
+
+                          realm.close();
+                        });
+                      },
+                    },
+                    {text: '취소'},
+                  ],
+                );
+              }}>
+              <Ionicons name="trash" size={24} style={styles.icon}></Ionicons>
+            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
               <Ionicons
                 name={'settings-outline'}
                 size={24}
                 style={{
                   color: 'grey',
                 }}></Ionicons>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </ContentContainer>
       </View>
@@ -85,6 +144,10 @@ function GoalBox(props) {
           <Text style={[{marginHorizontal: 10}]}> {props.mission.date}</Text>
         </Ionicons>
       </ConditionView>
+      <GoalBoxSettingModal
+        data={props.mission}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}></GoalBoxSettingModal>
     </Container>
   );
 }
@@ -92,6 +155,9 @@ function GoalBox(props) {
 export default GoalBox;
 
 const styles = StyleSheet.create({
+  icon: {
+    color: Colors.GREY,
+  },
   info: {
     color: Colors.MAIN_COLOR,
     fontSize: 12,
