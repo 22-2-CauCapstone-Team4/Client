@@ -117,7 +117,7 @@ export default function Categories() {
                   ),
                 );
                 dispatch(
-                  deleteCategory(data.filter(el => el.name !== item.name)),
+                  deleteCategory(data.filter(el => el._id !== item._id)),
                 );
                 dispatch(selectCategory('⭐ 전체 목표'));
 

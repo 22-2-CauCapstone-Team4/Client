@@ -104,6 +104,12 @@ export default function CreateSpaceScreen({navigation}) {
   useEffect(() => {
     ref.current?.setAddressText('Some Text');
   }, []);
+
+  function openModalResetRange() {
+    setRange(0.05);
+    setModalVisible(!modalVisible);
+  }
+
   return (
     <>
       <SafeAreaView style={{height: '100%', backgroundColor: 'white'}}>
@@ -261,7 +267,6 @@ export default function CreateSpaceScreen({navigation}) {
                     }}
                     buttonTextStyle={{color: 'white'}}
                     data={['25m', '50m', '100m', '250m']}
-                    defaultValueByIndex={1}
                     onSelect={value => {
                       //km 단위로 범위 저장
                       setRange(parseInt(value.split('m')[0]) / 1000);

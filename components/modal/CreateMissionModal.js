@@ -21,7 +21,6 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {addMission} from '../../store/action';
-import {withTheme} from 'styled-components';
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -29,38 +28,15 @@ export default function CreateMissionModal({
 }) {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
-  //console.log('미션 정보');
-  //console.log(missionData);
-  // ★ 시간 잠금 저장
-  const [saveTime, setSaveTime] = useState();
   // ★ 시간 잠금 데이터 저장 함수
   const saveTimeLock = (
     missionName,
     selectCategory,
     startTime,
     endTime,
+    selectedDay,
     lockingType,
   ) => {
-    setSaveTime({
-      id: missionName, // 미션 이름
-      category: selectCategory, // 카테고리 이름
-      name: missionName, // 미션 이름
-      date: `${new Date(startTime).getFullYear()}-${
-        new Date(startTime).getMonth() + 1
-      }-${new Date(startTime).getDate()}`, // 년, 월, 일
-      type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
-      time: {
-        // 시작시간, 종료시간
-        startTime: `${new Date(startTime).getHours()}:${new Date(
-          startTime,
-        ).getMinutes()}`,
-        endTime: `${new Date(endTime).getHours()}:${new Date(
-          endTime,
-        ).getMinutes()}`,
-      },
-      dayOfWeek: {}, // ＠ 요일 데이터
-      space: {},
-    });
     return {
       id: missionName, // 미션 이름
       category: selectCategory, // 카테고리 이름
@@ -68,6 +44,7 @@ export default function CreateMissionModal({
       date: `${new Date(startTime).getFullYear()}-${
         new Date(startTime).getMonth() + 1
       }-${new Date(startTime).getDate()}`, // 년, 월, 일
+      dayOfWeek: selectedDay, // ＠ 요일 데이터
       type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
       time: {
         // 시작시간, 종료시간
@@ -78,62 +55,40 @@ export default function CreateMissionModal({
           endTime,
         ).getMinutes()}`,
       },
-      dayOfWeek: {}, // ＠ 요일 데이터
       space: {},
+      state: 'none',
     };
   };
-  //console.log('시간 데이터');
-  //console.log(saveTime);
+
   // ★ 공간 잠금 저장
-  // const [saveSpace, setSaveSpace] = useState([
-  //   //  더미 데이터
-  //   {
-  //     test2: '공간 잠금',
-  //     id: '조깅',
-  //     category: '운동',
-  //     name: '조깅',
-  //     date: '오늘날짜',
-  //     type: 'space',
-  //     time: {},
-  //     space: {type: 'outside', place: '집'},
-  //   },
-  // ]);
-  // ☆ 공간 잠금 저장
-  // const saveSpaceLock = ({
-  //   missionName,
-  //   selectCategory,
-  //   selectSpace,
-  //   startTime,
-  //   lockingType,
-  //   spaceIn,
-  //   moveSpace,
-  // }) => {
-  //   setSaveSpace([
-  //     ...saveSpace,
-  //     {
-  //       id: missionName, // 미션 이름
-  //       category: selectCategory, // 카테고리 이름
-  //       name: missionName, // 미션 이름
-  //       date: `${startTime.getFullYear()}-${
-  //         startTime.getMonth() + 1
-  //       }-${startTime.getDate()}`, // 년, 월, 일
-  //       type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
-  //       time: {},
-  //       space: {
-  //         type:
-  //           {spaceIn} == false
-  //             ? {moveSpace} == false
-  //               ? 'global'
-  //               : 'inside'
-  //             : 'outside',
-  //         place: selectSpace,
-  //       },
-  //       state: 'none',
-  //     },
-  //   ]);
-  //   console.log(saveSpace);
-  // };
-  // 카테고리
+  const saveSpaceLock = (
+    missionName,
+    selectCategory,
+    selectSpace,
+    startTime,
+    lockingType,
+    spaceIn,
+    moveSpace,
+  ) => {
+    return {
+      id: missionName, // 미션 이름
+      category: selectCategory, // 카테고리 이름
+      name: missionName, // 미션 이름
+      date: `${startTime.getFullYear()}-${
+        startTime.getMonth() + 1
+      }-${startTime.getDate()}`, // 년, 월, 일
+      dayOfWeek: [],
+      type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
+      time: {},
+      space: {
+        type:
+          moveSpace && spaceIn ? 'global' : moveSpace ? 'outside' : 'inside',
+        place: selectSpace,
+      },
+      state: 'none',
+    };
+    // console.log(saveSpace);
+  };
 
   const category = useSelector(store => store.categoryReducer.data); // ★ 카테고리 데이터
   const space = useSelector(store => store.placeReducer.data); // ★ 공간 데이터
@@ -206,12 +161,8 @@ export default function CreateMissionModal({
   };
   // ＠ 요일 선택
   const [selected, setSelected] = React.useState(new Map());
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDay, setSelectedDay] = useState([]);
 
-  const dayOfWeekSave = selected => {
-    setSelectedDay([...selected.keys()]);
-    console.log(selectedDay);
-  };
   const Data = [
     //＠ 요일 데이터
     {
@@ -249,6 +200,9 @@ export default function CreateMissionModal({
       const newSelected = new Map(selected);
       newSelected.set(id, !selected.get(id));
       setSelected(newSelected);
+      setSelectedDay(
+        [...newSelected].filter(item => item[1] == true).map(item => item[0]),
+      );
     },
     [selected],
   );
@@ -272,7 +226,6 @@ export default function CreateMissionModal({
       </TouchableOpacity>
     );
   };
-
   return (
     <>
       {modalVisible ? (
@@ -288,8 +241,16 @@ export default function CreateMissionModal({
               <Text style={{color: 'black', fontSize: 20, marginBottom: 10}}>
                 미션 추가
               </Text>
-              <ScrollView>
-                <View style={{alignItems: 'center'}}>
+
+              <ScrollView
+                style={{
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  borderRadius: 25,
+                  padding: 5,
+                  marginBottom: 5,
+                }}>
+                <View style={{alignItems: 'center', flexDirection: 'row'}}>
                   <SelectDropdown
                     defaultButtonText="카테고리 선택"
                     buttonStyle={{
@@ -309,7 +270,7 @@ export default function CreateMissionModal({
                   <TextInput
                     style={missionStyle.textInputStyle}
                     onChangeText={saveMission}
-                    placeholder="미션 입력"
+                    placeholder="미션 이름"
                     placeholderTextColor="grey"
                   />
                 </View>
@@ -405,7 +366,7 @@ export default function CreateMissionModal({
                         trackColor={{false: '#767577', true: '#81b0ff'}}
                         onValueChange={() => {
                           setMoveSpace(!moveSpace);
-                          console.log(`moveSpace: ${moveSpace}`);
+                          // console.log(`moveSpace: ${moveSpace}`);
                         }}
                         value={moveSpace}
                       />
@@ -416,7 +377,7 @@ export default function CreateMissionModal({
                         trackColor={{false: '#767577', true: '#81b0ff'}}
                         onValueChange={() => {
                           setSpaceIn(!spaceIn);
-                          console.log(`spaceIn: ${spaceIn}`);
+                          // console.log(`spaceIn: ${spaceIn}`);
                         }}
                         value={spaceIn}
                       />
@@ -477,28 +438,39 @@ export default function CreateMissionModal({
                   </View>
                 )}
               </ScrollView>
-              <View style={{flexDirection: 'row'}}>
+
+              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
-                    saveTimeLock(
-                      missionName,
-                      selectCategory,
-                      startTime,
-                      endTime,
-                      lockingType,
-                    );
-                    dispatch(
-                      addMission(
-                        saveTimeLock(
-                          missionName,
-                          selectCategory,
-                          startTime,
-                          endTime,
-                          lockingType,
+                    if (lockingType === false) {
+                      dispatch(
+                        addMission(
+                          saveTimeLock(
+                            missionName,
+                            selectCategory,
+                            startTime,
+                            endTime,
+                            selectedDay,
+                            lockingType,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      dispatch(
+                        addMission(
+                          saveSpaceLock(
+                            missionName,
+                            selectCategory,
+                            selectSpace,
+                            startTime,
+                            lockingType,
+                            spaceIn,
+                            moveSpace,
+                          ),
+                        ),
+                      );
+                    }
                     SnackBar.show({
                       text: '미션 생성이 완료되었습니다. ',
                       duration: SnackBar.LENGTH_SHORT,
@@ -633,6 +605,9 @@ const missionStyle = StyleSheet.create({
   },
   missionText: {
     borderWidth: 1,
+    borderRightWidth: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
     marginTop: 10,
   },
   // 요일 style

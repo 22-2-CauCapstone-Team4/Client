@@ -51,7 +51,10 @@ export function timeInfoText(data) {
   let timeData = data.split(':');
   let result =
     (parseInt(timeData[0] / 12) == 0 ? '오전 ' : '오후 ') +
-    parseInt(timeData[0] % 12).toString() +
+    (parseInt(timeData[0] % 12).toString() == 0 &&
+    parseInt(timeData[0] / 12) != 0
+      ? '12'
+      : parseInt(timeData[0] % 12).toString()) +
     '시 ' +
     parseInt(timeData[1]).toString() +
     '분';

@@ -25,7 +25,6 @@ const HomeTab = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
-
   return (
     <View style={styles.tabContainer}>
       <AboutMission>
@@ -164,8 +163,9 @@ const styles = StyleSheet.create({
   // 경계선
   lineStyle: {
     borderWidth: 0.5,
-    borderColor: Colors.MAIN_COLOR,
+    borderColor: Colors.MAIN_COLOR_INACTIVE,
     margin: 10,
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
 
   missionTypeText: {
