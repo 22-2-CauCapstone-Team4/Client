@@ -34,178 +34,6 @@ export default function CreateMissionModal({
   setModalVisible,
 }) {
   const dispatch = useDispatch();
-  //<<<<<<< HEAD
-  // const missionData = useSelector(store => store.missionReducer.missionData);
-  // // ★ 시간 잠금 데이터 저장 함수
-  // const saveTimeLock = (
-  //   missionName,
-  //   selectCategory,
-  //   startTime,
-  //   endTime,
-  //   selectedDay,
-  //   lockingType,
-  // ) => {
-  //   return {
-  //     id: missionName, // 미션 이름
-  //     category: selectCategory, // 카테고리 이름
-  //     name: missionName, // 미션 이름
-  //     date: `${new Date(startTime).getFullYear()}-${
-  //       new Date(startTime).getMonth() + 1
-  //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
-  //     dayOfWeek: selectedDay, // ＠ 요일 데이터
-  //     type: {lockingType} ? 'time' : 'space', // false: 시간 잠금, true: 공간 잠금
-  //     time: {
-  //       // 시작시간, 종료시간
-  //       startTime: `${new Date(startTime).getHours()}:${new Date(
-  //         startTime,
-  //       ).getMinutes()}`,
-  //       endTime: `${new Date(endTime).getHours()}:${new Date(
-  //         endTime,
-  //       ).getMinutes()}`,
-  //     },
-  //     space: {},
-  //     state: 'none',
-  //   };
-  // };
-
-  // // ★ 공간 잠금 저장
-  // const saveSpaceLock = (
-  //   missionName,
-  //   selectCategory,
-  //   selectSpace,
-  //   startTime,
-  //   lockingType,
-  //   spaceIn,
-  //   moveSpace,
-  // ) => {
-  //   return {
-  //     id: missionName, // 미션 이름
-  //     category: selectCategory, // 카테고리 이름
-  //     name: missionName, // 미션 이름
-  //     date: `${startTime.getFullYear()}-${
-  //       startTime.getMonth() + 1
-  //     }-${startTime.getDate()}`, // 년, 월, 일
-  //     dayOfWeek: [],
-  //     type: {lockingType} ? 'space' : 'time', // false: 시간 잠금, true: 공간 잠금
-  //     time: {},
-  //     space: {
-  //       type:
-  //         moveSpace && spaceIn ? 'global' : moveSpace ? 'outside' : 'inside',
-  //       place: selectSpace,
-  //     },
-  //     state: 'none',
-  //   };
-  //   // console.log(saveSpace);
-  // };
-  //=======
-  // const missionData = useSelector(store => store.missionReducer.missionData);
-  //console.log('미션 정보');
-  //console.log(missionData);
-  // ★ 시간 잠금 저장
-  // const [saveTime, setSaveTime] = useState();
-  // ★ 시간 잠금 데이터 저장 함수
-  // const saveTimeLock = (
-  //   missionName,
-  //   selectCategory,
-  //   startTime,
-  //   endTime,
-  //   lockingType,
-  // ) => {
-  //   setSaveTime({
-  //     id: missionName, // 미션 이름
-  //     category: selectCategory.name, // 카테고리 이름
-  //     name: missionName, // 미션 이름
-  //     date: `${new Date(startTime).getFullYear()}-${
-  //       new Date(startTime).getMonth() + 1
-  //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
-  //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
-  //     time: {
-  //       // 시작시간, 종료시간
-  //       startTime: `${new Date(startTime).getHours()}:${new Date(
-  //         startTime,
-  //       ).getMinutes()}`,
-  //       endTime: `${new Date(endTime).getHours()}:${new Date(
-  //         endTime,
-  //       ).getMinutes()}`,
-  //     },
-  //     dayOfWeek: {}, // ＠ 요일 데이터
-  //     space: {},
-  //   });
-  //   return {
-  //     id: missionName, // 미션 이름
-  //     category: selectCategory.name, // 카테고리 이름
-  //     name: missionName, // 미션 이름
-  //     date: `${new Date(startTime).getFullYear()}-${
-  //       new Date(startTime).getMonth() + 1
-  //     }-${new Date(startTime).getDate()}`, // 년, 월, 일
-  //     type: {lockingType} ? 'TIME' : 'SPACE', // false: 시간 잠금, true: 공간 잠금
-  //     time: {
-  //       // 시작시간, 종료시간
-  //       startTime: `${new Date(startTime).getHours()}:${new Date(
-  //         startTime,
-  //       ).getMinutes()}`,
-  //       endTime: `${new Date(endTime).getHours()}:${new Date(
-  //         endTime,
-  //       ).getMinutes()}`,
-  //     },
-  //     dayOfWeek: {}, // ＠ 요일 데이터
-  //     space: {},
-  //   };
-  // };
-
-  //console.log('시간 데이터');
-  //console.log(saveTime);
-  // ★ 공간 잠금 저장
-  // const [saveSpace, setSaveSpace] = useState([
-  //   //  더미 데이터
-  //   {
-  //     test2: '공간 잠금',
-  //     id: '조깅',
-  //     category: '운동',
-  //     name: '조깅',
-  //     date: '오늘날짜',
-  //     type: 'PLACE',
-  //     time: {},
-  //     space: {type: 'outside', place: '집'},
-  //   },
-  // ]);
-  // ☆ 공간 잠금 저장
-  // const saveSpaceLock = ({
-  //   missionName,
-  //   selectCategory,
-  //   selectSpace,
-  //   startTime,
-  //   lockingType,
-  //   spaceIn,
-  //   moveSpace,
-  // }) => {
-  //   setSaveSpace([
-  //     ...saveSpace,
-  //     {
-  //       id: missionName, // 미션 이름
-  //       category: selectCategory, // 카테고리 이름
-  //       name: missionName, // 미션 이름
-  //       date: `${startTime.getFullYear()}-${
-  //         startTime.getMonth() + 1
-  //       }-${startTime.getDate()}`, // 년, 월, 일
-  //       type: {lockingType} ? 'PLACE' : 'TIME', // false: 시간 잠금, true: 공간 잠금
-  //       time: {},
-  //       space: {
-  //         type:
-  //           {spaceIn} == false
-  //             ? {moveSpace} == false
-  //               ? 'global'
-  //               : 'inside'
-  //             : 'outside',
-  //         place: selectSpace,
-  //       },
-  //       state: 'none',
-  //     },
-  //   ]);
-  //   console.log(saveSpace);
-  // };
-  // 카테고리
-  //>>>>>>> 6da50d0869bb1b9c8563723c9deb7eb6b5f7289e
 
   const {user} = useAuth();
 
@@ -279,13 +107,6 @@ export default function CreateMissionModal({
     // 취소 시
     setVisible2(false); // 모달 close
   };
-  //<<<<<<< HEAD
-  // // ＠ 요일 선택
-  // const [selected, setSelected] = React.useState(new Map());
-  // const [selectedDay, setSelectedDay] = useState([]);
-
-  // const Data = [
-  //=======
 
   // --- 출발 시간 ---
   const [departureTime, onChangeDate3] = useState(new Date()); // 선택 날짜
@@ -317,7 +138,6 @@ export default function CreateMissionModal({
   //   console.log(selectedDay);
   // };
   const dayOfWeekData = [
-    //>>>>>>> 6da50d0869bb1b9c8563723c9deb7eb6b5f7289e
     //＠ 요일 데이터
     {
       id: 0,
@@ -352,17 +172,8 @@ export default function CreateMissionModal({
   // 수정 -> 배열에서 id값만 가지고 있도록
   const onSelect = useCallback(
     id => {
-      //<<<<<<< HEAD
-      // const newSelected = new Map(selected);
-      // newSelected.set(id, !selected.get(id));
-      // setSelected(newSelected);
-      // setSelectedDay(
-      //   [...newSelected].filter(item => item[1] == true).map(item => item[0]),
-      // );
-      //=======
       if (selected.includes(id)) setSelected(selected.filter(ele => ele != id));
       else setSelected([...selected, id]);
-      //>>>>>>> 6da50d0869bb1b9c8563723c9deb7eb6b5f7289e
     },
     [selected],
   );
@@ -424,14 +235,10 @@ export default function CreateMissionModal({
                     buttonTextStyle={{color: 'white'}}
                     data={category.map(el => el.name)}
                     onSelect={selectedItem => {
-                      // <<<<<<< HEAD
-                      //                       setSelectCategory(selectedItem);
-                      // =======
                       setSelectCategory(
                         category.find(ele => ele.name === selectedItem),
                       );
                       console.log(selectCategory);
-                      // >>>>>>> 6da50d0869bb1b9c8563723c9deb7eb6b5f7289e
                     }}
                   />
                 </View>
@@ -528,10 +335,7 @@ export default function CreateMissionModal({
                     <View>
                       <View style={{alignItems: 'center', marginTop: 20}}>
                         <SelectDropdown
-                          // <<<<<<< HEAD
-                          //                           defaultButtonText="장소 선택"
-                          // =======
-                          defaultButtonText="공간 선택"
+                          defaultButtonText="장소 선택"
                           buttonStyle={{
                             borderRadius: 25,
                             height: 40,
@@ -661,37 +465,6 @@ export default function CreateMissionModal({
               <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  // <<<<<<< HEAD
-                  //                   onPress={() => {
-                  //                     if (lockingType === false) {
-                  //                       dispatch(
-                  //                         addMission(
-                  //                           saveTimeLock(
-                  //                             missionName,
-                  //                             selectCategory,
-                  //                             startTime,
-                  //                             endTime,
-                  //                             selectedDay,
-                  //                             lockingType,
-                  //                           ),
-                  //                         ),
-                  //                       );
-                  //                     } else {
-                  //                       dispatch(
-                  //                         addMission(
-                  //                           saveSpaceLock(
-                  //                             missionName,
-                  //                             selectCategory,
-                  //                             selectSpace,
-                  //                             startTime,
-                  //                             lockingType,
-                  //                             spaceIn,
-                  //                             moveSpace,
-                  //                           ),
-                  //                         ),
-                  //                       );
-                  //                     }
-                  // =======
                   onPress={async () => {
                     const mission = mkMissionObjToRealmObj({
                       user,
@@ -718,8 +491,6 @@ export default function CreateMissionModal({
                     );
                     await createMissionInRealm(user, realm, mission);
                     realm.close();
-
-                    // >>>>>>> 6da50d0869bb1b9c8563723c9deb7eb6b5f7289e
                     SnackBar.show({
                       text: '미션 생성이 완료되었습니다. ',
                       duration: SnackBar.LENGTH_SHORT,

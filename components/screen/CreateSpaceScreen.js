@@ -224,7 +224,7 @@ export default function CreateSpaceScreen({navigation}) {
                   </Marker>
                   <Circle
                     center={{latitude: place.lat, longitude: place.lng}}
-                    radius={50}
+                    radius={place.range * 1000}
                     fillColor={Colors.MAP_CIRCLE_COLOR}
                     strokeColor={Colors.MAIN_COLOR}></Circle>
                 </View>

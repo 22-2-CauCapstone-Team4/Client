@@ -18,13 +18,26 @@ const HomeTab = ({navigation}) => {
   const place = useSelector(store => store.placeReducer.data);
   const today = new Date();
   // 오늘 미션
-  const todayMission = missionData.filter(el => compareToday(el.date));
-  const todayTimeMission = todayMission.filter(el => el.type === 'time');
-  const todaySpaceMission = todayMission.filter(el => el.type === 'space');
+  const todayMission = missionData.filter(el =>
+    el.dayOfWeek.length == 0
+      ? compareToday(el.date)
+      : el.dayOfWeek.includes(new Date().getDay()),
+  );
+  const todayTimeMission = todayMission.filter(el => el.type === 'TIME');
+  const todaySpaceMission = todayMission.filter(el => el.type !== 'TIME');
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
+  // console.log('오늘 미션', todayMission);
+  // console.log(
+  //   '오늘 시간 미션',
+  //   todayMission.filter(el => el.type === 'TIME'),
+  // );
+  // console.log(
+  //   '오늘 공간 미션',
+  //   todayMission.filter(el => el.type !== 'TIME'),
+  // );
   return (
     <View style={styles.tabContainer}>
       <AboutMission>

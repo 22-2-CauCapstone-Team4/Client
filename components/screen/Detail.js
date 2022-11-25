@@ -100,9 +100,12 @@ function Detail({navigation}) {
 
       dispatch(addBlockedApps(tempBlockedApps));
       setBlockedApps(tempBlockedApps);
-
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
+      console.log(
+        '미션',
+        tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
+      );
       dispatch(
         initMission(
           tempMissions.map(mission => mkMissionRealmObjToObj(mission)),

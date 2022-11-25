@@ -22,16 +22,14 @@ function MissionBox(props) {
   const sixty = useRef(new Date().getUTCSeconds());
   //SPACE
   const missionLocation = useSelector(store => store.placeReducer.data).filter(
-    place => place.name === props.mission.space.place,
+    place => place.name === props.mission.space,
   );
   const [currentLocation, setCurrentLocation] = useState({});
-  const [missionState, setMissionState] = useState(props.mission.state);
-
+  const [missionState, setMissionState] = useState('none'); //props.mission.state
   const missionData = useSelector(store => store.missionReducer.missionData);
-
   useEffect(() => {
     sixty.current = setTimeout(() => {
-      if (props.mission.type === 'time') {
+      if (props.mission.type === 'TIME') {
         setLeftTime(compareTimeBeforeStart(props.mission.time.startTime));
         setEndMissionTime(compareTimeBeforeStart(props.mission.time.endTime));
       }
@@ -39,10 +37,10 @@ function MissionBox(props) {
     // console.log('sixty', sixty);
     // 미션 진행 중으로 상태 변화
     if (missionState === 'none' && isEnabled) {
-      if (props.mission.type === 'time' && leftTime[1] <= 0) {
+      if (props.mission.type === 'TIME' && leftTime[1] <= 0) {
         setMissionState('start');
       } else if (
-        props.mission.type === 'space' &&
+        props.mission.type !== 'TIME' &&
         missionLocation.length != 0 &&
         getDistance(
           missionLocation[0].lat,
@@ -63,7 +61,7 @@ function MissionBox(props) {
     const watchId = Geolocation.watchPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        if (props.mission.type === 'space') {
+        if (props.mission.type !== 'TIME') {
           setCurrentLocation({latitude, longitude});
         }
       },
@@ -149,13 +147,13 @@ function MissionBox(props) {
           </ContentView>
         </View>
         <LeftView>
-          {props.mission.type === 'time'
+          {props.mission.type === 'TIME'
             ? timeStateMessage()
             : spaceStateMessage()}
         </LeftView>
       </ContentContainer>
       <ConditionView>
-        {props.mission.type === 'time' ? (
+        {props.mission.type === 'TIME' ? (
           <View>
             <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
               시작:
@@ -173,9 +171,13 @@ function MissionBox(props) {
           </View>
         ) : (
           <View style={{flexDirection: 'row'}}>
-            <Text style={styles.info}>장소: {props.mission.space.place} |</Text>
+            <Text style={styles.info}>장소: {props.mission.space} |</Text>
             <Text style={[styles.info, {marginLeft: 10}]}>
-              {props.mission.space.type === 'inside' ? '안' : '밖'}
+              {props.mission.type === 'IN_PLACE'
+                ? '안'
+                : props.mission.type === 'MOVE_PLACE'
+                ? '이동'
+                : '이동 + 안'}
             </Text>
           </View>
         )}

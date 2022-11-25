@@ -28,7 +28,7 @@ function GoalBox(props) {
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
   const {user} = useAuth();
-  // console.log('미션', missionData);
+  console.log('미션', missionData);
   return (
     <Container>
       <View
