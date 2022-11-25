@@ -188,7 +188,7 @@ const updateMission = async (user, realm, mission) => {
     realm.write(() => {
       let oldMission = realm
         .objects('Mission')
-        .filtered(`owner_id == "${user.id}" && _id == oid(${mission._id})`);
+        .filtered(`_id == oid(${mission._id})`);
       oldMission = JSON.parse(JSON.stringify(oldMission));
 
       let newMission;
@@ -212,13 +212,13 @@ const updateMission = async (user, realm, mission) => {
   return result;
 };
 
-const deleteMission = async (user, realm, mission) => {
+const deleteMission = async (user, realm, missionId) => {
   console.log('delete goal');
 
   try {
     const deletedMission = realm
       .objects('Mission')
-      .filtered(`owner_id == "${user.id}" && _id == oid(${mission._id})`);
+      .filtered(`_id == oid(${missionId})`);
 
     console.log('읽기 결과', JSON.parse(JSON.stringify(deletedMission)));
 

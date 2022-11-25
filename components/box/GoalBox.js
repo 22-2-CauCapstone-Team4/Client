@@ -13,17 +13,22 @@ import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Mission} from '../../schema';
+import {Mission, Goal, Place} from '../../schema';
 import Colors from '../../utils/Colors';
 import {deleteMission} from '../../store/action';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
 import GoalBoxSettingModal from '../modal/GoalBoxSettingModal';
+import Realm from 'realm';
+import {deleteMissionInRealm} from '../../functions';
+import {mkConfig} from '../../functions/mkConfig';
+import {useAuth} from '../../providers/AuthProvider';
 
 function GoalBox(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
-  console.log('미션', missionData);
+  const {user} = useAuth();
+  // console.log('미션', missionData);
   return (
     <Container>
       <View
@@ -56,21 +61,41 @@ function GoalBox(props) {
             </ContentView>
             <TouchableOpacity
               onPress={() => {
-                Alert.alert('삭제', '미션을 삭제하시겠습니까?', [
-                  {
-                    text: '삭제',
-                    onPress: () => {
-                      dispatch(
-                        deleteMission(
-                          missionData.filter(
-                            item => item.id !== props.mission.id,
+                Alert.alert(
+                  '미션 삭제',
+                  `미션 "${props.mission.name}" 을/를 삭제하시겠습니까?`,
+                  [
+                    {
+                      text: '삭제',
+                      onPress: () => {
+                        dispatch(
+                          deleteMission(
+                            missionData.filter(
+                              item => item.id !== props.mission.id,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+
+                        Realm.open(
+                          mkConfig(user, [
+                            Mission.schema,
+                            Goal.schema,
+                            Place.schema,
+                          ]),
+                        ).then(async realm => {
+                          await deleteMissionInRealm(
+                            user,
+                            realm,
+                            props.mission.id,
+                          );
+
+                          realm.close();
+                        });
+                      },
                     },
-                  },
-                  {text: '취소'},
-                ]);
+                    {text: '취소'},
+                  ],
+                );
               }}>
               <Ionicons name="trash" size={24} style={styles.icon}></Ionicons>
             </TouchableOpacity>

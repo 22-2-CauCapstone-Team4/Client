@@ -75,17 +75,25 @@ const deletePlace = async (user, realm, place) => {
   console.log('delete goal');
 
   try {
-    const deletedGoal = realm
+    const deletedPlace = realm
       .objects('Place')
       .filtered(`owner_id == "${user.id}" && _id == oid(${place._id})`);
 
-    console.log('읽기 결과', JSON.parse(JSON.stringify(deletedGoal)));
+    console.log('읽기 결과', JSON.parse(JSON.stringify(deletedPlace)));
 
     console.log('쓰기 시작');
     realm.write(() => {
       // 이번에 삭제된 값 삭제
-      realm.delete(deletedGoal);
+      // 미션도 함께 삭제해야 함
+      const deletedMissions = realm
+        .objects('Mission')
+        .filtered(`place._id == oid(${place._id})`);
+
+      realm.delete(deletedPlace);
+      realm.delete(deletedMissions);
     });
+
+    console.log('삭제 완료');
   } catch (err) {
     console.log(err.message);
 

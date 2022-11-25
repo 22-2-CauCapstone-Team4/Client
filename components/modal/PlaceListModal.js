@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -17,7 +18,7 @@ import {useAuth} from '../../providers/AuthProvider';
 import {deletePlace, deleteMission} from '../../store/action/index';
 import {deletePlaceInRealm} from '../../functions';
 import {mkConfig} from '../../functions/mkConfig';
-import {Place} from '../../schema';
+import {Place, Mission, Goal} from '../../schema';
 import Realm from 'realm';
 
 export default function PlaceListModal({
@@ -58,28 +59,42 @@ export default function PlaceListModal({
                         key={item._id}
                         style={style.place}
                         onLongPress={async () => {
-                          Realm.open(mkConfig(user, [Place.schema])).then(
-                            async realm => {
-                              await deletePlaceInRealm(user, item);
-                              realm.close();
-                            },
-                          );
+                          Alert.alert(
+                            '장소 삭제',
+                            `장소 "${item.name}" 을/를 삭제하시겠습니까?\n연관된 미션 또한 함께 삭제됩니다. `,
+                            [
+                              {
+                                text: '삭제',
+                                onPress: () => {
+                                  Realm.open(
+                                    mkConfig(user, [
+                                      Place.schema,
+                                      Mission.schema,
+                                      Goal.schema,
+                                    ]),
+                                  ).then(async realm => {
+                                    await deletePlaceInRealm(user, realm, item);
+                                    realm.close();
+                                  });
 
-                          dispatch(
-                            deletePlace(
-                              place.filter(el => el.name !== item.name),
-                            ),
+                                  dispatch(
+                                    deletePlace(
+                                      place.filter(el => el.name !== item.name),
+                                    ),
+                                  );
+                                  //미션 삭제
+                                  dispatch(
+                                    deleteMission(
+                                      mission.filter(
+                                        el => el.space !== item.name,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              },
+                              {text: '취소'},
+                            ],
                           );
-                          //미션 삭제
-                          dispatch(
-                            deleteMission(
-                              mission.filter(
-                                el => el.space.place !== item.name,
-                              ),
-                            ),
-                          );
-                          // console.log('place');
-                          // console.log(place);
                         }}>
                         <Text style={{color: 'white'}}>{item.name}</Text>
                       </TouchableOpacity>

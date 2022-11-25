@@ -386,8 +386,8 @@ export default function CreateMissionModal({
       </TouchableOpacity>
     );
   };
-  const missionData = useSelector(store => store.missionReducer.missionData);
-  console.log(missionData);
+  // const missionData = useSelector(store => store.missionReducer.missionData);
+  // console.log(missionData);
   return (
     <>
       {modalVisible ? (
