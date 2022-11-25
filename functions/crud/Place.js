@@ -1,7 +1,4 @@
 /* eslint-disable curly */
-import Realm from 'realm';
-import {Place} from '../../schema';
-import {mkConfig} from '../mkConfig';
 
 const readPlaces = async (user, realm) => {
   console.log('read my places');

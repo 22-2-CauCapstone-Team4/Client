@@ -1,7 +1,4 @@
 /* eslint-disable curly */
-import Realm from 'realm';
-import {Goal} from '../../schema';
-import {mkConfig} from '../mkConfig';
 
 const readGoals = async (user, realm, getRealmObj = false) => {
   console.log('read my goals');
@@ -37,7 +34,7 @@ const createGoal = async (user, realm, goal) => {
       result = JSON.parse(JSON.stringify(newGoal));
     });
 
-    console.log('업데이트 결과', result);
+    console.log('생성 결과', result);
   } catch (err) {
     console.log(err.message);
 
@@ -63,7 +60,7 @@ const updateGoal = async (user, realm, goal) => {
       result = JSON.parse(JSON.stringify(oldGoal));
     });
 
-    console.log('생성 결과', result);
+    console.log('업데이트 결과', result);
   } catch (err) {
     console.log(err.message);
 

@@ -13,6 +13,7 @@ import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {Mission} from '../../schema';
 import Colors from '../../utils/Colors';
 import {deleteMission} from '../../store/action';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
@@ -44,13 +45,13 @@ function GoalBox(props) {
               <MissionName>{props.mission.name}</MissionName>
               <Ionicons
                 name={
-                  props.mission.type === 'time'
+                  props.mission.type === Mission.TYPE.TIME
                     ? 'timer-sharp'
                     : 'trail-sign-sharp'
                 }
                 style={{color: Colors.MAIN_COLOR, marginLeft: 10}}
                 size={16}>
-                {props.mission.type === 'time' ? '시간' : '공간'}
+                {props.mission.type === Mission.TYPE.TIME ? '시간' : '공간'}
               </Ionicons>
             </ContentView>
             <TouchableOpacity
@@ -86,30 +87,34 @@ function GoalBox(props) {
       </View>
 
       <ConditionView>
-        {props.mission.type === 'time' ? (
-          <View>
+        <View>
+          {props.mission.type !== Mission.TYPE.IN_PLACE && (
             <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
-              시작:
               <Text style={[{marginHorizontal: 5}]}>
-                {timeInfoText(props.mission.time.startTime)}
+                시작: {timeInfoText(props.mission.time.startTime)}
               </Text>
             </Ionicons>
-
+          )}
+          {props.mission.type === Mission.TYPE.TIME && (
             <Ionicons name={'lock-open'} size={14} style={styles.timeIcon}>
-              종료:
               <Text style={[{marginHorizontal: 20}]}>
-                {timeInfoText(props.mission.time.endTime)}
+                종료: {timeInfoText(props.mission.time.endTime)}
               </Text>
             </Ionicons>
-          </View>
-        ) : (
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.info}>장소: {props.mission.space.place} |</Text>
-            <Text style={[styles.info, {marginLeft: 10}]}>
-              {props.mission.space.type === 'inside' ? '안' : '밖'}
-            </Text>
-          </View>
-        )}
+          )}
+          {props.mission.type !== Mission.TYPE.TIME && (
+            <View style={{flexDirection: 'row'}}>
+              <Text style={styles.info}>장소: {props.mission.space} |</Text>
+              <Text style={[styles.info, {marginLeft: 3}]}>
+                {props.mission.type === Mission.TYPE.IN_PLACE
+                  ? '안'
+                  : props.mission.type === Mission.TYPE.MOVE_PLACE
+                  ? '이동'
+                  : '이동 + 안'}
+              </Text>
+            </View>
+          )}
+        </View>
         <Ionicons name={'calendar'} size={14} style={styles.timeIcon}>
           <Text style={[{marginHorizontal: 10}]}> {props.mission.date}</Text>
         </Ionicons>

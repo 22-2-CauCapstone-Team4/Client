@@ -10,8 +10,6 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MissionActivity extends AppCompatActivity {
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +32,4 @@ public class MissionActivity extends AppCompatActivity {
     public void onBackPressed() {
         //super.onBackPressed();
     }
-
-
 }

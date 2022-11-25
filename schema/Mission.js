@@ -12,7 +12,7 @@ class Mission {
     goal,
     isActive,
     isRepeated = false,
-    kind,
+    type,
     place,
   }) {
     this._id = id;
@@ -25,13 +25,15 @@ class Mission {
     this.goal = goal;
     this.isActive = isActive;
     this.isRepeated = isRepeated;
-    this.kind = kind;
-    this.place = place;
+    this.type = type;
+    if (place) this.place = place;
   }
 
-  static KIND = {
+  static TYPE = {
     TIME: 'TIME',
-    PLACE: 'PLACE',
+    IN_PLACE: 'IN_PLACE',
+    MOVE_PLACE: 'MOVE_PLACE',
+    BOTH_PLACE: 'BOTH_PLACE',
   };
 
   static schema = {
@@ -40,15 +42,15 @@ class Mission {
       _id: 'objectId',
       date: 'date?',
       dayOfTheWeek: {type: 'int?', default: 0},
-      endTime: {type: 'int?', default: 0},
-      goal: 'Goal',
+      endTime: {type: 'int?'},
+      goal: 'Goal?',
       isActive: {type: 'bool', default: false},
       isRepeated: {type: 'bool', default: false},
-      kind: 'string',
+      type: 'string',
       name: 'string',
       owner_id: 'string',
-      place: 'Place',
-      startTime: {type: 'int?', default: 0},
+      place: 'Place?',
+      startTime: {type: 'int?'},
     },
     primaryKey: '_id',
   };

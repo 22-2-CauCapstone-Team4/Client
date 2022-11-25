@@ -1,7 +1,5 @@
 /* eslint-disable curly */
-import Realm from 'realm';
 import {ProhibitedApp} from '../../schema';
-import {mkConfig} from '../mkConfig';
 
 const readProhibitedApps = async (user, realm) => {
   console.log('read my prohibited apps');
