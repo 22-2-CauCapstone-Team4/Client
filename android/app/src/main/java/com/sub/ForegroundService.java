@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -35,7 +34,10 @@ public class ForegroundService extends Service {
     private String phoneUsageState = "INIT";
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
-    private ArrayList<String> prohibitedAppList = null;
+    private ArrayList<AppInfo> prohibitedAppList = null;
+
+    // 시간 잠금
+    // 공간 잠금 정보
 
     private NotificationManager notificationManager;
     private Notification notification;
@@ -60,16 +62,25 @@ public class ForegroundService extends Service {
             while (isThreadRunning) {
                 // 현재 foreground 앱의 패키지 이름 확인
                 String nowAppPackageName = getPackageName(context);
-                boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
 
-                Log.i("ForegroundService", "AppName = " + nowAppPackageName);
+                // 앱 이름 알아내기
+                String appName = "";
+                for (AppInfo app : prohibitedAppList) {
+                    if (app.getPackageName().equals(nowAppPackageName)) {
+                        appName = app.getName();
+                        break;
+                    }
+                }
+                boolean nowIsProhibitedApp = !appName.isEmpty();
+
+                Log.i("ForegroundService", "app package name = " + nowAppPackageName + ", app name = " + appName);
 
                 // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
-                if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
+                if (!nowAppPackageName.isEmpty() && !nowAppPackageName.equals(appPackageName)) {
                     // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
                     // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
-                    if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
-                        sendAppPackageNameToJS(context, nowAppPackageName,getAppName(nowAppPackageName), nowIsProhibitedApp, phoneUsageState);
+                    if (nowIsProhibitedApp || isProhibitedApp)
+                        sendAppPackageNameToJS(context, nowAppPackageName, appName, nowIsProhibitedApp, phoneUsageState);
                     if (!phoneUsageState.equals("")){
                         Log.i("ForegroundService", phoneUsageState);
                         phoneUsageState = "";
@@ -165,13 +176,15 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // 번들의 내용 받아오기
-        if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
-            ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
-            if (appArrList != null)
-                prohibitedAppList = appArrList;
+        if (intent.getExtras() != null) {
+            if (intent.getExtras().containsKey("appList")) {
+                Log.i("ForegroundService", "금지 앱 리스트 추가/변경");
 
-            for (String appName : appArrList)
-                Log.i("ForegroundService", appName);
+                String JsonAppListStr = intent.getExtras().getString("appList");
+                if (JsonAppListStr != null) {
+                    prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
+                }
+            }
         }
 
         if (prohibitedAppList != null && prohibitedAppList.size() != 0) {
@@ -185,6 +198,8 @@ public class ForegroundService extends Service {
             Log.i("ForegroundService", "phone on 알림 보내기");
             sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
         }
+
+        // * TODO : 시작, 종료 시 알림 울리도록 해야 함
 
         Log.i("ForegroundService", "서비스 시작 작업 종료");
         return START_REDELIVER_INTENT;
@@ -238,15 +253,6 @@ public class ForegroundService extends Service {
         }
 
         return packageNameMap.get(lastRunAppTimeStamp, "").toString();
-    }
-
-    private String getAppName(String appPackageName) {
-        try {
-            return pm.getApplicationLabel(pm.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA)).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)

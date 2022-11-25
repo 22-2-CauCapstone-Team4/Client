@@ -22,6 +22,7 @@ public class BootUpReceiver extends BroadcastReceiver {
                 context.startService(new Intent(context, ForegroundService.class));
             }
 
+            // * TODO : 부트이벤트 보내지 말고, 그냥 여기서 불러오기 처리
             Intent bootIntent = new Intent(context, BootEventService.class);
 
             Bundle bundle = new Bundle();

@@ -162,8 +162,10 @@ function Detail({navigation}) {
       setCheckStatus(Status.OK);
 
       console.log('서비스 시작');
-      await ForegroundServiceModule.startService(
-        blockedApps.map(blockedApp => blockedApp.packageName),
+      ForegroundServiceModule.startService(
+        blockedApps.map(blockedApp => {
+          return {packageName: blockedApp.packageName, name: blockedApp.name};
+        }),
       );
 
       return;
