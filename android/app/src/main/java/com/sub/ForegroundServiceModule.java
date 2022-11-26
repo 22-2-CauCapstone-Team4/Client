@@ -81,7 +81,7 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startService(ReadableArray appList) {
+    public void startService(ReadableArray appList, ReadableArray missionList) {
         Log.i("ForegroundServiceModule", "서비스 시작 시도");
         ReactApplicationContext context = getReactApplicationContext();
 
@@ -97,6 +97,12 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
         if (appList != null) {
             JSONArray tempList = JsonTransmitter.convertArrayToJson(appList);
             bundle.putString("appList", tempList.toString());
+            foregroundServiceIntent.putExtras(bundle);
+        }
+
+        if (missionList != null) {
+            JSONArray tempList = JsonTransmitter.convertArrayToJson(missionList);
+            bundle.putString("missionList", tempList.toString());
             foregroundServiceIntent.putExtras(bundle);
         }
 

@@ -1,5 +1,6 @@
 package com.sub;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,8 +25,13 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.sub.info.AppInfo;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
@@ -36,15 +42,15 @@ public class ForegroundService extends Service {
     private boolean isProhibitedApp = false;
     private ArrayList<AppInfo> prohibitedAppList = null;
 
-    // 시간 잠금
-    // 공간 잠금 정보
+    // 시간 trigger
+    // 공간 trigger
 
     private NotificationManager notificationManager;
     private Notification notification;
 
     private Thread thread;
 
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver screenReceiver;
     private IntentFilter intentFilter;
 
     private PackageManager pm;
@@ -134,7 +140,7 @@ public class ForegroundService extends Service {
         intentFilter.addAction(Intent.ACTION_SHUTDOWN);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
 
-        receiver = new BroadcastReceiver() {
+        screenReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) || intent.getAction().equals((Intent.ACTION_SHUTDOWN))) {
@@ -170,7 +176,7 @@ public class ForegroundService extends Service {
             }
         };
 
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(screenReceiver, intentFilter);
     }
 
     @Override
@@ -208,7 +214,7 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
+        unregisterReceiver(screenReceiver);
         // handler.removeCallbacks(runnableCode);
         isThreadRunning = false;
     }
@@ -265,7 +271,7 @@ public class ForegroundService extends Service {
         return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
     }
 
-    static void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
+    private void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
         Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
         Bundle bundle = new Bundle();
 

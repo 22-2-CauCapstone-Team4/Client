@@ -5,6 +5,7 @@ import android.util.Log;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.sub.info.AppInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,9 +57,6 @@ public class JsonTransmitter {
             while (iterator.hasNextKey()) {
                 String key = iterator.nextKey();
                 switch (readableMap.getType(key)) {
-                    case Null:
-                        object.put(key, JSONObject.NULL);
-                        break;
                     case Boolean:
                         object.put(key, readableMap.getBoolean(key));
                         break;
@@ -73,6 +71,9 @@ public class JsonTransmitter {
                         break;
                     case Array:
                         object.put(key, convertArrayToJson(readableMap.getArray(key)));
+                        break;
+                    default:
+                        object.put(key, JSONObject.NULL);
                         break;
                 }
             }
@@ -89,8 +90,6 @@ public class JsonTransmitter {
         try {
             for (int i = 0; i < readableArray.size(); i++) {
                 switch (readableArray.getType(i)) {
-                    case Null:
-                        break;
                     case Boolean:
                         array.put(readableArray.getBoolean(i));
                         break;
@@ -105,6 +104,8 @@ public class JsonTransmitter {
                         break;
                     case Array:
                         array.put(convertArrayToJson(readableArray.getArray(i)));
+                        break;
+                    default:
                         break;
                 }
             }

@@ -5,10 +5,10 @@ import {ForegroundServiceModule} from '../../wrap_module';
 const startServiceTask = async taskData => {
   console.log('Boot event js에서 받음');
 
-  await ForegroundServiceModule.startService([
-    'com.github.android',
-    'com.android.chrome',
-  ]);
+  await ForegroundServiceModule.startService(
+    ['com.github.android', 'com.android.chrome'],
+    null,
+  );
 };
 
 export {startServiceTask};

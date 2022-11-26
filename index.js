@@ -11,11 +11,12 @@ import {appCheckHeadlessTask, startServiceTask} from './functions';
 AppRegistry.registerComponent(appName, () => App);
 
 const app = getRealmApp();
-console.log('태스크 등록', app.currentUser);
+console.log('headless 태스크 등록 시도');
 if (
   app.currentUser !== null &&
   app.currentUser.providerType === 'local-userpass'
 ) {
+  console.log('headless 태스크 등록 성공');
   AppRegistry.registerHeadlessTask('CheckApp', () =>
     appCheckHeadlessTask.bind(null, app.currentUser),
   );

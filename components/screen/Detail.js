@@ -60,7 +60,7 @@ function Detail({navigation}) {
     }
 
     if (checkStatus === Status.NOT_YET) checkPermissionAlert();
-  });
+  }, [checkStatus, isInit]);
 
   const loadApps = React.useCallback(async () => {
     setIsInit(false);
@@ -166,6 +166,7 @@ function Detail({navigation}) {
         blockedApps.map(blockedApp => {
           return {packageName: blockedApp.packageName, name: blockedApp.name};
         }),
+        null,
       );
 
       return;
