@@ -131,12 +131,6 @@ export default function CreateMissionModal({
 
   // ＠ 요일 선택
   const [selected, setSelected] = React.useState([]);
-  // const [selectedDay, setSelectedDay] = useState('');
-
-  // const dayOfWeekSave = selected => {
-  //   setSelectedDay([...selected.keys()]);
-  //   console.log(selectedDay);
-  // };
   const dayOfWeekData = [
     //＠ 요일 데이터
     {
@@ -183,22 +177,46 @@ export default function CreateMissionModal({
         onPress={() => onSelect(id)}
         style={{
           backgroundColor: selected ? Colors.MAIN_COLOR : 'white',
-          margin: 1,
+          margin: 2,
           marginTop: 10,
-          borderWidth: 1,
+          borderWidth: 0.7,
           borderRadius: 25,
-          borderColor: Colors.MAIN_COLOR,
-          width: 35,
-          height: 35,
+          borderColor: selected ? 'white' : Colors.GREY,
+          width: 34,
+          height: 34,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Text style={{color: selected ? 'white' : 'black'}}>{title}</Text>
+        <Text
+          style={{
+            color: selected
+              ? 'white'
+              : id == 0
+              ? 'red'
+              : id == 6
+              ? 'blue'
+              : 'black',
+          }}>
+          {title}
+        </Text>
       </TouchableOpacity>
     );
   };
-  // const missionData = useSelector(store => store.missionReducer.missionData);
-  // console.log(missionData);
+  const closeModalResetInfo = () => {
+    setSelectCategory('');
+    setMissionName('');
+    setModalVisible(!modalVisible);
+  };
+  // VALIDATION MESSAGE
+  const [categoryValid, setCategoryValid] =
+    useState('카테고리를 선택해주세요!');
+  const [missionNameValid, setMissionNameValid] =
+    useState('미션 이름을 입력해주세요!');
+  const [placeValid, setPlaceValid] = useState('장소를 선택해주세요!');
+  const [validMessage, setValidMessage] = useState(' ');
+  console.log('카테고리', selectCategory);
+  console.log('미션 이름', missionName);
+  console.log(selectCategory === '');
   return (
     <>
       {modalVisible ? (
@@ -207,221 +225,136 @@ export default function CreateMissionModal({
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
+            setLockingType(false);
+            setSelectCategory('');
+            setCategoryValid('카테고리를 선택해주세요!');
+            setMissionName('');
+            setMissionNameValid('미션 이름을 입력해주세요!');
+            setSelectSpace('');
+            setPlaceValid('장소를 선택해주세요!');
+            setValidMessage(' ');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
-            <View style={styles.modalView}>
+            <View style={[missionStyle.modalView]}>
               <Text style={{color: 'black', fontSize: 20, marginBottom: 10}}>
                 미션 추가
               </Text>
-
-              <ScrollView
-                style={{
-                  borderColor: 'grey',
-                  borderWidth: 1,
-                  borderRadius: 25,
-                  padding: 5,
-                  marginBottom: 5,
-                }}>
-                <View style={{alignItems: 'center', flexDirection: 'row'}}>
-                  <SelectDropdown
-                    defaultButtonText="카테고리 선택"
-                    buttonStyle={{
-                      borderRadius: 25,
-                      height: 40,
-                      width: '100%',
-                      backgroundColor: Colors.MAIN_COLOR,
-                    }}
-                    buttonTextStyle={{color: 'white'}}
-                    data={category.map(el => el.name)}
-                    onSelect={selectedItem => {
-                      setSelectCategory(
-                        category.find(ele => ele.name === selectedItem),
-                      );
-                      console.log(selectCategory);
-                    }}
-                  />
-                </View>
-                <View style={missionStyle.missionText}>
-                  <TextInput
-                    style={missionStyle.textInputStyle}
-                    onChangeText={saveMission}
-                    placeholder="미션 이름"
-                    placeholderTextColor="grey"
-                  />
-                </View>
-                <View style={missionStyle.inputRow}>
-                  <Text style={missionStyle.selectCalendar}>
-                    {selected.length === 0
-                      ? `${startTime.getMonth() + 1}월 ${startTime.getDate()}일`
-                      : selected.length === 7
-                      ? '매일 반복'
-                      : selected.length === 5 &&
-                        !selected.includes(0) &&
-                        !selected.includes(6)
-                      ? '주중 반복'
-                      : selected.length === 2 &&
-                        selected.includes(0) &&
-                        selected.includes(6)
-                      ? '주말 반복'
-                      : `매주 ${['일', '월', '화', '수', '목', '금', '토']
-                          .filter((ele, ind) => selected.includes(ind))
-                          .join(', ')} 반복`}
-                  </Text>
-                  <TouchableOpacity onPress={onPressDate}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={30}
-                      style={{color: Colors.MAIN_COLOR}}></Ionicons>
-                  </TouchableOpacity>
-                  <DateTimePickerModal
-                    isVisible={visible}
-                    mode={mode}
-                    onConfirm={onConfirm}
-                    onCancel={onCancel}
-                    date={startTime}
-                  />
-                </View>
-                {/* ＠ 요일 아직 구현 x */}
-                <View>
-                  <FlatList
-                    horizontal
-                    data={dayOfWeekData}
-                    renderItem={({item}) => (
-                      <Item
-                        id={item.id}
-                        title={item.title}
-                        selected={selected.includes(item.id)}
-                        onSelect={onSelect}
+              <View>
+                <View style={missionStyle.contentView}>
+                  <ScrollView>
+                    <View
+                      style={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexDirection: 'row',
+                        marginTop: 5,
+                        paddingHorizontal: 10,
+                      }}>
+                      <Text style={{color: 'black'}}>카테고리 선택</Text>
+                      <SelectDropdown
+                        defaultButtonText="카테고리 선택"
+                        buttonStyle={{
+                          borderRadius: 25,
+                          height: 33,
+                          width: '50%',
+                          backgroundColor: Colors.MAIN_COLOR,
+                        }}
+                        buttonTextStyle={{color: 'white', fontSize: 16}}
+                        data={category.map(el => el.name)}
+                        onSelect={selectedItem => {
+                          setCategoryValid(' ');
+                          setSelectCategory(
+                            category.find(ele => ele.name === selectedItem),
+                          );
+                          console.log(selectCategory);
+                        }}
                       />
-                    )}
-                    keyExtractor={item => item.id}
-                    extraData={selected}
-                  />
-                </View>
-                {/* 시간 잠금 or 공간 잠금 */}
-                <View style={missionStyle.btnStyle}>
-                  <TouchableOpacity onPress={lockTime}>
+                    </View>
                     <Text
-                      style={[
-                        missionStyle.lockBtn,
-                        {
-                          backgroundColor: lockingType
-                            ? Colors.GREY
-                            : Colors.MAIN_COLOR,
-                        },
-                      ]}>
-                      시간 잠금
+                      style={{
+                        color: 'red',
+                        paddingHorizontal: 10,
+                        fontSize: 10,
+                      }}>
+                      {categoryValid}
                     </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={lockSpace}>
-                    <Text
-                      style={[
-                        missionStyle.lockBtn,
-                        {
-                          backgroundColor: lockingType
-                            ? Colors.MAIN_COLOR
-                            : Colors.GREY,
-                        },
-                      ]}>
-                      공간 잠금
-                    </Text>
-                  </TouchableOpacity>
-                </View>
 
-                {/* state에 따라 시간 or 공간 잠금 컴포넌트 보여주는 곳 */}
-                {lockingType ? (
-                  <View>
-                    <View>
-                      <View style={{alignItems: 'center', marginTop: 20}}>
-                        <SelectDropdown
-                          defaultButtonText="장소 선택"
-                          buttonStyle={{
-                            borderRadius: 25,
-                            height: 40,
-                            width: '100%',
-                            backgroundColor: Colors.MAIN_COLOR,
+                    <View
+                      style={[
+                        {
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          height: 40,
+                        },
+                      ]}>
+                      <View
+                        style={{
+                          width: '50%',
+                          paddingHorizontal: 10,
+                        }}>
+                        <Text
+                          style={{
+                            color: 'black',
+                            textAlign: 'left',
+                          }}>
+                          미션 이름
+                        </Text>
+                      </View>
+                      <View style={{width: '50%'}}>
+                        <TextInput
+                          style={missionStyle.textInputStyle}
+                          onChangeText={text => {
+                            saveMission(text);
+                            if (text === '') {
+                              setMissionNameValid('미션 이름을 입력해주세요!');
+                            } else {
+                              setMissionNameValid(' ');
+                            }
                           }}
-                          buttonTextStyle={{color: 'white'}}
-                          data={space.map(el => el.name)}
-                          onSelect={selectedItem => {
-                            setSelectSpace(selectedItem);
-                          }}
+                          placeholder="이름"
+                          placeholderTextColor={Colors.GREY}
                         />
                       </View>
                     </View>
-                    <View style={missionStyle.toggleBtn}>
-                      <Text style={missionStyle.spaceText}>공간 이동</Text>
-                      <Switch
-                        trackColor={{false: '#767577', true: '#81b0ff'}}
-                        onValueChange={() => {
-                          setMoveSpace(!moveSpace);
-                          // console.log(`moveSpace: ${moveSpace}`);
-                        }}
-                        value={moveSpace}
-                      />
-                      {
-                        // 레이아웃 수정 필요
-                        /* 출발 시간 */ moveSpace && (
-                          <View style={{marginTop: 10}}>
-                            <View
-                              style={{
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}>
-                              {/* 시간 선택 영역 */}
-                              <TouchableOpacity
-                                onPress={onPressDepartureTime}
-                                style={missionStyle.time}>
-                                <Text style={missionStyle.timeText}>
-                                  출발 시간
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                            <DateTimePickerModal
-                              isVisible={visible3}
-                              mode={mode3}
-                              onConfirm={onConfirmDepartureTime}
-                              onCancel={onCancel3}
-                              date={departureTime}
-                            />
-                            <Text style={missionStyle.timeData}>
-                              {departureTime.getHours()}시
-                              {departureTime.getMinutes()}분
-                            </Text>
-                          </View>
-                        )
-                      }
-                    </View>
-
-                    <View style={missionStyle.toggleBtn}>
-                      <Text style={missionStyle.spaceText}>공간 안</Text>
-                      <Switch
-                        trackColor={{false: '#767577', true: '#81b0ff'}}
-                        onValueChange={() => {
-                          setSpaceIn(!spaceIn);
-                          // console.log(`spaceIn: ${spaceIn}`);
-                        }}
-                        value={spaceIn}
-                      />
-                    </View>
-                  </View>
-                ) : (
-                  <View>
-                    {/* 시작 시간 */}
-                    <View style={{marginTop: 10}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        {/* 시간 선택 영역 */}
-                        <TouchableOpacity
-                          onPress={onPressStartTime}
-                          style={missionStyle.time}>
-                          <Text style={missionStyle.timeText}>시작 시간</Text>
-                        </TouchableOpacity>
-                      </View>
+                    <Text
+                      style={{
+                        color: 'red',
+                        paddingHorizontal: 10,
+                        fontSize: 10,
+                      }}>
+                      {missionNameValid}
+                    </Text>
+                    <Text
+                      style={{color: 'black', marginTop: 5, paddingLeft: 10}}>
+                      날짜 선택
+                    </Text>
+                    <View style={missionStyle.inputRow}>
+                      <Text style={missionStyle.selectCalendar}>
+                        {selected.length === 0
+                          ? `${
+                              startTime.getMonth() + 1
+                            }월 ${startTime.getDate()}일`
+                          : selected.length === 7
+                          ? '매일 반복'
+                          : selected.length === 5 &&
+                            !selected.includes(0) &&
+                            !selected.includes(6)
+                          ? '주중 반복'
+                          : selected.length === 2 &&
+                            selected.includes(0) &&
+                            selected.includes(6)
+                          ? '주말 반복'
+                          : `매주 ${['일', '월', '화', '수', '목', '금', '토']
+                              .filter((ele, ind) => selected.includes(ind))
+                              .join(', ')} 반복`}
+                      </Text>
+                      <TouchableOpacity onPress={onPressDate}>
+                        <Ionicons
+                          name="calendar-outline"
+                          size={30}
+                          style={{color: Colors.MAIN_COLOR}}></Ionicons>
+                      </TouchableOpacity>
                       <DateTimePickerModal
                         isVisible={visible}
                         mode={mode}
@@ -429,80 +362,282 @@ export default function CreateMissionModal({
                         onCancel={onCancel}
                         date={startTime}
                       />
-                      <Text style={missionStyle.timeData}>
-                        {startTime.getHours()}시 {startTime.getMinutes()}분
-                      </Text>
                     </View>
-                    {/* 종료 시간 */}
-                    <View>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        {/* 시간 선택 영역 */}
-                        <TouchableOpacity
-                          onPress={onPressEndTime}
-                          style={missionStyle.time}>
-                          <Text style={missionStyle.timeText}>종료 시간</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <DateTimePickerModal
-                        isVisible={visible2}
-                        mode={mode2}
-                        onConfirm={onConfirm2}
-                        onCancel={onCancel2}
-                        date={endTime}
+                    {/* ＠ 요일 아직 구현 x */}
+                    <View style={{alignItems: 'center', margin: 4}}>
+                      <FlatList
+                        horizontal
+                        data={dayOfWeekData}
+                        renderItem={({item}) => (
+                          <Item
+                            id={item.id}
+                            title={item.title}
+                            selected={selected.includes(item.id)}
+                            onSelect={onSelect}
+                          />
+                        )}
+                        keyExtractor={item => item.id}
+                        extraData={selected}
                       />
-                      <Text style={missionStyle.timeData}>
-                        {endTime.getHours()}시 {endTime.getMinutes()}분
-                      </Text>
                     </View>
-                  </View>
-                )}
-              </ScrollView>
+                    {/* 시간 잠금 or 공간 잠금 */}
+                    <View style={missionStyle.btnStyle}>
+                      <TouchableOpacity
+                        onPress={lockTime}
+                        style={[
+                          missionStyle.lockBtn,
+                          {
+                            backgroundColor: lockingType
+                              ? Colors.GREY
+                              : Colors.MAIN_COLOR,
+                          },
+                        ]}>
+                        <Text style={missionStyle.lockBtnText}>시간 잠금</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={lockSpace}
+                        style={[
+                          missionStyle.lockBtn,
+                          {
+                            backgroundColor: lockingType
+                              ? Colors.MAIN_COLOR
+                              : Colors.GREY,
+                          },
+                        ]}>
+                        <Text style={missionStyle.lockBtnText}>공간 잠금</Text>
+                      </TouchableOpacity>
+                    </View>
 
-              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={async () => {
-                    const mission = mkMissionObjToRealmObj({
-                      user,
-                      missionName,
-                      selectCategory,
-                      startTime: lockingType ? startTime : departureTime,
-                      endTime,
-                      lockingType,
-                      dayOfWeek: selected,
-                      space: space.find(ele => ele.name === selectSpace),
-                      spaceIn,
-                      moveSpace,
-                    });
+                    {/* state에 따라 시간 or 공간 잠금 컴포넌트 보여주는 곳 */}
+                    {lockingType ? (
+                      <View>
+                        <View>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              flexDirection: 'row',
+                              marginTop: 15,
+                              paddingHorizontal: 10,
+                            }}>
+                            <Text style={{color: 'black'}}>장소 선택</Text>
+                            <SelectDropdown
+                              defaultButtonText="장소 선택"
+                              buttonStyle={{
+                                borderRadius: 25,
+                                height: 33,
+                                width: '50%',
 
-                    dispatch(addMission(mkMissionRealmObjToObj(mission)));
-                    setModalVisible(!modalVisible);
+                                backgroundColor: Colors.MAIN_COLOR,
+                              }}
+                              buttonTextStyle={{color: 'white'}}
+                              data={space.map(el => el.name)}
+                              onSelect={selectedItem => {
+                                setPlaceValid(' ');
+                                setSelectSpace(selectedItem);
+                              }}
+                            />
+                          </View>
+                          <Text
+                            style={{
+                              color: 'red',
+                              paddingHorizontal: 10,
+                              fontSize: 10,
+                            }}>
+                            {placeValid}
+                          </Text>
+                        </View>
+                        <View style={missionStyle.toggleBtn}>
+                          <Text style={missionStyle.spaceText}>공간 이동</Text>
+                          <Switch
+                            trackColor={{false: '#767577', true: '#81b0ff'}}
+                            onValueChange={() => {
+                              setMoveSpace(!moveSpace);
+                              // console.log(`moveSpace: ${moveSpace}`);
+                            }}
+                            value={moveSpace}
+                          />
+                          {
+                            // 레이아웃 수정 필요
+                            /* 출발 시간 */ moveSpace && (
+                              <View style={{marginTop: 10}}>
+                                <View
+                                  style={{
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}>
+                                  {/* 시간 선택 영역 */}
+                                  <TouchableOpacity
+                                    onPress={onPressDepartureTime}
+                                    style={missionStyle.time}>
+                                    <Text style={missionStyle.timeText}>
+                                      출발 시간
+                                    </Text>
+                                  </TouchableOpacity>
+                                </View>
+                                <DateTimePickerModal
+                                  isVisible={visible3}
+                                  mode={mode3}
+                                  onConfirm={onConfirmDepartureTime}
+                                  onCancel={onCancel3}
+                                  date={departureTime}
+                                />
+                                <Text style={missionStyle.timeData}>
+                                  {departureTime.getHours()}시
+                                  {departureTime.getMinutes()}분
+                                </Text>
+                              </View>
+                            )
+                          }
+                        </View>
 
-                    const realm = await Realm.open(
-                      mkConfig(user, [
-                        Mission.schema,
-                        Goal.schema,
-                        Place.schema,
-                      ]),
-                    );
-                    await createMissionInRealm(user, realm, mission);
-                    realm.close();
-                    SnackBar.show({
-                      text: '미션 생성이 완료되었습니다. ',
-                      duration: SnackBar.LENGTH_SHORT,
-                    });
-                  }}>
-                  <Text style={styles.textStyle}>확인</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={styles.textStyle}>취소</Text>
-                </Pressable>
+                        <View style={missionStyle.toggleBtn}>
+                          <Text style={missionStyle.spaceText}>공간 안</Text>
+                          <Switch
+                            trackColor={{false: '#767577', true: '#81b0ff'}}
+                            onValueChange={() => {
+                              setSpaceIn(!spaceIn);
+                              // console.log(`spaceIn: ${spaceIn}`);
+                            }}
+                            value={spaceIn}
+                          />
+                        </View>
+                      </View>
+                    ) : (
+                      <View>
+                        {/* 시작 시간 */}
+                        <View style={{marginVertical: 15}}>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              paddingHorizontal: 10,
+                            }}>
+                            {/* 시간 선택 영역 */}
+                            <TouchableOpacity
+                              onPress={onPressStartTime}
+                              style={missionStyle.time}>
+                              <Text style={missionStyle.timeText}>
+                                시작 시간
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <DateTimePickerModal
+                            isVisible={visible}
+                            mode={mode}
+                            onConfirm={onConfirm}
+                            onCancel={onCancel}
+                            date={startTime}
+                          />
+                          <Text style={missionStyle.timeData}>
+                            {startTime.getHours()}시 {startTime.getMinutes()}분
+                          </Text>
+                        </View>
+                        {/* 종료 시간 */}
+                        <View>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              paddingHorizontal: 10,
+                            }}>
+                            {/* 시간 선택 영역 */}
+                            <TouchableOpacity
+                              onPress={onPressEndTime}
+                              style={missionStyle.time}>
+                              <Text style={missionStyle.timeText}>
+                                종료 시간
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <DateTimePickerModal
+                            isVisible={visible2}
+                            mode={mode2}
+                            onConfirm={onConfirm2}
+                            onCancel={onCancel2}
+                            date={endTime}
+                          />
+                          <Text style={missionStyle.timeData}>
+                            {endTime.getHours()}시 {endTime.getMinutes()}분
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                    <View style={{alignItems: 'center', marginTop: 10}}>
+                      <Text style={{color: 'red'}}>{validMessage}</Text>
+                    </View>
+                  </ScrollView>
+                </View>
+
+                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={async () => {
+                      if (
+                        (lockingType == false ||
+                          (lockingType == true && placeValid === ' ')) &&
+                        categoryValid === ' ' &&
+                        missionNameValid === ' '
+                      ) {
+                        setSelectCategory('');
+                        setCategoryValid('카테고리를 선택해주세요!');
+                        setMissionName('');
+                        setMissionNameValid('미션 이름을 입력해주세요!');
+                        setSelectSpace('');
+                        setPlaceValid('장소를 선택해주세요!');
+                        setValidMessage(' ');
+                        const mission = mkMissionObjToRealmObj({
+                          user,
+                          missionName,
+                          selectCategory,
+                          startTime: lockingType ? startTime : departureTime,
+                          endTime,
+                          lockingType,
+                          dayOfWeek: selected,
+                          space: space.find(ele => ele.name === selectSpace),
+                          spaceIn,
+                          moveSpace,
+                        });
+
+                        dispatch(addMission(mkMissionRealmObjToObj(mission)));
+                        setLockingType(false);
+                        setModalVisible(!modalVisible);
+
+                        const realm = await Realm.open(
+                          mkConfig(user, [
+                            Mission.schema,
+                            Goal.schema,
+                            Place.schema,
+                          ]),
+                        );
+                        await createMissionInRealm(user, realm, mission);
+                        realm.close();
+                        SnackBar.show({
+                          text: '미션 생성이 완료되었습니다. ',
+                          duration: SnackBar.LENGTH_SHORT,
+                        });
+                      } else {
+                        setValidMessage('입력 정보를 확인해주세요!');
+                      }
+                    }}>
+                    <Text style={styles.textStyle}>확인</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      setLockingType(false);
+                      setValidMessage(' ');
+                      setSelectCategory('');
+                      setCategoryValid('카테고리를 선택해주세요!');
+                      setMissionName('');
+                      setMissionNameValid('미션 이름을 입력해주세요!');
+                      setSelectSpace('');
+                      setPlaceValid('장소를 선택해주세요!');
+                      setModalVisible(!modalVisible);
+                    }}>
+                    <Text style={styles.textStyle}>취소</Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
@@ -512,10 +647,41 @@ export default function CreateMissionModal({
   );
 }
 const missionStyle = StyleSheet.create({
-  textInputStyle: {
+  modalView: {
+    margin: 5,
+    width: '90%',
+    height: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  contentView: {
+    width: 300,
+    height: 500,
     borderColor: 'grey',
+    borderWidth: 1,
+    padding: 7,
+    borderColor: 'grey',
+    borderWidth: 0.5,
+    borderRadius: 25,
+  },
+  textInputStyle: {
     height: 40,
+    fontSize: 13,
     color: 'black',
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
   },
   // CreateMissionModal.js에서 input
   missionInput: {
@@ -525,18 +691,28 @@ const missionStyle = StyleSheet.create({
   },
   inputRow: {
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
   btnStyle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    height: 40,
   },
   lockBtn: {
+    height: 33,
+    width: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+  },
+  lockBtnText: {
     color: 'white',
-    borderRadius: 100,
-    padding: 10,
-    margin: 10,
   },
   week: {
     marginTop: 30,
@@ -570,11 +746,11 @@ const missionStyle = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    marginTop: 20,
+    paddingHorizontal: 10,
+    marginTop: 5,
   },
   spaceText: {
     color: 'black',
-    fontSize: 20,
   },
   selectSpaceText: {
     fontSize: 20,
@@ -589,7 +765,6 @@ const missionStyle = StyleSheet.create({
     marginTop: 10,
   },
   selectCalendar: {
-    fontSize: 20,
     color: 'black',
   },
   // 날짜, 시간 설정 style
@@ -597,17 +772,15 @@ const missionStyle = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.MAIN_COLOR,
     width: '100%',
-    height: 40,
+    height: 33,
     justifyContent: 'center',
-    borderRadius: 200,
+    borderRadius: 25,
   },
   timeText: {
-    fontWeight: 'bold',
     color: 'white',
   },
   timeData: {
     textAlign: 'center',
-    fontSize: 20,
     color: 'black',
   },
   resultData: {
