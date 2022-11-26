@@ -44,6 +44,7 @@ const mkMissionObjToRealmObj = ({
       ? Mission.TYPE.MOVE_PLACE
       : Mission.TYPE.BOTH_PLACE,
     isRepeated,
+    state: 'none',
   };
 
   if (startTime)

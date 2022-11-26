@@ -590,7 +590,7 @@ export default function CreateMissionModal({
                           user,
                           missionName,
                           selectCategory,
-                          startTime: lockingType ? startTime : departureTime,
+                          startTime: lockingType ? departureTime : startTime,
                           endTime,
                           lockingType,
                           dayOfWeek: selected,

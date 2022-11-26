@@ -156,16 +156,14 @@ function MissionBox(props) {
         {props.mission.type === 'TIME' ? (
           <View>
             <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
-              시작:
               <Text style={{color: Colors.MAIN_COLOR, marginHorizontal: 5}}>
-                {timeInfoText(props.mission.time.startTime)}
+                시작: {timeInfoText(props.mission.time.startTime)}
               </Text>
             </Ionicons>
 
             <Ionicons name={'lock-open'} size={14} style={styles.timeIcon}>
-              종료:
               <Text style={{color: Colors.MAIN_COLOR}}>
-                {timeInfoText(props.mission.time.endTime)}
+                종료: {timeInfoText(props.mission.time.endTime)}
               </Text>
             </Ionicons>
           </View>
