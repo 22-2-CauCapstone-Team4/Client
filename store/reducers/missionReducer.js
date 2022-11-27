@@ -102,6 +102,8 @@ const missionReducer = (state = INITIAL_STATE, action) => {
       return {...state, missionData: [...state.missionData, action.payload]};
     case 'DELETE_MISSION':
       return {...state, missionData: action.payload};
+    case 'UPDATE_MISSION':
+      return {...state, missionData: action.payload};
     case 'SELECT_MISSION':
       return {...state, filter: action.payload};
     default:

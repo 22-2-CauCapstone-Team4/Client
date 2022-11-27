@@ -25,19 +25,15 @@ const HomeTab = ({navigation}) => {
   );
   const todayTimeMission = todayMission.filter(el => el.type === 'TIME');
   const todaySpaceMission = todayMission.filter(el => el.type !== 'TIME');
+  const doingMission = useSelector(
+    store => store.missionReducer.missionData,
+  ).filter(item => item.state == 'start')[0];
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const clickMission1 = () => setMission(false);
   const clickMission2 = () => setMission(true);
-  // console.log('오늘 미션', todayMission);
-  // console.log(
-  //   '오늘 시간 미션',
-  //   todayMission.filter(el => el.type === 'TIME'),
-  // );
-  // console.log(
-  //   '오늘 공간 미션',
-  //   todayMission.filter(el => el.type !== 'TIME'),
-  // );
+  //console.log('홈탭만 바뀌나요?', doingMission);
+  useEffect(() => {}, [doingMission]);
   return (
     <View style={styles.tabContainer}>
       <AboutMission>
@@ -63,7 +59,7 @@ const HomeTab = ({navigation}) => {
         </TouchableOpacity>
       </AboutMission>
       <MainText>
-        {mission ? `진행중 | 0` : `오늘 미션 | ${todayMission.length}`}
+        {mission ? `진행 중 |` : `오늘 미션 | ${todayMission.length}`}
       </MainText>
       <View style={styles.lineStyle}></View>
       {mission ? (

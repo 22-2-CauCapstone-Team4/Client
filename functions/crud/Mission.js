@@ -98,8 +98,10 @@ const mkMissionRealmObjToObj = mission => {
     type: mission.type, // false: 시간 잠금, true: 공간 잠금
     time: {
       // 시작시간, 종료시간
-      startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
-      endTime: `${mission.endTime / 60}:${mission.endTime % 60}`,
+      startTime: `${parseInt(mission.startTime / 60)}:${
+        mission.startTime % 60
+      }`,
+      endTime: `${parseInt(mission.endTime / 60)}:${mission.endTime % 60}`,
     },
     dayOfWeek: dayOfWeekArr, // ＠ 요일 데이터,
   };

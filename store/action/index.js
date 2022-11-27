@@ -49,6 +49,13 @@ export const deleteMission = items => {
   };
 };
 
+export const updateMission = items => {
+  return {
+    type: 'UPDATE_MISSION',
+    payload: items,
+  };
+};
+
 export const selectMission = item => {
   return {
     type: 'SELECT_MISSION',

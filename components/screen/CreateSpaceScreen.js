@@ -211,7 +211,7 @@ export default function CreateSpaceScreen({navigation}) {
                   <Marker
                     draggable={true}
                     title={place.name}
-                    description={'범위: ' + '50m'}
+                    description={'범위: ' + `${parseInt(place.range * 1000)}m`}
                     style={{color: 'black'}}
                     coordinate={{
                       latitude: place.lat,

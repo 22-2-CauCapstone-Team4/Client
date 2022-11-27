@@ -18,7 +18,7 @@ import {
   LockAppModule,
   AppListModule,
 } from '../../wrap_module';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   readProhibitedAppsInRealm,
   readGoalsInRealm,
@@ -36,6 +36,7 @@ import {
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
 import {ProhibitedApp, Goal, Place, Mission} from '../../schema';
+import {composeEventHandlers} from 'native-base';
 
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +59,6 @@ function Detail({navigation}) {
     if (isInit) {
       loadApps();
     }
-
     if (checkStatus === Status.NOT_YET) checkPermissionAlert();
   });
 
@@ -106,9 +106,26 @@ function Detail({navigation}) {
         '미션',
         tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
       );
+      //
+      // console.log(
+      //   '상태가 있는 미션',
+      //   tempMissions.map(mission => ({
+      //     ...mkMissionRealmObjToObj(mission),
+      //     state: 'none',
+      //   })),
+      // );
+      //
+      // dispatch(
+      //   initMission(
+      //     tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
+      //   ),
+      // );
       dispatch(
         initMission(
-          tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
+          tempMissions.map(mission => ({
+            ...mkMissionRealmObjToObj(mission),
+            state: 'none',
+          })),
         ),
       );
       console.log('불러오기 완료');

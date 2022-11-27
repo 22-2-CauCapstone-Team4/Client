@@ -214,9 +214,9 @@ export default function CreateMissionModal({
     useState('미션 이름을 입력해주세요!');
   const [placeValid, setPlaceValid] = useState('장소를 선택해주세요!');
   const [validMessage, setValidMessage] = useState(' ');
-  console.log('카테고리', selectCategory);
-  console.log('미션 이름', missionName);
-  console.log(selectCategory === '');
+  // console.log('카테고리', selectCategory);
+  // console.log('미션 이름', missionName);
+  // console.log(selectCategory === '');
   return (
     <>
       {modalVisible ? (
