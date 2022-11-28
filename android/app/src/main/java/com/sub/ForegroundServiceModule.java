@@ -1,6 +1,7 @@
 package com.sub;
 
 import android.app.AppOpsManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -81,7 +84,7 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startService(ReadableArray appList, ReadableArray missionList) {
+    public void startService(ReadableArray appList, ReadableArray missionList, ReadableMap notiInfo) {
         Log.i("ForegroundServiceModule", "서비스 시작 시도");
         ReactApplicationContext context = getReactApplicationContext();
 
@@ -97,14 +100,20 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
         if (appList != null) {
             JSONArray tempList = JsonTransmitter.convertArrayToJson(appList);
             bundle.putString("appList", tempList.toString());
-            foregroundServiceIntent.putExtras(bundle);
         }
 
         if (missionList != null) {
             JSONArray tempList = JsonTransmitter.convertArrayToJson(missionList);
             bundle.putString("missionList", tempList.toString());
-            foregroundServiceIntent.putExtras(bundle);
         }
+
+        if (notiInfo != null) {
+            bundle.putBoolean("isNotiNeeded", true);
+            bundle.putString("title", notiInfo.getString("title"));
+            bundle.putString("content", notiInfo.getString("content"));
+        }
+
+        foregroundServiceIntent.putExtras(bundle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             context.startForegroundService(foregroundServiceIntent);

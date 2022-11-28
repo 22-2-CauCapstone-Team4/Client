@@ -45,6 +45,8 @@ export default function BlockApp({navigation}) {
           );
           ForegroundServiceModule.startService(
             blockedApps.map(blockedApp => blockedApp.packageName),
+            null,
+            null,
           );
 
           dispatch(addBlockedApps(blockedApps));

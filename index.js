@@ -47,10 +47,17 @@ if (user !== null && user.providerType === 'local-userpass') {
         };
       }),
       null,
+      null,
     );
     realm.close();
     console.log('index.js - service start, realm close');
   });
 }
+
+// test - 미션 정보 알림 울리기
+// ForegroundServiceModule.startService(null, null, {
+//   title: '안녕',
+//   content: '테스트',
+// });
 
 export {app};

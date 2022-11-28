@@ -167,6 +167,7 @@ function Detail({navigation}) {
           return {packageName: blockedApp.packageName, name: blockedApp.name};
         }),
         null,
+        null,
       );
 
       return;

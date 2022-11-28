@@ -12,7 +12,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -51,9 +50,8 @@ public class ForegroundService extends Service {
     private Thread thread;
 
     private BroadcastReceiver screenReceiver;
+    private BroadcastReceiver missionInfoReceiver;
     private IntentFilter intentFilter;
-
-    private PackageManager pm;
 
     private boolean isThreadRunning = false;
     // private Handler handler = new Handler();
@@ -116,8 +114,8 @@ public class ForegroundService extends Service {
 
     @Override
     public void onCreate() {
+        Log.i("ForegroundService", "서비스 첫 생성");
         Context context = getApplicationContext();
-        pm = context.getPackageManager();
 
         createNotificationChannel(); // Creating channel for API 26+
 
@@ -181,6 +179,8 @@ public class ForegroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("ForegroundService", "서비스 생성 시작");
+
         // 번들의 내용 받아오기
         if (intent.getExtras() != null) {
             if (intent.getExtras().containsKey("appList")) {
@@ -190,6 +190,13 @@ public class ForegroundService extends Service {
                 if (JsonAppListStr != null) {
                     prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
                 }
+            }
+            
+            if (intent.getExtras().containsKey("isNotiNeeded") && intent.getBooleanExtra("isNotiNeeded", false)) {
+                String title = intent.getExtras().getString("title");
+                String content = intent.getExtras().getString("content");
+
+                notifyMission(title, content);
             }
         }
 
@@ -205,9 +212,7 @@ public class ForegroundService extends Service {
             sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
         }
 
-        // * TODO : 시작, 종료 시 알림 울리도록 해야 함
-
-        Log.i("ForegroundService", "서비스 시작 작업 종료");
+        Log.i("ForegroundService", "서비스 생성 종료");
         return START_REDELIVER_INTENT;
     }
 
@@ -217,6 +222,21 @@ public class ForegroundService extends Service {
         unregisterReceiver(screenReceiver);
         // handler.removeCallbacks(runnableCode);
         isThreadRunning = false;
+    }
+    
+    public void notifyMission(String title, String content) {Log.i("ForegroundService", "미션 noti 울리기");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                // 실제 알림창에 뜨는 내용 설정
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(contentIntent)
+                .build();
+
+        startForeground(SERVICE_NOTIFICATION_ID, notification);
     }
 
     private void createNotificationChannel() {
