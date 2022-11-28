@@ -55,7 +55,6 @@
         </activity>
         <receiver
             android:name=".BootUpReceiver"
-            android:directBootAware="true"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">

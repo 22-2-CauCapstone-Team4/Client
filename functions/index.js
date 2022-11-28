@@ -20,11 +20,18 @@ import {
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
 } from './crud';
-import {appCheckHeadlessTask, startServiceTask} from './task';
+import {
+  appCheckHeadlessTask,
+  startServiceTask,
+  everyMidnightTask,
+  acceptMissionTriggerTask,
+} from './task';
 
 module.exports = {
   appCheckHeadlessTask,
   startServiceTask,
+  everyMidnightTask,
+  acceptMissionTriggerTask,
   readProhibitedAppsInRealm,
   updateProhibitedAppsInRealm,
   readGoalsInRealm,

@@ -3,7 +3,7 @@ import {AppRegistry} from 'react-native';
 import Realm from 'realm';
 import {CurState} from '../schema';
 import {mkConfigWithSubscriptions} from '../functions';
-import {appCheckHeadlessTask, startServiceTask} from '../functions';
+import {appCheckHeadlessTask} from '../functions';
 import {app} from '../index';
 import {ForegroundServiceModule} from '../wrap_module';
 import {Goal} from '../schema/Goal';
@@ -45,9 +45,6 @@ const AuthProvider = ({children}) => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
     );
-    AppRegistry.registerHeadlessTask('Boot', () => {
-      startServiceTask.bind(null, newUser);
-    });
 
     setUser(newUser);
     return newUser;
@@ -116,9 +113,6 @@ const AuthProvider = ({children}) => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
     );
-    AppRegistry.registerHeadlessTask('Boot', () => {
-      startServiceTask.bind(null, newUser);
-    });
 
     console.log('닫기');
     realm.close();
