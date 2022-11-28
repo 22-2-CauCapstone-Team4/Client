@@ -9,19 +9,19 @@ import {getRealmApp} from './getRealmApp';
 import {
   appCheckHeadlessTask,
   startServiceTask,
-  // everyMidnightTask,
+  everyMidnightTask,
   // acceptMissionTriggerTask,
   mkConfig,
   readProhibitedAppsInRealm,
 } from './functions';
-import {ForegroundServiceModule} from './wrap_module';
+import {ForegroundServiceModule, MissionSetterModule} from './wrap_module';
 import Realm from 'realm';
 import {ProhibitedApp} from './schema';
 
 AppRegistry.registerComponent(appName, () => App);
 
 AppRegistry.registerHeadlessTask('Boot', () => startServiceTask);
-// AppRegistry.registerHeadlessTask('Midnight', () => everyMidnightTask);
+AppRegistry.registerHeadlessTask('Midnight', () => everyMidnightTask);
 // AppRegistry.registerHeadlessTask('MissionTrigger', () => acceptMissionTriggerTask);
 
 const app = getRealmApp();
@@ -49,6 +49,9 @@ if (user !== null && user.providerType === 'local-userpass') {
       null,
       null,
     );
+
+    // *TODO : 정보 불러오기
+    MissionSetterModule.startMidnightAlarm();
     realm.close();
     console.log('index.js - service start, realm close');
   });
