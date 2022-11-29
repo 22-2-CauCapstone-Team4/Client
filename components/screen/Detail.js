@@ -24,7 +24,9 @@ import {
   readGoalsInRealm,
   readPlacesInRealm,
   readMissionsInRealm,
+  readTodayMissionsInRealm,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
 } from '../../functions';
 import {
   addApps,
@@ -35,7 +37,7 @@ import {
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
-import {ProhibitedApp, Goal, Place, Mission} from '../../schema';
+import {ProhibitedApp, Goal, Place, Mission, TodayMission} from '../../schema';
 
 const Tab = createBottomTabNavigator();
 
@@ -73,6 +75,7 @@ function Detail({navigation}) {
           Goal.schema,
           Place.schema,
           Mission.schema,
+          TodayMission.schema,
         ]),
       );
 
@@ -88,13 +91,19 @@ function Detail({navigation}) {
         dispatch(addApps(tempApps));
       });
 
-      let [tempBlockedApps, tempGoals, tempPlaces, tempMissions] =
-        await Promise.all([
-          readProhibitedAppsInRealm(user, realm),
-          readGoalsInRealm(user, realm),
-          readPlacesInRealm(user, realm),
-          readMissionsInRealm(user, realm),
-        ]);
+      let [
+        tempBlockedApps,
+        tempGoals,
+        tempPlaces,
+        tempMissions,
+        tempTodayMissions,
+      ] = await Promise.all([
+        readProhibitedAppsInRealm(user, realm),
+        readGoalsInRealm(user, realm),
+        readPlacesInRealm(user, realm),
+        readMissionsInRealm(user, realm),
+        readTodayMissionsInRealm(user, realm),
+      ]);
 
       realm.close();
 
@@ -108,6 +117,12 @@ function Detail({navigation}) {
           tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
         ),
       );
+
+      // *TODO : 오늘 미션 리듀서 추가
+      // console.log(
+      //   '테스트',
+      //   tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),
+      // );
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);

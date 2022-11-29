@@ -5,6 +5,7 @@ import {
   Goal,
   Place,
   Mission,
+  TodayMission,
   PhoneUsageRecord,
 } from '../schema';
 
@@ -26,7 +27,7 @@ const mkConfig = (user, schema) => {
 };
 
 const mkConfigWithSubscriptions = user => {
-  console.log('config 생성');
+  console.log('구독 config 생성');
   return {
     schema: [
       CurState.schema,
@@ -36,6 +37,7 @@ const mkConfigWithSubscriptions = user => {
       Place.schema,
       Mission.schema,
       PhoneUsageRecord.schema,
+      TodayMission.schema,
     ],
     sync: {
       user,
@@ -65,6 +67,9 @@ const mkConfigWithSubscriptions = user => {
             realm
               .objects('PhoneUsageRecord')
               .filtered(`owner_id == "${user.id}"`),
+          );
+          subs.add(
+            realm.objects('TodayMission').filtered(`owner_id == "${user.id}"`),
           );
         },
       },

@@ -21,7 +21,6 @@ import {ProhibitedApp} from './schema';
 AppRegistry.registerComponent(appName, () => App);
 
 AppRegistry.registerHeadlessTask('Boot', () => startServiceTask);
-AppRegistry.registerHeadlessTask('Midnight', () => everyMidnightTask);
 // AppRegistry.registerHeadlessTask('MissionTrigger', () => acceptMissionTriggerTask);
 
 const app = getRealmApp();
@@ -33,7 +32,10 @@ if (user !== null && user.providerType === 'local-userpass') {
 
   Realm.open(mkConfig(user, [ProhibitedApp.schema])).then(async realm => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
-      appCheckHeadlessTask.bind(null, app.currentUser),
+      appCheckHeadlessTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('Midnight', () =>
+      everyMidnightTask.bind(null, user),
     );
 
     const prohibitedApps = await readProhibitedAppsInRealm(user, realm);

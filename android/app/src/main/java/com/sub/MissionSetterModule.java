@@ -43,6 +43,9 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
+        // test code
+//        calendar.set(Calendar.MINUTE, 1);
+
         setTime(bundle, calendar);
     }
 

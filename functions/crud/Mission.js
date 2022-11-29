@@ -1,5 +1,6 @@
 /* eslint-disable curly */
-import {Mission} from '../../schema/Mission';
+import {Mission, TodayMission} from '../../schema';
+import moment from 'moment';
 
 // db 저장용 객체 생성
 const mkMissionObjToRealmObj = ({
@@ -58,6 +59,12 @@ const mkMissionObjToRealmObj = ({
   return mission;
 };
 
+const mkTodayMissionRealmObjToObj = todayMission => {
+  const mission = mkMissionRealmObjToObj(todayMission.mission);
+  delete todayMission.mission;
+  return {...todayMission, ...mission};
+};
+
 // time: {
 //       // 시작시간, 종료시간
 //       startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
@@ -114,6 +121,82 @@ const mkMissionRealmObjToObj = mission => {
   }
 
   return tempObj;
+};
+
+const mkTodayMissions = async (user, realm) => {
+  console.log('mk today missions');
+  let result = null;
+
+  try {
+    // 0. 그전에 기록한 오늘의 미션 전부 삭제
+    realm.write(() => {
+      realm.delete(realm.objects('TodayMission'));
+    });
+
+    // 1. 모든 미션 읽어오기
+    const allMissions = realm.objects('Mission');
+
+    // 2. 오늘의 미션만 가져오기
+    const todayMissions = allMissions.filter(mission => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (
+        (mission.date && moment(today).isSame(mission.date)) ||
+        (mission.dayOfTheWeek && mission.dayOfTheWeek & (1 << today.getDay()))
+      )
+        // 오늘 미션인 경우
+        return true;
+
+      return false;
+    });
+    // console.log(todayMissions);
+
+    // 저장
+    result = [];
+    realm.write(() => {
+      todayMissions.forEach(mission => {
+        const temp = new TodayMission({
+          owner_id: user.id,
+          state: TodayMission.STATE.NONE,
+          mission,
+        });
+        // console.log(temp);
+
+        realm.create('TodayMission', temp);
+        result.push(temp);
+      });
+    });
+  } catch (err) {
+    console.log(err);
+
+    if (realm !== null) {
+      realm.close();
+    }
+  }
+
+  console.log('오늘의 미션 생성 결과', result);
+  return result;
+};
+
+const readTodayMissions = async (user, realm) => {
+  console.log('read my today missions');
+  let result = null;
+
+  try {
+    const list = realm.objects('TodayMission');
+
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    console.log('읽기 결과', result);
+  } catch (err) {
+    console.log(err.message);
+
+    if (realm !== null) {
+      realm.close();
+    }
+  }
+
+  return result;
 };
 
 const readMissions = async (user, realm) => {
@@ -245,4 +328,7 @@ export {
   deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  mkTodayMissions,
+  readTodayMissions,
 };
