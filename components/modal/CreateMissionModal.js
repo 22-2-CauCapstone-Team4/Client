@@ -22,7 +22,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {addMission} from '../../store/action';
 import {createMissionInRealm, mkMissionObjToRealmObj} from '../../functions';
-import {Mission, Goal, Place} from '../../schema';
+import {TodayMission, Mission, Goal, Place} from '../../schema';
 import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
 import Realm from 'realm';
@@ -581,6 +581,7 @@ export default function CreateMissionModal({
 
                     const realm = await Realm.open(
                       mkConfig(user, [
+                        TodayMission.schema,
                         Mission.schema,
                         Goal.schema,
                         Place.schema,
