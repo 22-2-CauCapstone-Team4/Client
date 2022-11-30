@@ -6,22 +6,63 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {getRealmApp} from './getRealmApp';
-import {appCheckHeadlessTask, startServiceTask} from './functions';
+import {
+  appCheckHeadlessTask,
+  startServiceTask,
+  everyMidnightTask,
+  // acceptMissionTriggerTask,
+  mkConfig,
+  readProhibitedAppsInRealm,
+} from './functions';
+import {ForegroundServiceModule, MissionSetterModule} from './wrap_module';
+import Realm from 'realm';
+import {ProhibitedApp} from './schema';
 
 AppRegistry.registerComponent(appName, () => App);
 
+AppRegistry.registerHeadlessTask('Boot', () => startServiceTask);
+// AppRegistry.registerHeadlessTask('MissionTrigger', () => acceptMissionTriggerTask);
+
 const app = getRealmApp();
-console.log('태스크 등록', app.currentUser);
-if (
-  app.currentUser !== null &&
-  app.currentUser.providerType === 'local-userpass'
-) {
-  AppRegistry.registerHeadlessTask('CheckApp', () =>
-    appCheckHeadlessTask.bind(null, app.currentUser),
-  );
-  AppRegistry.registerHeadlessTask('Boot', () => {
-    startServiceTask.bind(null, app.currentUser);
+const user = app.currentUser;
+
+console.log('index.js - 앱 처음 실행, 로그인 여부 확인');
+if (user !== null && user.providerType === 'local-userpass') {
+  console.log('index.js - 로그인 된 상태');
+
+  Realm.open(mkConfig(user, [ProhibitedApp.schema])).then(async realm => {
+    AppRegistry.registerHeadlessTask('CheckApp', () =>
+      appCheckHeadlessTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('Midnight', () =>
+      everyMidnightTask.bind(null, user),
+    );
+
+    const prohibitedApps = await readProhibitedAppsInRealm(user, realm);
+    console.log('index.js - 금지 앱 불러오기 완료');
+
+    ForegroundServiceModule.startService(
+      prohibitedApps.map(prohibitedApp => {
+        return {
+          packageName: prohibitedApp.packageName,
+          name: prohibitedApp.name,
+        };
+      }),
+      null,
+      null,
+    );
+
+    // *TODO : 정보 불러오기
+    MissionSetterModule.startMidnightAlarm();
+    realm.close();
+    console.log('index.js - service start, realm close');
   });
 }
+
+// test - 미션 정보 알림 울리기
+// ForegroundServiceModule.startService(null, null, {
+//   title: '안녕',
+//   content: '테스트',
+// });
 
 export {app};

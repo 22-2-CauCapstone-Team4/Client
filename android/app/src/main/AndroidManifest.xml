@@ -12,6 +12,7 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -37,6 +38,8 @@
             android:exported="false" />
         <service android:name=".CheckAppEventService" />
         <service android:name=".BootEventService" />
+        <service android:name=".MissionEventService" />
+        <service android:name=".MidnightEventService" />
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
@@ -57,7 +60,6 @@
         </activity>
         <receiver
             android:name=".BootUpReceiver"
-            android:directBootAware="true"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
@@ -65,6 +67,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".TimePlaceReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.sec" />
             </intent-filter>
         </receiver>
         <meta-data 

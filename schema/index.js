@@ -5,6 +5,7 @@ import {Goal} from './Goal';
 import {Place} from './Place';
 import {Mission} from './Mission';
 import {PhoneUsageRecord} from './PhoneUsageRecord';
+import {TodayMission} from './TodayMission';
 
 module.exports = {
   AppUsageRecord,
@@ -14,4 +15,5 @@ module.exports = {
   Goal,
   Place,
   Mission,
+  TodayMission,
 };

@@ -19,12 +19,22 @@ import {
   readAppCntInRealm,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  mkTodayMissionsInRealm,
+  readTodayMissionsInRealm,
 } from './crud';
-import {appCheckHeadlessTask, startServiceTask} from './task';
+import {
+  appCheckHeadlessTask,
+  startServiceTask,
+  everyMidnightTask,
+  acceptMissionTriggerTask,
+} from './task';
 
 module.exports = {
   appCheckHeadlessTask,
   startServiceTask,
+  everyMidnightTask,
+  acceptMissionTriggerTask,
   readProhibitedAppsInRealm,
   updateProhibitedAppsInRealm,
   readGoalsInRealm,
@@ -41,6 +51,9 @@ module.exports = {
   deleteMissionInRealm,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  mkTodayMissionsInRealm,
+  readTodayMissionsInRealm,
   readUsageInRealm,
   readAppSecInRealm,
   readAppCntInRealm,
