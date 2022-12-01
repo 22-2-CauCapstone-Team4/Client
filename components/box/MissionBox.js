@@ -14,14 +14,14 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../../utils/Colors';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
-import {updateMission} from '../../store/action';
+import {updateTodayMission} from '../../store/action';
 import {getDistance} from '../../functions/space';
 
 /*
 README 11.27
 작성자: 한신
 
-missionReducer에 저장되는 데이터에
+todayMissionReducer에 저장되는 데이터에
 range와 state가 없는 것 같아 임시로 잡아두고 진행 중
 state는 총 4가지가 있고 아래에 세부 설명 있습니다.
 
@@ -46,9 +46,12 @@ function MissionBox(props) {
   const dispatch = useDispatch();
   // console.log(userState);
   //console.log('미션 정보', props.mission);
-  // console.log(props.mission.name, props.mission.state);
-  const [isEnabled, setIsEnabled] = useState(true);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [isEnabled, setIsEnabled] = useState(props.mission.isActive);
+  const toggleSwitch = () => {
+    setIsEnabled(previousState => !previousState);
+    // *TODO : toggle update
+    // *TODO : 오늘의 미션 삭제 안 되는 문제 해결
+  };
   //TIME
   const [leftTime, setLeftTime] = useState(
     compareTimeBeforeStart(props.mission.time.startTime),
@@ -62,7 +65,9 @@ function MissionBox(props) {
     place => place.name === props.mission.space,
   );
   const [currentLocation, setCurrentLocation] = useState({});
-  const missionData = useSelector(store => store.missionReducer.missionData);
+  const missionData = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
   const [missionState, setMissionState] = useState(props.mission.state); //props.mission.state
   //미션 중에 start인 미션 있는지 확인
   // console.log(
@@ -110,14 +115,14 @@ function MissionBox(props) {
         leftTime[1] <= 0 &&
         (endMissionTime[0] > 0 || endMissionTime[1] > 0)
       ) {
-        dispatch(updateMission(temp));
+        dispatch(updateTodayMission(temp));
       }
       // 공간 조건 확인: 안 미션은 안에 있을 때, 이동 미션은 밖에 있을 때
       else if (
         (props.mission.type == 'IN_PLACE' && distance < range) ||
         (props.mission.type == 'MOVE_PLACE' && distance > range)
       ) {
-        dispatch(updateMission(temp));
+        dispatch(updateTodayMission(temp));
       }
     }
     //start -> over(정상 종료)
@@ -134,14 +139,14 @@ function MissionBox(props) {
         endMissionTime[0] <= 0 &&
         endMissionTime[1] <= 0
       ) {
-        dispatch(updateMission(temp));
+        dispatch(updateTodayMission(temp));
       }
       //공간 조건 확인: 안 미션은 벗어날 때, 이동 미션은 들어올 때
       else if (
         (props.mission.type == 'IN_PLACE' && distance > range) ||
         (props.mission.type == 'MOVE_PLACE' && distance < range)
       ) {
-        dispatch(updateMission(temp));
+        dispatch(updateTodayMission(temp));
       }
     }
     // over -> start
@@ -157,7 +162,7 @@ function MissionBox(props) {
         (props.mission.type == 'IN_PLACE' && distance < range) ||
         (props.mission.type == 'MOVE_PLACE' && distance > range)
       ) {
-        dispatch(updateMission(temp));
+        dispatch(updateTodayMission(temp));
       }
     }
   }, [leftTime, currentLocation]);
@@ -367,7 +372,7 @@ function MissionBox(props) {
                   {
                     text: '포기',
                     onPress: () => {
-                      dispatch(updateMission(temp));
+                      dispatch(updateTodayMission(temp));
                     },
                   },
                   {

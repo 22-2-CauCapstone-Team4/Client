@@ -11,6 +11,8 @@ import {
   mkTodayMissionRealmObjToObj,
   mkTodayMissions,
   readTodayMissions,
+  getTodayMission,
+  isTodayMission,
 } from './Mission';
 
 import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
@@ -33,8 +35,10 @@ module.exports = {
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
   mkTodayMissionRealmObjToObj,
+  isTodayMission,
   mkTodayMissionsInRealm: mkTodayMissions,
   readTodayMissionsInRealm: readTodayMissions,
+  getTodayMissionInRealm: getTodayMission,
   readUsageInRealm: readUsage,
   readAppSecInRealm: readAppSec,
   readAppCntInRealm: readAppCnt,

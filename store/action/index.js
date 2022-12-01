@@ -63,6 +63,42 @@ export const selectMission = item => {
   };
 };
 
+// TODAY MISSION
+export const initTodayMission = item => {
+  return {
+    type: 'INIT_TODAY_MISSION',
+    payload: item,
+  };
+};
+
+export const addTodayMission = item => {
+  return {
+    type: 'ADD_TODAY_MISSION',
+    payload: item,
+  };
+};
+
+export const deleteTodayMission = items => {
+  return {
+    type: 'DELETE_TODAY_MISSION',
+    payload: items,
+  };
+};
+
+export const updateTodayMission = items => {
+  return {
+    type: 'UPDATE_TODAY_MISSION',
+    payload: items,
+  };
+};
+
+export const selectTodayMission = item => {
+  return {
+    type: 'SELECT_TODAY_MISSION',
+    payload: item,
+  };
+};
+
 //친구
 export const addFriend = item => {
   return {

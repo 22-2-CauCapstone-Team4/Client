@@ -22,6 +22,8 @@ import {
   mkTodayMissionRealmObjToObj,
   mkTodayMissionsInRealm,
   readTodayMissionsInRealm,
+  getTodayMissionInRealm,
+  isTodayMission,
 } from './crud';
 import {
   appCheckHeadlessTask,
@@ -54,6 +56,8 @@ module.exports = {
   mkTodayMissionRealmObjToObj,
   mkTodayMissionsInRealm,
   readTodayMissionsInRealm,
+  getTodayMissionInRealm,
+  isTodayMission,
   readUsageInRealm,
   readAppSecInRealm,
   readAppCntInRealm,

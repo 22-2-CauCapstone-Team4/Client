@@ -34,6 +34,7 @@ import {
   initCategory,
   initMission,
   initPlace,
+  initTodayMission,
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
@@ -131,14 +132,21 @@ function Detail({navigation}) {
       // );
       dispatch(
         initMission(
-          tempMissions.map(mission => ({
-            ...mkMissionRealmObjToObj(mission),
-            state: 'none',
-          })),
+          tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
         ),
       );
 
-      // *TODO : 오늘 미션 리듀서 추가
+      dispatch(
+        initTodayMission(
+          tempTodayMissions.map(mission =>
+            mkTodayMissionRealmObjToObj(mission),
+          ),
+        ),
+      );
+      console.log(
+        '오늘 미션!!!',
+        tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),
+      );
       // console.log(
       //   '테스트',
       //   tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),

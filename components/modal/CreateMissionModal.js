@@ -20,13 +20,19 @@ import SelectDropdown from 'react-native-select-dropdown';
 import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
-import {addMission} from '../../store/action';
-import {createMissionInRealm, mkMissionObjToRealmObj} from '../../functions';
+import {addMission, addTodayMission} from '../../store/action';
+import {
+  createMissionInRealm,
+  mkMissionObjToRealmObj,
+  isTodayMission,
+  mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  getTodayMissionInRealm,
+} from '../../functions';
 import {TodayMission, Mission, Goal, Place} from '../../schema';
 import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
 import Realm from 'realm';
-import {mkMissionRealmObjToObj} from '../../functions/crud/Mission';
 import {withTheme} from 'styled-components';
 export default function CreateMissionModal({
   navigation,
@@ -600,19 +606,37 @@ export default function CreateMissionModal({
                         });
 
                         dispatch(addMission(mkMissionRealmObjToObj(mission)));
+
                         setLockingType(false);
                         setModalVisible(!modalVisible);
 
-                        const realm = await Realm.open(
+                        console.log('?');
+                        Realm.open(
                           mkConfig(user, [
                             TodayMission.schema,
                             Mission.schema,
                             Goal.schema,
                             Place.schema,
                           ]),
-                        );
-                        await createMissionInRealm(user, realm, mission);
-                        realm.close();
+                        ).then(async realm => {
+                          await createMissionInRealm(user, realm, mission);
+                          if (isTodayMission(mission)) {
+                            dispatch(
+                              addTodayMission(
+                                mkTodayMissionRealmObjToObj(
+                                  await getTodayMissionInRealm(
+                                    user,
+                                    realm,
+                                    mission,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          realm.close();
+                        });
+
                         SnackBar.show({
                           text: '미션 생성이 완료되었습니다. ',
                           duration: SnackBar.LENGTH_SHORT,
