@@ -11,6 +11,11 @@ class CurState {
     endAppTime,
     startPhoneTime,
     endPhoneTime,
+    isNowDoingMission,
+    missionStartTime,
+    isNowGivingUp,
+    lastBreaktime,
+    mission,
   }) {
     this._id = id;
     this.owner_id = owner_id;
@@ -21,6 +26,11 @@ class CurState {
     if (endAppTime) this.endTime = endAppTime;
     if (startPhoneTime) this.startTime = startPhoneTime;
     if (endPhoneTime) this.endTime = endPhoneTime;
+    if (isNowDoingMission) this.isNowDoingMission = isNowDoingMission;
+    if (missionStartTime) this.missionStartTime = missionStartTime;
+    if (isNowGivingUp) this.isNowGivingUp = isNowGivingUp;
+    if (lastBreaktime) this.lastBreaktime = lastBreaktime;
+    if (mission) this.mission = mission;
   }
 
   static schema = {
@@ -35,6 +45,11 @@ class CurState {
       endAppTime: {type: 'date?'},
       startPhoneTime: {type: 'date?'},
       endPhoneTime: {type: 'date?'},
+      isNowDoingMission: {type: 'bool', default: false},
+      missionStartTime: {type: 'date?'},
+      isNowGivingUp: {type: 'bool', default: false},
+      lastBreaktime: 'date?',
+      mission: 'Mission?',
     },
     primaryKey: '_id',
   };

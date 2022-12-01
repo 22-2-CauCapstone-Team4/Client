@@ -8,12 +8,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class MissionSetterModule extends ReactContextBaseJavaModule {
     private static AlarmManager alarmManager = null;
@@ -42,19 +49,35 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
         // test code
 //        calendar.set(Calendar.MINUTE, 1);
 
-        setTime(bundle, calendar);
+        setTime(bundle, calendar, 0);
     }
 
     @ReactMethod
-    public void setMission() {
-        // *TODO : 오늘 미션 정보 받아서 여기 넣기
+    public void setTimeMission(int hour, int min, String id, int code) {
+        Log.i("MissionSetterModule", "시간 알람 세팅 시작, id = " + id + ", 시간 = " + hour + ":" + min);
+
+        Date date = new Date(); // 현재 시간
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("isTime", true);
+        bundle.putString("id", id);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        setTime(bundle, calendar, code);
     }
 
-    private void setTime(Bundle bundle, Calendar calendar) {
+    private void setTime(Bundle bundle, Calendar calendar, int code) {
         Log.i("MissionSetterModule", "알람 설정");
 
         ReactApplicationContext context = getReactApplicationContext();
@@ -64,7 +87,7 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
         Intent intent = new Intent(context, TimePlaceReceiver.class);
         intent.putExtras(bundle);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, code, intent, PendingIntent.FLAG_IMMUTABLE);
 
         if (Build.VERSION.SDK_INT >= 23) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);

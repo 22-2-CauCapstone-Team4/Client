@@ -221,14 +221,14 @@ const readMissions = async (user, realm) => {
   return result;
 };
 
-const getTodayMission = async (user, realm, mission) => {
+const getTodayMission = async (user, realm, missionId) => {
   console.log('read a specific today mission');
   let result = null;
 
   try {
     result = realm
       .objects('TodayMission')
-      .filtered(`mission._id == oid(${mission._id})`);
+      .filtered(`mission._id == oid(${missionId})`);
 
     // console.log(result);
     result = JSON.parse(JSON.stringify(result[0]));

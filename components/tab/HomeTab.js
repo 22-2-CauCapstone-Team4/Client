@@ -76,6 +76,7 @@ const HomeTab = ({navigation}) => {
             </View>
 
             {todayTimeMission.map(mission => {
+              // console.log(mission, mission.id);
               return (
                 <MissionBox key={mission.id} mission={mission}></MissionBox>
               );

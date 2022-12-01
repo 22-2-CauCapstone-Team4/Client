@@ -3,6 +3,7 @@ package com.sub;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.facebook.react.HeadlessJsTaskService;
@@ -31,8 +32,15 @@ public class TimePlaceReceiver extends BroadcastReceiver {
 
                 // *TODO : 다음 날 12시에 다시 예약
             } else {
-                // *TODO : 내용 뽑아오기
-                // *TODO : headless로 전달
+                Log.i("TimePlaceReceiver", "미션 알람 받음");
+
+                String id = intent.getStringExtra("id");
+
+                Intent missionIntent = new Intent(context, MissionEventService.class);
+                missionIntent.putExtra("id", id);
+
+                context.startService(missionIntent);
+                HeadlessJsTaskService.acquireWakeLockNow(context);
             }
         } else if (isPlace) {
             // *TODO : 내용 뽑아오기

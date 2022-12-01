@@ -122,7 +122,7 @@ function MissionBox(props) {
       isEnabled &&
       missionData.filter(item => item.state === 'start').length == 0
     ) {
-      temp[temp.map(item => item.id).indexOf(props.mission.id)] = {
+      const temp = {
         ...props.mission,
         state: 'start',
       };
@@ -146,7 +146,7 @@ function MissionBox(props) {
     //start -> quit는 포기 버튼 onPress에서 따로 처리됨
     //조건: {시간: 종료 시간까지 채움, 공간: 공간에서 벗어남(IN_PLACE) or 들어옴(MOVE_PLACE)}
     else if (props.mission.state === 'start') {
-      temp[temp.map(item => item.id).indexOf(props.mission.id)] = {
+      temp = {
         ...props.mission,
         state: 'over',
       };
@@ -170,7 +170,7 @@ function MissionBox(props) {
     // 공간 미션이 끝났는데 또 조건 만족하면 발동
     // 시간 미션은 종료 시간이 정해져 있으니까 그대로 over로 유지된다 (검사 자체를 안 함)
     else if (props.mission.state === 'over') {
-      temp[temp.map(item => item.id).indexOf(props.mission.id)] = {
+      temp = {
         ...props.mission,
         state: 'start',
       };
@@ -380,8 +380,7 @@ function MissionBox(props) {
             <TouchableOpacity
               style={styles.quitBtn}
               onPress={() => {
-                let temp = missionData.slice();
-                temp[temp.map(item => item.id).indexOf(props.mission.id)] = {
+                const temp = {
                   ...props.mission,
                   state: 'quit',
                 };

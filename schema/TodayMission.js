@@ -11,7 +11,7 @@ class TodayMission {
   static STATE = {
     NONE: 'none',
     START: 'start',
-    END: 'end',
+    OVER: 'over',
     QUIT: 'quit',
   };
 

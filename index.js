@@ -10,7 +10,7 @@ import {
   appCheckHeadlessTask,
   startServiceTask,
   everyMidnightTask,
-  // acceptMissionTriggerTask,
+  acceptMissionTriggerTask,
   mkConfig,
   readProhibitedAppsInRealm,
 } from './functions';
@@ -21,7 +21,6 @@ import {ProhibitedApp} from './schema';
 AppRegistry.registerComponent(appName, () => App);
 
 AppRegistry.registerHeadlessTask('Boot', () => startServiceTask);
-// AppRegistry.registerHeadlessTask('MissionTrigger', () => acceptMissionTriggerTask);
 
 const app = getRealmApp();
 const user = app.currentUser;
@@ -36,6 +35,9 @@ if (user !== null && user.providerType === 'local-userpass') {
     );
     AppRegistry.registerHeadlessTask('Midnight', () =>
       everyMidnightTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('MissionTrigger', () =>
+      acceptMissionTriggerTask.bind(null, user),
     );
 
     const prohibitedApps = await readProhibitedAppsInRealm(user, realm);

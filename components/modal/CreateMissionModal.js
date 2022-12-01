@@ -34,6 +34,8 @@ import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
 import Realm from 'realm';
 import {withTheme} from 'styled-components';
+import {MissionSetterModule} from '../../wrap_module';
+
 export default function CreateMissionModal({
   navigation,
   modalVisible,
@@ -626,10 +628,18 @@ export default function CreateMissionModal({
                                   await getTodayMissionInRealm(
                                     user,
                                     realm,
-                                    mission,
+                                    mission._id,
                                   ),
                                 ),
                               ),
+                            );
+
+                            // 예약 설정
+                            MissionSetterModule.setTimeMission(
+                              parseInt(mission.startTime / 60),
+                              mission.startTime % 60,
+                              mission._id.toString(),
+                              parseInt(Math.random() * 10000000),
                             );
                           }
 

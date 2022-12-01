@@ -2,8 +2,13 @@ import React, {useContext, useState, useEffect} from 'react';
 import {AppRegistry} from 'react-native';
 import Realm from 'realm';
 import {CurState} from '../schema';
-import {mkConfigWithSubscriptions} from '../functions';
-import {appCheckHeadlessTask} from '../functions';
+import {} from '../functions';
+import {
+  mkConfigWithSubscriptions,
+  appCheckHeadlessTask,
+  everyMidnightTask,
+  acceptMissionTriggerTask,
+} from '../functions';
 import {app} from '../index';
 import {ForegroundServiceModule} from '../wrap_module';
 import {Goal} from '../schema/Goal';
@@ -44,6 +49,12 @@ const AuthProvider = ({children}) => {
 
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
+    );
+    AppRegistry.registerHeadlessTask('Midnight', () =>
+      everyMidnightTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('MissionTrigger', () =>
+      acceptMissionTriggerTask.bind(null, user),
     );
 
     setUser(newUser);
@@ -104,6 +115,9 @@ const AuthProvider = ({children}) => {
       );
     });
 
+    console.log('닫기');
+    realm.close();
+
     // remember to unregister the progress notifications
     // syncSession.removeProgressNotification((transferred, transferable) => {
     //   console.log(`There was ${transferable} total transferable bytes`);
@@ -113,9 +127,12 @@ const AuthProvider = ({children}) => {
     AppRegistry.registerHeadlessTask('CheckApp', () =>
       appCheckHeadlessTask.bind(null, newUser),
     );
-
-    console.log('닫기');
-    realm.close();
+    AppRegistry.registerHeadlessTask('Midnight', () =>
+      everyMidnightTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('MissionTrigger', () =>
+      acceptMissionTriggerTask.bind(null, user),
+    );
 
     setUser(newUser);
     return newUser;
