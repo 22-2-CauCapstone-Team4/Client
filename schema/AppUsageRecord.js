@@ -6,6 +6,7 @@ class AppUsageRecord {
     owner_id,
     appPackageName,
     appName,
+    type = AppUsageRecord.TYPE.NORMAL,
     date,
     hour,
     usageSec,
@@ -21,6 +22,12 @@ class AppUsageRecord {
     this.clickCnt = clickCnt;
   }
 
+  static TYPE = {
+    DEFAULT: 'DEFAULT',
+    MISSION: 'MISSION',
+    GIVE_UP: 'GIVE_UP',
+  };
+
   static schema = {
     name: 'AppUsageRecord',
     properties: {
@@ -28,6 +35,7 @@ class AppUsageRecord {
       owner_id: 'string',
       appPackageName: {type: 'string', indexed: true},
       appName: {type: 'string'},
+      type: {type: 'string?'},
       date: {type: 'date', indexed: true},
       hour: 'int',
       usageSec: {type: 'int', default: 0},

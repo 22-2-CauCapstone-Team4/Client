@@ -98,7 +98,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
             : 60 * 60 * 60 -
               parseInt(moment(curState.startPhoneTime).diff(startDate) / 1000);
 
-        console.log(days, startDate, endDate, startSec);
+        // console.log(days, startDate, endDate, startSec);
 
         // 시간 기록
         // 시작 날짜
@@ -107,7 +107,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
           .filtered(
             `date == ${moment(startDate)
               .utc()
-              .format('YYYY-MM-DD@HH:mm:ss')}:0`,
+              .format('YYYY-MM-DD@HH:mm:ss')}:0 && type == "${type}"`,
           );
         // 1. 기록 없는 경우, 생성
         if (todayRecord.length === 0) {
@@ -117,6 +117,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
               owner_id: user.id,
               date: startDate,
               usageSec: startSec,
+              type,
             }),
           );
         }
@@ -147,11 +148,18 @@ const appCheckHeadlessTask = async (user, taskData) => {
               owner_id: user.id,
               date: endDate,
               usageSec: endSec,
+              type,
             }),
           );
         }
       }
     });
+
+    const type = curState.isNowDoingMission
+      ? PhoneUsageRecord.isNowGivingUp
+        ? PhoneUsageRecord.TYPE.GIVE_UP
+        : PhoneUsageRecord.TYPE.MISSION
+      : PhoneUsageRecord.TYPE.DEFAULT;
 
     console.log(
       '1. CurState 업데이트 완료',
@@ -177,7 +185,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
               todayMidnight,
             )
               .utc()
-              .format('YYYY-MM-DD@HH:mm:ss')}:0 && hour == ${hour}`,
+              .format(
+                'YYYY-MM-DD@HH:mm:ss',
+              )}:0 && hour == ${hour} && type == "${type}"`,
           );
         const startRecordObj = startRecord.map(realmObj =>
           JSON.parse(JSON.stringify(realmObj)),
@@ -193,7 +203,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
         if (
           startRecordObj.length === 0 ||
           !moment(todayMidnight).isSame(startRecordObj[0].date) ||
-          startRecordObj[0].hour !== hour
+          startRecordObj[0].hour !== hour ||
+          startRecordObj[0].type !== type
         ) {
           // 현 시간에 대한 기록 없는 경우, 생성
           realm.create(
@@ -204,6 +215,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
               appName,
               date: todayMidnight,
               hour,
+              type,
               clickCnt: 1,
             }),
           );
@@ -255,7 +267,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
                 startDate,
               )
                 .utc()
-                .format('YYYY-MM-DD@HH:mm:ss')}:0 && hour == ${hour}`,
+                .format(
+                  'YYYY-MM-DD@HH:mm:ss',
+                )}:0 && hour == ${hour} && type == "${type}"`,
             );
 
           // 기록 1개가 아니면 err
@@ -285,7 +299,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
               curState.endAppTime.getSeconds();
 
           const tempDate = moment(startDate);
-          console.log(startSec, endSec);
+          // console.log(startSec, endSec);
 
           outer: for (
             let dayCnt = 0;
@@ -313,7 +327,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
                       tempDate,
                     )
                       .utc()
-                      .format('YYYY-MM-DD@HH:mm:ss')}:0 && hour == ${tempHour}`,
+                      .format(
+                        'YYYY-MM-DD@HH:mm:ss',
+                      )}:0 && hour == ${tempHour} && type == "${type}"`,
                   );
 
                 // 기록 1개가 아니면 err
@@ -346,6 +362,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                     appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
+                    type,
                     usageSec: endSec,
                   }),
                 );
@@ -365,6 +382,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                     appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
+                    type,
                     usageSec: 60 * 60,
                   }),
                 );
@@ -375,19 +393,27 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
         console.log('3. AppUsageRecord 종료 기록');
       }
+
+      // 앱 실행 코드 추가
+      // console.log(isProhibitedApp, curState.isNowDoingMission);
+      if (isProhibitedApp && curState.isNowDoingMission) {
+        try {
+          LockAppModule.viewLockScreen(
+            curState.mission.goal.name,
+            curState.mission.name,
+            5,
+            1540,
+            643, // test int
+            // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+          );
+        } catch (err) {
+          console.error(err.message);
+        }
+      }
     });
 
     // Realm 작업 끝
     realm.close();
-
-    // 앱 실행 코드 추가
-    if (isProhibitedApp) {
-      try {
-        await LockAppModule.viewLockScreen();
-      } catch (err) {
-        console.error(err.message);
-      }
-    }
 
     console.log('appCheckHeadlessTask 완료');
   } catch (err) {

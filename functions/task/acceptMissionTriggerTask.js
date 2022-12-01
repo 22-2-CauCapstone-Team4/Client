@@ -31,7 +31,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
       // console.log(JSON.parse(JSON.stringify(curState)), mission.name);
       if (
         todayMission.state === TodayMission.STATE.NONE &&
-        curState.isNowDoingMission
+        !curState.isNowDoingMission
       ) {
         // 미션 수행
         console.log(mission.name, '미션 시작');
@@ -73,6 +73,8 @@ const acceptMissionTriggerTask = async (user, taskData) => {
     console.log(err.message);
     if (realm !== null) realm.close();
   }
+
+  console.log('acceptMissionTriggerTask 완료');
 };
 
 export {acceptMissionTriggerTask};

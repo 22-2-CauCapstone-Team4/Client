@@ -188,6 +188,7 @@ public class ForegroundService extends Service {
 
                 String JsonAppListStr = intent.getExtras().getString("appList");
                 if (JsonAppListStr != null) {
+                    // *TODO : 여기서 콘솔 찍어봐서 오류 찾기
                     prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
                 }
             }
