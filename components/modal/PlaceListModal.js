@@ -15,10 +15,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../../utils/Colors';
 import {styles} from '../../utils/styles';
 import {useAuth} from '../../providers/AuthProvider';
-import {deletePlace, deleteMission} from '../../store/action/index';
+import {
+  deletePlace,
+  deleteMission,
+  deleteTodayMission,
+} from '../../store/action/index';
 import {deletePlaceInRealm} from '../../functions';
 import {mkConfig} from '../../functions/mkConfig';
-import {Place, Mission, Goal} from '../../schema';
+import {Place, Mission, Goal, TodayMission} from '../../schema';
 import Realm from 'realm';
 
 export default function PlaceListModal({
@@ -30,6 +34,9 @@ export default function PlaceListModal({
   const dispatch = useDispatch();
   const place = useSelector(store => store.placeReducer.data);
   const mission = useSelector(store => store.missionReducer.missionData);
+  const todayMission = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
   const placesNumber = place.length;
   // console.log(place);
   return (
@@ -70,6 +77,7 @@ export default function PlaceListModal({
                                     mkConfig(user, [
                                       Place.schema,
                                       Mission.schema,
+                                      TodayMission.schema,
                                       Goal.schema,
                                     ]),
                                   ).then(async realm => {
@@ -86,6 +94,14 @@ export default function PlaceListModal({
                                   dispatch(
                                     deleteMission(
                                       mission.filter(
+                                        el => el.space !== item.name,
+                                      ),
+                                    ),
+                                  );
+                                  // 오늘의 미션 삭제
+                                  dispatch(
+                                    deleteTodayMission(
+                                      todayMission.filter(
                                         el => el.space !== item.name,
                                       ),
                                     ),

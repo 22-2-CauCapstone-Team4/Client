@@ -88,6 +88,12 @@ const deletePlace = async (user, realm, place) => {
       const deletedMissions = realm
         .objects('Mission')
         .filtered(`place._id == oid(${place._id})`);
+      deletedMissions.forEach(ele => {
+        const tempToday = realm
+          .objects('TodayMission')
+          .filtered(`mission._id == oid(${ele._id})`)[0];
+        realm.delete(tempToday);
+      });
 
       realm.delete(deletedPlace);
       realm.delete(deletedMissions);

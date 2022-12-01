@@ -15,10 +15,11 @@ import {
   deleteCategory,
   selectCategory,
   deleteMission,
+  deleteTodayMission,
 } from '../store/action';
 import Colors from '../utils/Colors';
 import {useAuth} from '../providers/AuthProvider';
-import {Goal, Mission, Place} from '../schema';
+import {Goal, Mission, Place, TodayMission} from '../schema';
 import {createGoalInRealm, deleteGoalInRealm} from '../functions';
 import {mkConfig} from '../functions/mkConfig';
 import Realm from 'realm';
@@ -63,6 +64,10 @@ export default function Categories() {
   const data = useSelector(store => store.categoryReducer.data); // 카테고리 데이터
   const now = useSelector(store => store.categoryReducer.filter);
   const mission = useSelector(store => store.missionReducer.missionData);
+  const todayMission = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
+
   const [categoryText, setCategoryText] = useState('');
   const createCategory = () => {
     if (categoryText !== '') {
@@ -121,6 +126,7 @@ export default function Categories() {
                           mkConfig(user, [
                             Goal.schema,
                             Mission.schema,
+                            TodayMission.schema,
                             Place.schema,
                           ]),
                         ).then(async realm => {
@@ -131,6 +137,13 @@ export default function Categories() {
                         dispatch(
                           deleteMission(
                             mission.filter(el => el.category !== item.name),
+                          ),
+                        );
+                        dispatch(
+                          deleteTodayMission(
+                            todayMission.filter(
+                              el => el.category !== item.name,
+                            ),
                           ),
                         );
                         dispatch(
