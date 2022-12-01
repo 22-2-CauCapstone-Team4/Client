@@ -16,6 +16,10 @@ import Colors from '../../utils/Colors';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
 import {updateTodayMission} from '../../store/action';
 import {getDistance} from '../../functions/space';
+import {mkConfig, toggleMissionActiveInRealm} from '../../functions';
+import {TodayMission, Mission, Place, Goal} from '../../schema';
+import Realm from 'realm';
+import {useAuth} from '../../providers/AuthProvider';
 
 /*
 README 11.27
@@ -43,14 +47,27 @@ quit: 중도 포기한 상태, 포기한 미션은 재시작이 불가능하다.
 */
 
 function MissionBox(props) {
+  const {user} = useAuth();
+
   const dispatch = useDispatch();
   // console.log(userState);
-  //console.log('미션 정보', props.mission);
+  // console.log('미션 정보', props.mission);
   const [isEnabled, setIsEnabled] = useState(props.mission.isActive);
   const toggleSwitch = () => {
-    setIsEnabled(previousState => !previousState);
-    // *TODO : toggle update
-    // *TODO : 오늘의 미션 삭제 안 되는 문제 해결
+    Realm.open(
+      mkConfig(user, [
+        TodayMission.schema,
+        Mission.schema,
+        Place.schema,
+        Goal.schema,
+      ]),
+    ).then(async realm => {
+      await toggleMissionActiveInRealm(user, realm, props.mission.id);
+      dispatch(updateTodayMission({...props.mission, isActive: !isEnabled}));
+      realm.close();
+    });
+
+    setIsEnabled(!isEnabled);
   };
   //TIME
   const [leftTime, setLeftTime] = useState(

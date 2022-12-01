@@ -4,7 +4,7 @@ import {readPlaces, createPlace, updatePlace, deletePlace} from './Place';
 import {
   readMissions,
   createMission,
-  updateMission,
+  toggleMissionActive,
   deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
@@ -30,7 +30,7 @@ module.exports = {
   deletePlaceInRealm: deletePlace,
   readMissionsInRealm: readMissions,
   createMissionInRealm: createMission,
-  updateMissionInRealm: updateMission,
+  toggleMissionActiveInRealm: toggleMissionActive,
   deleteMissionInRealm: deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,

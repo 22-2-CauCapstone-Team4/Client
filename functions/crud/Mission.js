@@ -118,6 +118,7 @@ const mkMissionRealmObjToObj = mission => {
       endTime: `${parseInt(mission.endTime / 60)}:${mission.endTime % 60}`,
     },
     dayOfWeek: dayOfWeekArr, // ＠ 요일 데이터,
+    isActive: mission.isActive,
   };
 
   if (mission.place) tempObj.space = mission.place.name;
@@ -299,40 +300,25 @@ const createMission = async (user, realm, mission) => {
   return result;
 };
 
-const updateMission = async (user, realm, mission) => {
+const toggleMissionActive = async (user, realm, missionId) => {
   console.log('update mission');
   let result = null;
 
   try {
     console.log('쓰기 시작');
     realm.write(() => {
-      const oldMission = realm
+      const newMission = realm
         .objects('Mission')
-        .filtered(`_id == oid(${mission._id})`)[0];
-      const oldMissionObj = JSON.parse(JSON.stringify(oldMission));
+        .filtered(`_id == oid(${missionId})`)[0];
 
-      const newMission = new Mission({
-        ...oldMissionObj,
-        id: oldMission._id,
-        ...mission,
-      });
-
-      realm.delete(oldMission);
-      realm.create('Mission', newMission);
+      newMission.isActive = !newMission.isActive;
 
       if (isTodayMission(newMission)) {
-        const oldTodayMission = realm
+        const newTodayMission = realm
           .objects('TodayMission')
-          .filtered(`mission._id == oid(${mission._id})`)[0];
-        const oldTodayMissionObj = JSON.parse(JSON.stringify(oldTodayMission));
+          .filtered(`mission._id == oid(${missionId})`)[0];
 
-        const newTodayMission = new TodayMission({
-          ...oldTodayMissionObj,
-          mission: newMission,
-        });
-
-        realm.delete(oldTodayMission);
-        realm.create('TodayMission', newTodayMission);
+        newTodayMission.mission = newMission;
       }
 
       result = JSON.parse(JSON.stringify(newMission));
@@ -387,7 +373,7 @@ const deleteMission = async (user, realm, missionId) => {
 export {
   readMissions,
   createMission,
-  updateMission,
+  toggleMissionActive,
   deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,

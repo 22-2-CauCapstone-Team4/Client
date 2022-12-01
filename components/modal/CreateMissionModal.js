@@ -610,7 +610,6 @@ export default function CreateMissionModal({
                         setLockingType(false);
                         setModalVisible(!modalVisible);
 
-                        console.log('?');
                         Realm.open(
                           mkConfig(user, [
                             TodayMission.schema,

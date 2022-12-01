@@ -112,23 +112,9 @@ function Detail({navigation}) {
       setBlockedApps(tempBlockedApps);
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
-      console.log(
-        '미션',
-        tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
-      );
-      //
       // console.log(
-      //   '상태가 있는 미션',
-      //   tempMissions.map(mission => ({
-      //     ...mkMissionRealmObjToObj(mission),
-      //     state: 'none',
-      //   })),
-      // );
-      //
-      // dispatch(
-      //   initMission(
-      //     tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
-      //   ),
+      //   '미션',
+      //   tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
       // );
       dispatch(
         initMission(
@@ -143,12 +129,8 @@ function Detail({navigation}) {
           ),
         ),
       );
-      console.log(
-        '오늘 미션!!!',
-        tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),
-      );
       // console.log(
-      //   '테스트',
+      //   '오늘 미션!!!',
       //   tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),
       // );
       console.log('불러오기 완료');
