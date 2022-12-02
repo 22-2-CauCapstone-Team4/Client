@@ -1,5 +1,6 @@
 /* eslint-disable curly */
-import {Mission} from '../../schema/Mission';
+import {Mission, TodayMission} from '../../schema';
+import moment from 'moment';
 
 // db 저장용 객체 생성
 const mkMissionObjToRealmObj = ({
@@ -59,15 +60,28 @@ const mkMissionObjToRealmObj = ({
   return mission;
 };
 
-// time: {
-//       // 시작시간, 종료시간
-//       startTime: `${mission.startTime / 60}:${mission.startTime % 60}`,
-//       endTime: `${mission.endTime / 60}:${mission.endTime % 60}`,
-//     },
+const mkTodayMissionRealmObjToObj = todayMission => {
+  const mission = mkMissionRealmObjToObj(todayMission.mission);
+  delete todayMission.mission;
+  // console.log({...todayMission, ...mission});
+  return {...todayMission, ...mission};
+};
+
+const isTodayMission = mission => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return (
+    (!mission.isRepeated &&
+      mission.date &&
+      moment(today).isSame(mission.date)) ||
+    (mission.isRepeated &&
+      mission.dayOfTheWeek &&
+      mission.dayOfTheWeek & (1 << today.getDay()))
+  );
+};
 
 const mkMissionRealmObjToObj = mission => {
-  const date = new Date(mission.date);
-
   let dayOfWeekArr = [];
   for (let i = 0; i < 7; i++) {
     if (mission.dayOfTheWeek & (1 << i)) {
@@ -104,6 +118,7 @@ const mkMissionRealmObjToObj = mission => {
       endTime: `${parseInt(mission.endTime / 60)}:${mission.endTime % 60}`,
     },
     dayOfWeek: dayOfWeekArr, // ＠ 요일 데이터,
+    isActive: mission.isActive,
   };
 
   if (mission.place) tempObj.space = mission.place.name;
@@ -111,12 +126,79 @@ const mkMissionRealmObjToObj = mission => {
     tempObj.dayOfWeek = dayOfWeekArr;
     tempObj.date = dayOfWeekStr;
   } else {
+    const date = new Date(mission.date);
     tempObj.date = `${date.getFullYear()}-${
       date.getMonth() + 1
     }-${date.getDate()}`; // 년, 월, 일
   }
 
   return tempObj;
+};
+
+const mkTodayMissions = async (user, realm) => {
+  console.log('mk today missions');
+  let result = null;
+
+  try {
+    // 0. 그전에 기록한 오늘의 미션 전부 삭제
+    realm.write(() => {
+      realm.delete(realm.objects('TodayMission'));
+    });
+
+    // 1. 모든 미션 읽어오기
+    const allMissions = realm.objects('Mission');
+
+    // 2. 오늘의 미션만 가져오기
+    const todayMissions = allMissions.filter(mission =>
+      isTodayMission(mission),
+    );
+    // console.log(todayMissions);
+
+    // 저장
+    result = [];
+    realm.write(() => {
+      todayMissions.forEach(mission => {
+        const temp = new TodayMission({
+          owner_id: user.id,
+          state: TodayMission.STATE.NONE,
+          mission,
+        });
+        // console.log(temp);
+
+        realm.create('TodayMission', temp);
+        result.push(temp);
+      });
+    });
+  } catch (err) {
+    console.log(err);
+
+    if (realm !== null) {
+      realm.close();
+    }
+  }
+
+  console.log('오늘의 미션 생성 결과', result);
+  return result;
+};
+
+const readTodayMissions = async (user, realm) => {
+  console.log('read my today missions');
+  let result = null;
+
+  try {
+    const list = realm.objects('TodayMission');
+
+    result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    console.log('읽기 결과', result);
+  } catch (err) {
+    console.log(err.message);
+
+    if (realm !== null) {
+      realm.close();
+    }
+  }
+
+  return result;
 };
 
 const readMissions = async (user, realm) => {
@@ -127,6 +209,29 @@ const readMissions = async (user, realm) => {
     const list = realm.objects('Mission').filtered(`owner_id == "${user.id}"`);
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    console.log('읽기 결과', result);
+  } catch (err) {
+    console.log(err.message);
+
+    if (realm !== null) {
+      realm.close();
+    }
+  }
+
+  return result;
+};
+
+const getTodayMission = async (user, realm, missionId) => {
+  console.log('read a specific today mission');
+  let result = null;
+
+  try {
+    result = realm
+      .objects('TodayMission')
+      .filtered(`mission._id == oid(${missionId})`);
+
+    // console.log(result);
+    result = JSON.parse(JSON.stringify(result[0]));
     console.log('읽기 결과', result);
   } catch (err) {
     console.log(err.message);
@@ -151,7 +256,7 @@ const createMission = async (user, realm, mission) => {
     goal = realm.objects('Goal').filtered(`_id == oid(${mission.goal._id})`);
     goal = goal[0];
 
-    console.log(mission.type);
+    // console.log(mission.type);
     if (mission.type !== Mission.TYPE.TIME) {
       place = realm
         .objects('Place')
@@ -159,14 +264,27 @@ const createMission = async (user, realm, mission) => {
       place = place[0];
     }
 
-    console.log('쓰기 시작');
+    if (mission.type !== Mission.TYPE.TIME) mission.place = place;
+    const missionObj = {
+      ...mission,
+      goal,
+    };
 
+    console.log('쓰기 시작');
     realm.write(() => {
-      if (mission.type !== Mission.TYPE.TIME) mission.place = place;
-      const newMission = realm.create('Mission', {
-        ...mission,
-        goal,
-      });
+      const newMission = realm.create('Mission', missionObj);
+      if (isTodayMission(newMission)) {
+        // 오늘의 미션인 경우, TodayMission에도 추가 필요
+        // 렐름 obj로 넣어주지 않으면, 새로 생성하는 것으로 취급하게 되는듯 -> id 중복 오류 뜨게 됨
+        realm.create(
+          'TodayMission',
+          new TodayMission({
+            owner_id: user.id,
+            state: TodayMission.STATE.NONE,
+            mission: newMission,
+          }),
+        );
+      }
       result = JSON.parse(JSON.stringify(newMission));
     });
 
@@ -182,23 +300,26 @@ const createMission = async (user, realm, mission) => {
   return result;
 };
 
-const updateMission = async (user, realm, mission) => {
+const toggleMissionActive = async (user, realm, missionId) => {
   console.log('update mission');
   let result = null;
 
   try {
     console.log('쓰기 시작');
     realm.write(() => {
-      let oldMission = realm
+      const newMission = realm
         .objects('Mission')
-        .filtered(`_id == oid(${mission._id})`);
-      oldMission = JSON.parse(JSON.stringify(oldMission));
+        .filtered(`_id == oid(${missionId})`)[0];
 
-      let newMission;
-      realm.create(
-        () => (newMission = new Mission({...oldMission, ...mission})),
-      );
-      realm.delete(oldMission);
+      newMission.isActive = !newMission.isActive;
+
+      if (isTodayMission(newMission)) {
+        const newTodayMission = realm
+          .objects('TodayMission')
+          .filtered(`mission._id == oid(${missionId})`)[0];
+
+        newTodayMission.mission = newMission;
+      }
 
       result = JSON.parse(JSON.stringify(newMission));
     });
@@ -216,18 +337,26 @@ const updateMission = async (user, realm, mission) => {
 };
 
 const deleteMission = async (user, realm, missionId) => {
-  console.log('delete goal');
+  console.log('delete mission');
 
   try {
     const deletedMission = realm
       .objects('Mission')
-      .filtered(`_id == oid(${missionId})`);
+      .filtered(`_id == oid(${missionId})`)[0];
 
     console.log('읽기 결과', JSON.parse(JSON.stringify(deletedMission)));
 
     console.log('쓰기 시작');
     realm.write(() => {
       // 이번에 삭제된 값 삭제
+      if (isTodayMission(deletedMission)) {
+        console.log('오늘 미션 함께 삭제');
+        const todayMission = realm
+          .objects('TodayMission')
+          .filtered(`mission._id == oid(${missionId})`)[0];
+        realm.delete(todayMission);
+      }
+
       realm.delete(deletedMission);
     });
 
@@ -244,8 +373,13 @@ const deleteMission = async (user, realm, missionId) => {
 export {
   readMissions,
   createMission,
-  updateMission,
+  toggleMissionActive,
   deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  mkTodayMissions,
+  isTodayMission,
+  getTodayMission,
+  readTodayMissions,
 };

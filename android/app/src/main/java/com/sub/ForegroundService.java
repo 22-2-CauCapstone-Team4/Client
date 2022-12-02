@@ -1,5 +1,6 @@
 package com.sub;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,10 +12,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -25,8 +24,13 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.sub.info.AppInfo;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
@@ -35,17 +39,19 @@ public class ForegroundService extends Service {
     private String phoneUsageState = "INIT";
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
-    private ArrayList<String> prohibitedAppList = null;
+    private ArrayList<AppInfo> prohibitedAppList = null;
+
+    // 시간 trigger
+    // 공간 trigger
 
     private NotificationManager notificationManager;
     private Notification notification;
 
     private Thread thread;
 
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver screenReceiver;
+    private BroadcastReceiver missionInfoReceiver;
     private IntentFilter intentFilter;
-
-    private PackageManager pm;
 
     private boolean isThreadRunning = false;
     // private Handler handler = new Handler();
@@ -60,16 +66,25 @@ public class ForegroundService extends Service {
             while (isThreadRunning) {
                 // 현재 foreground 앱의 패키지 이름 확인
                 String nowAppPackageName = getPackageName(context);
-                boolean nowIsProhibitedApp = prohibitedAppList.contains(nowAppPackageName);
 
-                Log.i("ForegroundService", "AppName = " + nowAppPackageName);
+                // 앱 이름 알아내기
+                String appName = "";
+                for (AppInfo app : prohibitedAppList) {
+                    if (app.getPackageName().equals(nowAppPackageName)) {
+                        appName = app.getName();
+                        break;
+                    }
+                }
+                boolean nowIsProhibitedApp = !appName.isEmpty();
+
+                Log.i("ForegroundService", "app package name = " + nowAppPackageName + ", app name = " + appName);
 
                 // ""이 오는 경우, 같은 화면 유지 중인 상황 (고려할 필요 X)
-                if (!nowAppPackageName.equals("") && !nowAppPackageName.equals(appPackageName)) {
+                if (!nowAppPackageName.isEmpty() && !nowAppPackageName.equals(appPackageName)) {
                     // 현재 앱이 금지 앱이거나, 현재 앱이 금지 앱이 아니고 직전 앱이 금지 앱이었던 경우
                     // JS쪽에 이벤트를 보내 금지 앱 상황 알리기
-                    if (prohibitedAppList.contains(nowAppPackageName) || (!prohibitedAppList.contains(nowAppPackageName) && isProhibitedApp))
-                        sendAppPackageNameToJS(context, nowAppPackageName,getAppName(nowAppPackageName), nowIsProhibitedApp, phoneUsageState);
+                    if (nowIsProhibitedApp || isProhibitedApp)
+                        sendAppPackageNameToJS(context, nowAppPackageName, appName, nowIsProhibitedApp, phoneUsageState);
                     if (!phoneUsageState.equals("")){
                         Log.i("ForegroundService", phoneUsageState);
                         phoneUsageState = "";
@@ -99,8 +114,8 @@ public class ForegroundService extends Service {
 
     @Override
     public void onCreate() {
+        Log.i("ForegroundService", "서비스 첫 생성");
         Context context = getApplicationContext();
-        pm = context.getPackageManager();
 
         createNotificationChannel(); // Creating channel for API 26+
 
@@ -123,7 +138,7 @@ public class ForegroundService extends Service {
         intentFilter.addAction(Intent.ACTION_SHUTDOWN);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
 
-        receiver = new BroadcastReceiver() {
+        screenReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) || intent.getAction().equals((Intent.ACTION_SHUTDOWN))) {
@@ -159,19 +174,30 @@ public class ForegroundService extends Service {
             }
         };
 
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(screenReceiver, intentFilter);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 번들의 내용 받아오기
-        if (intent.getExtras() != null && intent.getExtras().containsKey("appList")) {
-            ArrayList<String> appArrList = intent.getExtras().getStringArrayList("appList");
-            if (appArrList != null)
-                prohibitedAppList = appArrList;
+        Log.i("ForegroundService", "서비스 생성 시작");
 
-            for (String appName : appArrList)
-                Log.i("ForegroundService", appName);
+        // 번들의 내용 받아오기
+        if (intent.getExtras() != null) {
+            if (intent.getExtras().containsKey("appList")) {
+                Log.i("ForegroundService", "금지 앱 리스트 추가/변경");
+
+                String JsonAppListStr = intent.getExtras().getString("appList");
+                if (JsonAppListStr != null) {
+                    prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
+                }
+            }
+            
+            if (intent.getExtras().containsKey("isNotiNeeded") && intent.getBooleanExtra("isNotiNeeded", false)) {
+                String title = intent.getExtras().getString("title");
+                String content = intent.getExtras().getString("content");
+
+                notifyMission(title, content);
+            }
         }
 
         if (prohibitedAppList != null && prohibitedAppList.size() != 0) {
@@ -186,16 +212,31 @@ public class ForegroundService extends Service {
             sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
         }
 
-        Log.i("ForegroundService", "서비스 시작 작업 종료");
+        Log.i("ForegroundService", "서비스 생성 종료");
         return START_REDELIVER_INTENT;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
+        unregisterReceiver(screenReceiver);
         // handler.removeCallbacks(runnableCode);
         isThreadRunning = false;
+    }
+    
+    public void notifyMission(String title, String content) {Log.i("ForegroundService", "미션 noti 울리기");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                // 실제 알림창에 뜨는 내용 설정
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(contentIntent)
+                .build();
+
+        startForeground(SERVICE_NOTIFICATION_ID, notification);
     }
 
     private void createNotificationChannel() {
@@ -240,15 +281,6 @@ public class ForegroundService extends Service {
         return packageNameMap.get(lastRunAppTimeStamp, "").toString();
     }
 
-    private String getAppName(String appPackageName) {
-        try {
-            return pm.getApplicationLabel(pm.getApplicationInfo(appPackageName, PackageManager.GET_META_DATA)).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean isForeGroundEvent(UsageEvents.Event event) {
         if (event == null) return false;
@@ -259,7 +291,7 @@ public class ForegroundService extends Service {
         return event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND;
     }
 
-    static void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
+    private void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
         Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
         Bundle bundle = new Bundle();
 

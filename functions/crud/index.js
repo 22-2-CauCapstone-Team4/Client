@@ -4,10 +4,15 @@ import {readPlaces, createPlace, updatePlace, deletePlace} from './Place';
 import {
   readMissions,
   createMission,
-  updateMission,
+  toggleMissionActive,
   deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  mkTodayMissions,
+  readTodayMissions,
+  getTodayMission,
+  isTodayMission,
 } from './Mission';
 
 import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
@@ -25,10 +30,15 @@ module.exports = {
   deletePlaceInRealm: deletePlace,
   readMissionsInRealm: readMissions,
   createMissionInRealm: createMission,
-  updateMissionInRealm: updateMission,
+  toggleMissionActiveInRealm: toggleMissionActive,
   deleteMissionInRealm: deleteMission,
   mkMissionObjToRealmObj,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
+  isTodayMission,
+  mkTodayMissionsInRealm: mkTodayMissions,
+  readTodayMissionsInRealm: readTodayMissions,
+  getTodayMissionInRealm: getTodayMission,
   readUsageInRealm: readUsage,
   readAppSecInRealm: readAppSec,
   readAppCntInRealm: readAppCnt,

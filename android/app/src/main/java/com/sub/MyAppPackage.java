@@ -17,6 +17,7 @@ public class MyAppPackage implements ReactPackage {
         modules.add(new AppListModule(reactContext));
         modules.add(new ForegroundServiceModule(reactContext));
         modules.add(new LockAppModule(reactContext));
+        modules.add(new MissionSetterModule(reactContext));
 
         return modules;
     }

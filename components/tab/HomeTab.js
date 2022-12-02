@@ -14,19 +14,17 @@ import Colors from '../../utils/Colors';
 // 미션 더미 데이터에 있는 날짜와 현재 날짜 비교하는 함수
 const HomeTab = ({navigation}) => {
   const dispatch = useDispatch();
-  const missionData = useSelector(store => store.missionReducer.missionData);
+  const missionData = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
   const place = useSelector(store => store.placeReducer.data);
   const today = new Date();
   // 오늘 미션
-  const todayMission = missionData.filter(el =>
-    el.dayOfWeek.length == 0
-      ? compareToday(el.date)
-      : el.dayOfWeek.includes(new Date().getDay()),
-  );
+  let todayMission = missionData;
   const todayTimeMission = todayMission.filter(el => el.type === 'TIME');
   const todaySpaceMission = todayMission.filter(el => el.type !== 'TIME');
   const doingMission = useSelector(
-    store => store.missionReducer.missionData,
+    store => store.todayMissionReducer.todayMissionData,
   ).filter(item => item.state == 'start')[0];
   const [mission, setMission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -78,6 +76,7 @@ const HomeTab = ({navigation}) => {
             </View>
 
             {todayTimeMission.map(mission => {
+              // console.log(mission, mission.id);
               return (
                 <MissionBox key={mission.id} mission={mission}></MissionBox>
               );

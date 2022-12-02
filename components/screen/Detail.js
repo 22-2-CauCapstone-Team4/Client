@@ -24,7 +24,9 @@ import {
   readGoalsInRealm,
   readPlacesInRealm,
   readMissionsInRealm,
+  readTodayMissionsInRealm,
   mkMissionRealmObjToObj,
+  mkTodayMissionRealmObjToObj,
 } from '../../functions';
 import {
   addApps,
@@ -32,11 +34,12 @@ import {
   initCategory,
   initMission,
   initPlace,
+  initTodayMission,
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
-import {ProhibitedApp, Goal, Place, Mission} from '../../schema';
 import {composeEventHandlers} from 'native-base';
+import {ProhibitedApp, Goal, Place, Mission, TodayMission} from '../../schema';
 
 const Tab = createBottomTabNavigator();
 
@@ -60,7 +63,7 @@ function Detail({navigation}) {
       loadApps();
     }
     if (checkStatus === Status.NOT_YET) checkPermissionAlert();
-  });
+  }, [checkStatus, isInit]);
 
   const loadApps = React.useCallback(async () => {
     setIsInit(false);
@@ -73,6 +76,7 @@ function Detail({navigation}) {
           Goal.schema,
           Place.schema,
           Mission.schema,
+          TodayMission.schema,
         ]),
       );
 
@@ -88,13 +92,19 @@ function Detail({navigation}) {
         dispatch(addApps(tempApps));
       });
 
-      let [tempBlockedApps, tempGoals, tempPlaces, tempMissions] =
-        await Promise.all([
-          readProhibitedAppsInRealm(user, realm),
-          readGoalsInRealm(user, realm),
-          readPlacesInRealm(user, realm),
-          readMissionsInRealm(user, realm),
-        ]);
+      let [
+        tempBlockedApps,
+        tempGoals,
+        tempPlaces,
+        tempMissions,
+        tempTodayMissions,
+      ] = await Promise.all([
+        readProhibitedAppsInRealm(user, realm),
+        readGoalsInRealm(user, realm),
+        readPlacesInRealm(user, realm),
+        readMissionsInRealm(user, realm),
+        readTodayMissionsInRealm(user, realm),
+      ]);
 
       realm.close();
 
@@ -102,32 +112,27 @@ function Detail({navigation}) {
       setBlockedApps(tempBlockedApps);
       dispatch(initCategory(tempGoals));
       dispatch(initPlace(tempPlaces));
-      console.log(
-        '미션',
-        tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
-      );
-      //
       // console.log(
-      //   '상태가 있는 미션',
-      //   tempMissions.map(mission => ({
-      //     ...mkMissionRealmObjToObj(mission),
-      //     state: 'none',
-      //   })),
-      // );
-      //
-      // dispatch(
-      //   initMission(
-      //     tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
-      //   ),
+      //   '미션',
+      //   tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
       // );
       dispatch(
         initMission(
-          tempMissions.map(mission => ({
-            ...mkMissionRealmObjToObj(mission),
-            state: 'none',
-          })),
+          tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
         ),
       );
+
+      dispatch(
+        initTodayMission(
+          tempTodayMissions.map(mission =>
+            mkTodayMissionRealmObjToObj(mission),
+          ),
+        ),
+      );
+      // console.log(
+      //   '오늘 미션!!!',
+      //   tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),
+      // );
       console.log('불러오기 완료');
     } catch (err) {
       console.log(err);
@@ -182,8 +187,12 @@ function Detail({navigation}) {
       setCheckStatus(Status.OK);
 
       console.log('서비스 시작');
-      await ForegroundServiceModule.startService(
-        blockedApps.map(blockedApp => blockedApp.packageName),
+      ForegroundServiceModule.startService(
+        blockedApps.map(blockedApp => {
+          return {packageName: blockedApp.packageName, name: blockedApp.name};
+        }),
+        null,
+        null,
       );
 
       return;

@@ -87,6 +87,13 @@ const deleteGoal = async (user, realm, goal) => {
       const deletedMissions = realm
         .objects('Mission')
         .filtered(`goal._id == oid(${goal._id})`);
+      // 오늘의 미션 함께 삭제해야 함
+      deletedMissions.forEach(ele => {
+        const tempToday = realm
+          .objects('TodayMission')
+          .filtered(`mission._id == oid(${ele._id})`)[0];
+        realm.delete(tempToday);
+      });
 
       realm.delete(deletedGoal);
       realm.delete(deletedMissions);

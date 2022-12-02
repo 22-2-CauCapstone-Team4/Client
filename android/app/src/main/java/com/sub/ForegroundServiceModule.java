@@ -1,6 +1,7 @@
 package com.sub;
 
 import android.app.AppOpsManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,20 +11,28 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     // 서비스 시작 유무 확인
     private boolean isServiceStarted = false;
-    private Intent checkAppServiceIntent = null;
+    private Intent foregroundServiceIntent = null;
 
     ForegroundServiceModule(ReactApplicationContext context) {
         super(context);
@@ -75,7 +84,7 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startService(ReadableArray appList) {
+    public void startService(ReadableArray appList, ReadableArray missionList, ReadableMap notiInfo) {
         Log.i("ForegroundServiceModule", "서비스 시작 시도");
         ReactApplicationContext context = getReactApplicationContext();
 
@@ -84,18 +93,32 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        checkAppServiceIntent = new Intent(context, ForegroundService.class);
+        foregroundServiceIntent = new Intent(context, ForegroundService.class);
         Bundle bundle = new Bundle();
 
         // 번들에 내용 담아서 넣어주기
-        ArrayList<String> appArrList = Arguments.toList(appList);
-        bundle.putStringArrayList("appList", appArrList);
-        checkAppServiceIntent.putExtras(bundle);
+        if (appList != null) {
+            JSONArray tempList = JsonTransmitter.convertArrayToJson(appList);
+            bundle.putString("appList", tempList.toString());
+        }
+
+        if (missionList != null) {
+            JSONArray tempList = JsonTransmitter.convertArrayToJson(missionList);
+            bundle.putString("missionList", tempList.toString());
+        }
+
+        if (notiInfo != null) {
+            bundle.putBoolean("isNotiNeeded", true);
+            bundle.putString("title", notiInfo.getString("title"));
+            bundle.putString("content", notiInfo.getString("content"));
+        }
+
+        foregroundServiceIntent.putExtras(bundle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            context.startForegroundService(checkAppServiceIntent);
+            context.startForegroundService(foregroundServiceIntent);
         else
-            context.startService(checkAppServiceIntent);
+            context.startService(foregroundServiceIntent);
 
         isServiceStarted = true;
     }
@@ -107,12 +130,12 @@ public class ForegroundServiceModule extends ReactContextBaseJavaModule {
             ReactApplicationContext context = getReactApplicationContext();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                context.stopService(checkAppServiceIntent);
+                context.stopService(foregroundServiceIntent);
             else
-                context.stopService(checkAppServiceIntent);
+                context.stopService(foregroundServiceIntent);
 
             isServiceStarted = false;
-            checkAppServiceIntent = null;
+            foregroundServiceIntent = null;
         }
     }
 

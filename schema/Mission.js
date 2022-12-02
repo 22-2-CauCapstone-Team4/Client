@@ -10,8 +10,10 @@ class Mission {
     endTime,
     name,
     goal,
-    isActive,
-    isRepeated = false,
+    // state,
+    // isToday,
+    isActive = true,
+    isRepeated = dayOfTheWeek ? true : false,
     type,
     place,
   }) {
@@ -23,6 +25,8 @@ class Mission {
     this.endTime = endTime;
     this.name = name;
     this.goal = goal;
+    // this.isToday = isToday;
+    // this.state = state;
     this.isActive = isActive;
     this.isRepeated = isRepeated;
     this.type = type;
@@ -44,7 +48,9 @@ class Mission {
       dayOfTheWeek: {type: 'int?', default: 0},
       endTime: {type: 'int?'},
       goal: 'Goal?',
-      isActive: {type: 'bool', default: false},
+      // state: {type: 'string?'},
+      // isToday: {type: 'bool?'},
+      isActive: {type: 'bool', default: true},
       isRepeated: {type: 'bool', default: false},
       type: 'string',
       name: 'string',

@@ -211,10 +211,10 @@ function CreateAccountScreen({navigation}) {
       navigation.replace('Menu');
       console.log('회원가입, 로그인 완료');
 
-      SnackBar.show({
-        text: '계정 생성이 완료되었습니다. ',
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      // SnackBar.show({
+      //   text: '계정 생성이 완료되었습니다. \n해당 계정으로 로그인 중...',
+      //   duration: SnackBar.LENGTH_SHORT,
+      // });
     } catch (err) {
       setCheckSignUpStatus(Status.NOT_CHECKED_YET);
 

@@ -13,13 +13,17 @@ import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Mission, Goal, Place} from '../../schema';
+import {TodayMission, Mission, Goal, Place} from '../../schema';
 import Colors from '../../utils/Colors';
-import {deleteMission} from '../../store/action';
+import {deleteMission, deleteTodayMission} from '../../store/action';
 import {compareTimeBeforeStart, timeInfoText} from '../../functions/time';
 import GoalBoxSettingModal from '../modal/GoalBoxSettingModal';
 import Realm from 'realm';
-import {deleteMissionInRealm} from '../../functions';
+import {
+  deleteMissionInRealm,
+  isTodayMission,
+  mkMissionObjToRealmObj,
+} from '../../functions';
 import {mkConfig} from '../../functions/mkConfig';
 import {useAuth} from '../../providers/AuthProvider';
 
@@ -27,6 +31,9 @@ function GoalBox(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const missionData = useSelector(store => store.missionReducer.missionData);
+  const todayMissionData = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
   const {user} = useAuth();
   // console.log('미션', missionData);
   return (
@@ -68,16 +75,11 @@ function GoalBox(props) {
                     {
                       text: '삭제',
                       onPress: () => {
-                        dispatch(
-                          deleteMission(
-                            missionData.filter(
-                              item => item.id !== props.mission.id,
-                            ),
-                          ),
-                        );
+                        // console.log(props.mission);
 
                         Realm.open(
                           mkConfig(user, [
+                            TodayMission.schema,
                             Mission.schema,
                             Goal.schema,
                             Place.schema,
@@ -91,6 +93,21 @@ function GoalBox(props) {
 
                           realm.close();
                         });
+
+                        dispatch(
+                          deleteMission(
+                            missionData.filter(
+                              item => item.id != props.mission.id,
+                            ),
+                          ),
+                        );
+                        dispatch(
+                          deleteTodayMission(
+                            todayMissionData.filter(
+                              item => item.id != props.mission.id,
+                            ),
+                          ),
+                        );
                       },
                     },
                     {text: '취소'},

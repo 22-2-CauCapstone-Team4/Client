@@ -2,7 +2,14 @@
 // import {LockAppModule} from './wrap_module';
 
 import Realm from 'realm';
-import {AppUsageRecord, PhoneUsageRecord, CurState} from '../../schema';
+import {
+  AppUsageRecord,
+  PhoneUsageRecord,
+  CurState,
+  Mission,
+  Place,
+  Goal,
+} from '../../schema';
 import moment from 'moment';
 import {mkConfig} from '../mkConfig';
 import {LockAppModule} from '../../wrap_module';
@@ -23,6 +30,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
         AppUsageRecord.schema,
         PhoneUsageRecord.schema,
         CurState.schema,
+        Mission.schema,
+        Place.schema,
+        Goal.schema,
       ]),
     );
     console.log('0. realm open');
