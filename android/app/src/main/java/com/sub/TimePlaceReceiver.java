@@ -32,7 +32,7 @@ public class TimePlaceReceiver extends BroadcastReceiver {
 
                 // *TODO : 다음 날 12시에 다시 예약
             } else {
-                Log.i("TimePlaceReceiver", "미션 알람 받음");
+                Log.i("TimePlaceReceiver", "미션 알람 받음 - 시간");
 
                 String id = intent.getStringExtra("id");
 
@@ -43,8 +43,15 @@ public class TimePlaceReceiver extends BroadcastReceiver {
                 HeadlessJsTaskService.acquireWakeLockNow(context);
             }
         } else if (isPlace) {
-            // *TODO : 내용 뽑아오기
-            // *TODO : headless로 전달
+            Log.i("TimePlaceReceiver", "미션 알람 받음 - 공간");
+
+            String id = intent.getStringExtra("id");
+
+            Intent missionIntent = new Intent(context, MissionEventService.class);
+            missionIntent.putExtra("id", id);
+
+            context.startService(missionIntent);
+            HeadlessJsTaskService.acquireWakeLockNow(context);
         }
     }
 }

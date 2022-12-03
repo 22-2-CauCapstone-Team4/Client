@@ -39,56 +39,57 @@ const acceptMissionTriggerTask = async (user, taskData) => {
       const curState = realm.objects('CurState')[0];
 
       // console.log(JSON.parse(JSON.stringify(curState)), mission.name);
-      if (
-        todayMission.state === TodayMission.STATE.NONE &&
-        !curState.isNowDoingMission
-      ) {
-        // 미션 수행
-        console.log(mission.name, '미션 시작');
+      if (todayMission.state === TodayMission.STATE.NONE) {
+        if (!curState.isNowDoingMission) {
+          // 미션 수행
+          console.log(mission.name, '미션 시작');
 
-        curState.isNowDoingMission = true;
-        curState.mission = mission;
-        todayMission.state = TodayMission.STATE.START;
+          curState.isNowDoingMission = true;
+          curState.mission = mission;
+          todayMission.state = TodayMission.STATE.START;
 
-        ForegroundServiceModule.startService(null, {
-          title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
-          content: '당신의 목표를 응원합니다!',
-        });
+          ForegroundServiceModule.startService(null, {
+            title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
+            content: '당신의 목표를 응원합니다!',
+          });
 
-        appPackageName = curState.appPackageName;
-        appName = curState.appName;
-        isProhibitedApp = curState.isNowUsingProhibitedApp;
-        console.log(
-          appPackageName,
-          appName,
-          isProhibitedApp,
-          JSON.parse(JSON.stringify(curState)),
-        );
+          appPackageName = curState.appPackageName;
+          appName = curState.appName;
+          isProhibitedApp = curState.isNowUsingProhibitedApp;
+          console.log(
+            appPackageName,
+            appName,
+            isProhibitedApp,
+            JSON.parse(JSON.stringify(curState)),
+          );
 
-        // curState, appCheckHeadlessTask 관련
-        if (curState.isNowUsingProhibitedApp && curState.isNowDoingMission) {
-          try {
-            LockAppModule.viewLockScreen(
-              curState.mission.goal.name,
-              curState.mission.name,
-              5,
-              1540,
-              643,
-              123, // test int
-              // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+          // curState, appCheckHeadlessTask 관련
+          if (curState.isNowUsingProhibitedApp && curState.isNowDoingMission) {
+            try {
+              LockAppModule.viewLockScreen(
+                curState.mission.goal.name,
+                curState.mission.name,
+                5,
+                1540,
+                643,
+                123, // test int
+                // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+              );
+            } catch (err) {
+              console.error(err.message);
+            }
+          }
+
+          // 미선 종료 조건 trigger
+          if (mission.type === Mission.TYPE.TIME) {
+            MissionSetterModule.setTimeMission(
+              parseInt(mission.endTime / 60),
+              mission.endTime % 60,
+              mission._id.toString(),
+              parseInt(Math.random() * 10000000),
             );
-          } catch (err) {
-            console.error(err.message);
           }
         }
-
-        // 미선 종료 조건 trigger
-        MissionSetterModule.setTimeMission(
-          parseInt(mission.endTime / 60),
-          mission.endTime % 60,
-          mission._id.toString(),
-          parseInt(Math.random() * 10000000),
-        );
       } else if (todayMission.state === TodayMission.STATE.START) {
         // 미션 종료
         console.log(mission.name, '미션 종료');

@@ -41,7 +41,6 @@ public class ForegroundService extends Service {
     private Thread thread;
 
     private BroadcastReceiver screenReceiver;
-    private BroadcastReceiver missionInfoReceiver;
     private IntentFilter intentFilter;
 
     private boolean isThreadRunning = false;
@@ -216,7 +215,9 @@ public class ForegroundService extends Service {
         isThreadRunning = false;
     }
     
-    public void notifyMission(String title, String content) {Log.i("ForegroundService", "미션 noti 울리기");
+    public void notifyMission(String title, String content) {
+        Log.i("ForegroundService", "미션 noti 울리기");
+
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 

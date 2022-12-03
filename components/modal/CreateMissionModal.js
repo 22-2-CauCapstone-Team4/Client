@@ -634,13 +634,24 @@ export default function CreateMissionModal({
                               ),
                             );
 
-                            // 예약 설정
-                            MissionSetterModule.setTimeMission(
-                              parseInt(mission.startTime / 60),
-                              mission.startTime % 60,
-                              mission._id.toString(),
-                              parseInt(Math.random() * 10000000),
-                            );
+                            if (mission.type !== Mission.TYPE.IN_PLACE) {
+                              // 예약 설정
+                              await MissionSetterModule.setTimeMission(
+                                parseInt(mission.startTime / 60),
+                                mission.startTime % 60,
+                                mission._id.toString(),
+                                parseInt(Math.random() * 10000000),
+                              );
+                            } else {
+                              await MissionSetterModule.setPlaceMission(
+                                mission.place.lat,
+                                mission.place.lng,
+                                parseInt(mission.place.range * 1000),
+                                true, // isEnter
+                                mission._id.toString(),
+                                parseInt(Math.random() * 10000000),
+                              );
+                            }
                           }
 
                           realm.close();
