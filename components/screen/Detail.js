@@ -17,6 +17,7 @@ import {
   ForegroundServiceModule,
   LockAppModule,
   AppListModule,
+  MissionSetterModule,
 } from '../../wrap_module';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -173,24 +174,40 @@ function Detail({navigation}) {
       checkPermission: checkLockAppPermission,
       allowPermission: allowLockAppPermission,
     } = LockAppModule;
+    const {
+      checkPermission: checkMissionPermission,
+      allowPermission: allowMissionPermission,
+    } = MissionSetterModule;
 
-    let [isCurAppPermissionAllowed, isLockAppPermissionAllowed] =
-      await Promise.all([checkCurAppPermission(), checkLockAppPermission()]);
+    let [
+      isCurAppPermissionAllowed,
+      isLockAppPermissionAllowed,
+      isMissionPermissionAllowed,
+    ] = await Promise.all([
+      checkCurAppPermission(),
+      checkLockAppPermission(),
+      checkMissionPermission(),
+    ]);
 
     isCurAppPermissionAllowed = isCurAppPermissionAllowed.isAllowed;
     isLockAppPermissionAllowed = isLockAppPermissionAllowed.isAllowed;
+    isMissionPermissionAllowed = isMissionPermissionAllowed.isAllowed;
 
     if (isCurAppPermissionAllowed) allowCnt++;
     if (isLockAppPermissionAllowed) allowCnt++;
+    if (isMissionPermissionAllowed) allowCnt++;
 
     console.log('허용된 권한 개수', allowCnt);
-    if (allowCnt === 2) {
+    if (allowCnt === 3) {
       setCheckStatus(Status.OK);
 
       console.log('서비스 시작');
       ForegroundServiceModule.startService(
         blockedApps.map(blockedApp => {
-          return {packageName: blockedApp.packageName, name: blockedApp.name};
+          return {
+            name: blockedApp.name,
+            packageName: blockedApp.packageName,
+          };
         }),
         null,
       );
@@ -202,9 +219,11 @@ function Detail({navigation}) {
       console.log('권한 허용 창 띄우기');
       Alert.alert(
         '권한 허용 필요',
-        `${2 - allowCnt}개의 권한 허용이 필요합니다.\n\n${
+        `${3 - allowCnt}개의 권한 허용이 필요합니다.\n\n${
           !isCurAppPermissionAllowed ? '- 사용정보 접근 허용\n' : ''
-        }${!isLockAppPermissionAllowed ? '- 다른 앱 위에 표시\n' : ''}
+        }${!isLockAppPermissionAllowed ? '- 다른 앱 위에 표시\n' : ''}${
+          !isMissionPermissionAllowed ? '- 백그라운드 위치 항상 허용' : ''
+        }
       `,
         [
           {
@@ -220,6 +239,8 @@ function Detail({navigation}) {
                 allowCurAppPermission();
               } else if (!isLockAppPermissionAllowed) {
                 allowLockAppPermission();
+              } else {
+                allowMissionPermission();
               }
 
               setTimeout(() => {

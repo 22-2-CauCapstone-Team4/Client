@@ -2,20 +2,29 @@ package com.sub;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.AppOpsManager;
+import android.app.LauncherActivity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
@@ -39,6 +48,46 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
     @Override
     public String getName() {
         return "MissionSetterModule";
+    }
+
+    // 권한 확인 함수
+    @ReactMethod
+    public void checkPermission(Promise promise) {
+        try {
+            ReactApplicationContext context = getReactApplicationContext();
+            WritableMap map = Arguments.createMap();
+
+            if (!checkPermission(context)) map.putBoolean("isAllowed", false);
+            else {
+                // 권한 이미 허용된 경우
+                map.putBoolean("isAllowed", true);
+            }
+
+            promise.resolve(map);
+        } catch (Exception e) {
+            promise.reject("error", e);
+        }
+    }
+
+    // 권한 허용 함수
+    @ReactMethod
+    public void allowPermission(Promise promise) {
+        try {
+            ReactApplicationContext context = getReactApplicationContext();
+            WritableMap map = Arguments.createMap();
+
+            Log.i("MissionSetterModule",  "허용 함수 호출");
+            allowPermission();
+            if (!checkPermission(context)) map.putBoolean("isAllowed", false);
+            else {
+                // 권한 이미 허용된 경우
+                map.putBoolean("isAllowed", true);
+            }
+
+            promise.resolve(map);
+        } catch (Exception e) {
+            promise.reject("error", e);
+        }
     }
 
     @ReactMethod
@@ -175,5 +224,21 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
                     });
             Log.i("MissionSetterModule", "지오펜스 추가 완료");
         }
+    }
+
+    private void allowPermission() {
+        ReactApplicationContext context = getReactApplicationContext();
+
+        if (!checkPermission(context)) {
+//            ActivityCompat.requestPermissions(context.getCurrentActivity(), new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 0);
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
+    // 권한 체크 함수
+    private boolean checkPermission(ReactApplicationContext context) {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_DENIED;
     }
 }

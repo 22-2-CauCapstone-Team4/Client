@@ -57,8 +57,11 @@ public class MissionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Context context = getApplicationContext();
+
                 Intent intent = new Intent(context, MainActivity.class);
-                context.startActivity(intent);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 
@@ -95,7 +98,7 @@ public class MissionActivity extends AppCompatActivity {
     //뒤로 가기 차단
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
+        // super.onBackPressed();
     }
 
     private String mkTimeIntToStr(int time) {
