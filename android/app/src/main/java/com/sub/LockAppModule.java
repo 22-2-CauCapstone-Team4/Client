@@ -67,6 +67,8 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
     public void viewLockScreen(String goal, String mission, int totalNum, int passedTime, int usedTime, int leftTime) {
         ReactApplicationContext context = getReactApplicationContext();
 
+        Log.i("LockAppModule", goal + " " + mission + " ");
+
         if (checkPermission(context)) {
             // Intent intent = new Intent(context, MainActivity.class);
             Intent intent = new Intent(context, MissionActivity.class);
@@ -76,7 +78,7 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
             bundle.putString("goal", goal);
             bundle.putString("mission", mission);
             bundle.putInt("totalNum", totalNum);
-            bundle.getInt("passedTime", passedTime);
+            bundle.putInt("passedTime", passedTime);
             bundle.putInt("usedTime", usedTime);
             bundle.putInt("leftTime", leftTime);
 

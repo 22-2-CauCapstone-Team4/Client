@@ -40,19 +40,19 @@ if (user !== null && user.providerType === 'local-userpass') {
       acceptMissionTriggerTask.bind(null, user),
     );
 
-    const prohibitedApps = await readProhibitedAppsInRealm(user, realm);
-    console.log('index.js - 금지 앱 불러오기 완료');
+    // const prohibitedApps = await readProhibitedAppsInRealm(user, realm);
+    // console.log('index.js - 금지 앱 불러오기 완료');
+    // console.log(prohibitedApps);
 
-    ForegroundServiceModule.startService(
-      prohibitedApps.map(prohibitedApp => {
-        return {
-          packageName: prohibitedApp.packageName,
-          name: prohibitedApp.name,
-        };
-      }),
-      null,
-      null,
-    );
+    // ForegroundServiceModule.startService(
+    //   prohibitedApps.map(prohibitedApp => {
+    //     return {
+    //       packageName: prohibitedApp.packageName,
+    //       name: prohibitedApp.name,
+    //     };
+    //   }),
+    //   null,
+    // );
 
     // *TODO : 정보 불러오기
     MissionSetterModule.startMidnightAlarm();
@@ -60,11 +60,5 @@ if (user !== null && user.providerType === 'local-userpass') {
     console.log('index.js - service start, realm close');
   });
 }
-
-// test - 미션 정보 알림 울리기
-// ForegroundServiceModule.startService(null, null, {
-//   title: '안녕',
-//   content: '테스트',
-// });
 
 export {app};

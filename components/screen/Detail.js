@@ -80,6 +80,7 @@ function Detail({navigation}) {
         ]),
       );
 
+      // * TODO : 이거때문에 빌드 속도 너무 느림... 나중에 수정 필요
       let tempApps;
       AppListModule.getAppList().then(result => {
         tempApps = result;
@@ -191,7 +192,6 @@ function Detail({navigation}) {
         blockedApps.map(blockedApp => {
           return {packageName: blockedApp.packageName, name: blockedApp.name};
         }),
-        null,
         null,
       );
 

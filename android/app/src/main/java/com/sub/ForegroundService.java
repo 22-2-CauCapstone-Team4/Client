@@ -1,6 +1,5 @@
 package com.sub;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,13 +23,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.jstasks.HeadlessJsTaskConfig;
-import com.sub.info.AppInfo;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
@@ -40,9 +34,6 @@ public class ForegroundService extends Service {
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
     private ArrayList<AppInfo> prohibitedAppList = null;
-
-    // 시간 trigger
-    // 공간 trigger
 
     private NotificationManager notificationManager;
     private Notification notification;

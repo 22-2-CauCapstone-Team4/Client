@@ -23,6 +23,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
     console.log('CheckApp 이벤트', taskData);
     const {appPackageName, appName, isProhibitedApp, isPhoneOn, isPhoneOff} =
       taskData;
+    let {type} = taskData;
 
     // Realm 열기
     realm = await Realm.open(
@@ -59,6 +60,33 @@ const appCheckHeadlessTask = async (user, taskData) => {
       prevAppName = curState.appName;
 
       curState.isNowUsingProhibitedApp = isProhibitedApp;
+
+      // 금지 앱 화면 실행
+      if (isProhibitedApp && curState.isNowDoingMission) {
+        try {
+          LockAppModule.viewLockScreen(
+            curState.mission.goal.name,
+            curState.mission.name,
+            5,
+            1540,
+            643,
+            123, // test int
+            // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+          );
+        } catch (err) {
+          console.error(err.message);
+        }
+      }
+
+      if (!type) {
+        type = curState.isNowDoingMission
+          ? curState.isNowGivingUp
+            ? PhoneUsageRecord.TYPE.GIVE_UP
+            : PhoneUsageRecord.TYPE.MISSION
+          : PhoneUsageRecord.TYPE.DEFAULT;
+      }
+
+      console.log('type?', type);
       if (isProhibitedApp) {
         curState.appPackageName = appPackageName;
         curState.appName = appName;
@@ -98,7 +126,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
             : 60 * 60 * 60 -
               parseInt(moment(curState.startPhoneTime).diff(startDate) / 1000);
 
-        // console.log(days, startDate, endDate, startSec);
+        console.log(days, startDate, endDate, startSec);
 
         // 시간 기록
         // 시작 날짜
@@ -117,7 +145,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
               owner_id: user.id,
               date: startDate,
               usageSec: startSec,
-              type,
+              type: type,
             }),
           );
         }
@@ -148,18 +176,12 @@ const appCheckHeadlessTask = async (user, taskData) => {
               owner_id: user.id,
               date: endDate,
               usageSec: endSec,
-              type,
+              type: type,
             }),
           );
         }
       }
     });
-
-    const type = curState.isNowDoingMission
-      ? PhoneUsageRecord.isNowGivingUp
-        ? PhoneUsageRecord.TYPE.GIVE_UP
-        : PhoneUsageRecord.TYPE.MISSION
-      : PhoneUsageRecord.TYPE.DEFAULT;
 
     console.log(
       '1. CurState 업데이트 완료',
@@ -215,7 +237,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
               appName,
               date: todayMidnight,
               hour,
-              type,
+              type: type,
               clickCnt: 1,
             }),
           );
@@ -362,7 +384,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                     appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
-                    type,
+                    type: type,
                     usageSec: endSec,
                   }),
                 );
@@ -382,7 +404,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
                     appName: prevAppName,
                     date: tempDate.toDate(),
                     hour: tempHour,
-                    type,
+                    type: type,
                     usageSec: 60 * 60,
                   }),
                 );
@@ -392,23 +414,6 @@ const appCheckHeadlessTask = async (user, taskData) => {
         }
 
         console.log('3. AppUsageRecord 종료 기록');
-      }
-
-      // 앱 실행 코드 추가
-      // console.log(isProhibitedApp, curState.isNowDoingMission);
-      if (isProhibitedApp && curState.isNowDoingMission) {
-        try {
-          LockAppModule.viewLockScreen(
-            curState.mission.goal.name,
-            curState.mission.name,
-            5,
-            1540,
-            643, // test int
-            // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
-          );
-        } catch (err) {
-          console.error(err.message);
-        }
       }
     });
 

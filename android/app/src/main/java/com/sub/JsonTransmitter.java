@@ -5,7 +5,6 @@ import android.util.Log;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.sub.info.AppInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;

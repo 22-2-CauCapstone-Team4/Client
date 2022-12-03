@@ -48,20 +48,6 @@ function LogInScreen({navigation}) {
       setLoginValid(' ');
       navigation.replace('Menu');
 
-      // 서비스 실행
-      // ** TODO : 금지 앱 CRUD 이후 아래 코드 추가하기
-      // try {
-      //   await CurAppModule.startService([
-      //     // 서비스 실행 시점
-      //     // ** TODO: 1. 금지 앱 리스트 바뀔 때 (기존 것 삭제 + 실행)
-      //     // ** TODO : 2. 부팅 시 (이때 앱에서 금지 앱 리스트 읽어올 수 있도록 코드 수정해야 할 듯)
-      //     'com.github.android',
-      //     'com.android.chrome',
-      //   ]);
-      // } catch (err) {
-      //   console.error(err.message);
-      // }
-
       SnackBar.show({
         text: '로그인이 완료되었습니다. ',
         duration: SnackBar.LENGTH_SHORT,

@@ -1,8 +1,17 @@
 /* eslint-disable no-labels */
 import Realm from 'realm';
-import {Mission, TodayMission, Goal, Place, CurState} from '../../schema';
+import {
+  Mission,
+  TodayMission,
+  Goal,
+  Place,
+  CurState,
+  PhoneUsageRecord,
+} from '../../schema';
 import {ForegroundServiceModule, MissionSetterModule} from '../../wrap_module';
 import {mkConfig} from '../mkConfig';
+import {LockAppModule} from '../../wrap_module';
+import {appCheckHeadlessTask} from './appCheckHeadlessTask';
 
 const acceptMissionTriggerTask = async (user, taskData) => {
   let realm = null;
@@ -21,6 +30,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
       ]),
     );
 
+    let appPackageName, appName, isProhibitedApp;
     realm.write(async () => {
       const todayMission = realm
         .objects('TodayMission')
@@ -40,10 +50,37 @@ const acceptMissionTriggerTask = async (user, taskData) => {
         curState.mission = mission;
         todayMission.state = TodayMission.STATE.START;
 
-        ForegroundServiceModule.startService(null, null, {
+        ForegroundServiceModule.startService(null, {
           title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
-          content: '당신의 목표를 응원합니다! 👍',
+          content: '당신의 목표를 응원합니다!',
         });
+
+        appPackageName = curState.appPackageName;
+        appName = curState.appName;
+        isProhibitedApp = curState.isNowUsingProhibitedApp;
+        console.log(
+          appPackageName,
+          appName,
+          isProhibitedApp,
+          JSON.parse(JSON.stringify(curState)),
+        );
+
+        // curState, appCheckHeadlessTask 관련
+        if (curState.isNowUsingProhibitedApp && curState.isNowDoingMission) {
+          try {
+            LockAppModule.viewLockScreen(
+              curState.mission.goal.name,
+              curState.mission.name,
+              5,
+              1540,
+              643,
+              123, // test int
+              // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+            );
+          } catch (err) {
+            console.error(err.message);
+          }
+        }
 
         // 미선 종료 조건 trigger
         MissionSetterModule.setTimeMission(
@@ -61,7 +98,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
 
         todayMission.state = TodayMission.STATE.OVER;
 
-        ForegroundServiceModule.startService(null, null, {
+        ForegroundServiceModule.startService(null, {
           title: `감지 중`,
           content: '금지 앱 접속을 감지 중입니다. ',
         });
@@ -69,6 +106,24 @@ const acceptMissionTriggerTask = async (user, taskData) => {
     });
 
     realm.close();
+
+    await appCheckHeadlessTask(user, {
+      appPackageName: '',
+      appName: '',
+      isProhibitedApp: false,
+      // isPhoneOn,
+      isPhoneOff: true,
+      type: PhoneUsageRecord.TYPE.DEFAULT,
+    });
+
+    await appCheckHeadlessTask(user, {
+      appPackageName,
+      appName,
+      isProhibitedApp,
+      isPhoneOn: true,
+      // isPhoneOff,
+      type: PhoneUsageRecord.TYPE.MISSION,
+    });
   } catch (err) {
     console.log(err.message);
     if (realm !== null) realm.close();

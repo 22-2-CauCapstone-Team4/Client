@@ -9,7 +9,9 @@ import {updateMission} from '../../store/action';
 
 const OngoingBox = () => {
   const dispatch = useDispatch();
-  const missionData = useSelector(store => store.missionReducer.missionData);
+  const missionData = useSelector(
+    store => store.todayMissionReducer.todayMissionData,
+  );
   const doingMission = missionData.filter(item => item.state == 'start')[0];
   useEffect(() => {}, [doingMission]);
   //console.log('바뀔까요?', doingMission);
@@ -24,10 +26,10 @@ const OngoingBox = () => {
   if (typeof doingMission !== 'undefined') {
     return (
       <Container>
-        <Text
+        {/* <Text
           style={
             styles.infoLeftOver
-          }>{`오늘 진행할 미션이 ${pendingMission.length}개 있습니다.`}</Text>
+          }>{`오늘 진행할 미션이 ${pendingMission.length}개 있습니다.`}</Text> */}
         <Info1>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={[styles.type1, {marginRight: 20}]}>

@@ -27,7 +27,7 @@ class PhoneUsageRecord {
       _id: 'objectId',
       owner_id: 'string',
       date: 'date',
-      type: {type: 'string?'},
+      type: 'string?',
       usageSec: 'int',
     },
     primaryKey: '_id',

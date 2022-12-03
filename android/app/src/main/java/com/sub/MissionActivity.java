@@ -1,5 +1,7 @@
 package com.sub;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -20,40 +22,43 @@ public class MissionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        Bundle bundle = getIntent().getExtras();
+        super.onCreate(bundle);
         setContentView(R.layout.mission_activity);
 
         // text 설정
         TextView goal = findViewById(R.id.categoryText);
-        goal.setText(savedInstanceState.getString("goal"));
+        goal.setText(bundle.getString("goal") + " | ");
 
         TextView mission = findViewById(R.id.missionText);
-        mission.setText("|" + savedInstanceState.getString("mission"));
+        mission.setText(bundle.getString("mission"));
 
         TextView infoText = findViewById(R.id.infoText);
-        infoText.setText("전체 " + savedInstanceState.getInt("totalNum") + "명이 함께함");
+        infoText.setText("전체 " + bundle.getInt("totalNum") + "명이 함께함");
 
         passedTime = findViewById(R.id.passedTime);
-        passedTimeInt = savedInstanceState.getInt("passedTime");
+        passedTimeInt = bundle.getInt("passedTime");
         passedTime.setText(mkTimeIntToStr(passedTimeInt));
 
         TextView usedTime = findViewById(R.id.usedTime);
-        int usedTimeInt = savedInstanceState.getInt("usedTime");
+        int usedTimeInt = bundle.getInt("usedTime");
         usedTime.setText(mkTimeIntToStr(usedTimeInt));
 
-        leftTimeInt = savedInstanceState.getInt("leftTime");
+        leftTimeInt = bundle.getInt("leftTime");
         leftTime = findViewById(R.id.leftText);
         ableText = findViewById(R.id.ableText);
         if (leftTimeInt > 0)
-            ableText.setVisibility(View.INVISIBLE);
+            ableText.setVisibility(View.GONE);
         leftTime.setVisibility(View.VISIBLE);
-        leftTime.setText(mkTimeIntToStrWithText(leftTimeInt) + "분 뒤 사용 가능");
+        leftTime.setText(mkTimeIntToStrWithText(leftTimeInt) + " 뒤 사용 가능");
 
         Button quitButton = findViewById(R.id.quit);
         quitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // *TODO : headless 연결 (버튼 클릭)
+                Context context = getApplicationContext();
+                Intent intent = new Intent(context, MainActivity.class);
+                context.startActivity(intent);
             }
         });
 
@@ -78,7 +83,10 @@ public class MissionActivity extends AppCompatActivity {
 
                 if (leftTimeInt > 0) {
                     leftTimeInt--;
-                    leftTime.setText(mkTimeIntToStrWithText(leftTimeInt));
+                    leftTime.setText(mkTimeIntToStrWithText(leftTimeInt) + " 뒤 사용 가능");
+                } if (leftTimeInt == 0) {
+                    ableText.setVisibility(View.VISIBLE);
+                    leftTime.setVisibility(View.GONE);
                 }
             }
         }, 1000);

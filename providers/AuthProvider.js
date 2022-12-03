@@ -51,10 +51,10 @@ const AuthProvider = ({children}) => {
       appCheckHeadlessTask.bind(null, newUser),
     );
     AppRegistry.registerHeadlessTask('Midnight', () =>
-      everyMidnightTask.bind(null, user),
+      everyMidnightTask.bind(null, newUser),
     );
     AppRegistry.registerHeadlessTask('MissionTrigger', () =>
-      acceptMissionTriggerTask.bind(null, user),
+      acceptMissionTriggerTask.bind(null, newUser),
     );
 
     setUser(newUser);
@@ -128,10 +128,10 @@ const AuthProvider = ({children}) => {
       appCheckHeadlessTask.bind(null, newUser),
     );
     AppRegistry.registerHeadlessTask('Midnight', () =>
-      everyMidnightTask.bind(null, user),
+      everyMidnightTask.bind(null, newUser),
     );
     AppRegistry.registerHeadlessTask('MissionTrigger', () =>
-      acceptMissionTriggerTask.bind(null, user),
+      acceptMissionTriggerTask.bind(null, newUser),
     );
 
     setUser(newUser);
