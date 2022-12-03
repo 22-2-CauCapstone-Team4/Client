@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import {TouchableOpacity, Text, ScrollView, View, Switch} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import CalendarStrip from 'react-native-calendar-strip';
+// import CalendarStrip from 'react-native-calendar-strip';
 import Colors from '../../utils/Colors';
 import * as Progress from 'react-native-progress';
 import recordReducer from '../../store/reducers/recordReducer';
