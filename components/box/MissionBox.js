@@ -24,25 +24,19 @@ import {useAuth} from '../../providers/AuthProvider';
 /*
 README 11.27
 작성자: 한신
-
 todayMissionReducer에 저장되는 데이터에
 range와 state가 없는 것 같아 임시로 잡아두고 진행 중
 state는 총 4가지가 있고 아래에 세부 설명 있습니다.
-
 range는 추후에 반영되면 간단하게 수정 가능
 state같은 경우 DB에 반영할 때 dispatch(updateMission(...)); 써진 코드에
 DB에 반영할 코드를 추가하면 될 것 같다.
 'temp'라는 업데이트 된 미션 배열 데이터가 마련되어 있다.
-
 ** 설정한 state 종류 **
 none: 초기 상태, 미션 시작 전 상태, 미션 조건 만족했는데 진행 중인 미션이 있어서 대기 중인 상태, 
-생성된 시간 미션이 이미 시간이 지난 상태 -> 추후 DB 연동될때 확인 가능
-
+생성된 시간 미션이 이미 시간이 지난 상태
 start: 미션 진행 중, !!미션 1개만 이 state를 가질 수 있음!!
 10분 휴식 버튼 눌러도 start 상태로 유지, 다른 상태 변화가 필요하면 수정하도록 하겠습니다.
-
 end: 정상적으로 미션을 완료한 상태, UI에서 종료 미션으로 따로 빼둠
-
 quit: 중도 포기한 상태, 포기한 미션은 재시작이 불가능하다.
 */
 
@@ -86,11 +80,7 @@ function MissionBox(props) {
     store => store.todayMissionReducer.todayMissionData,
   );
   const [missionState, setMissionState] = useState(props.mission.state); //props.mission.state
-  //미션 중에 start인 미션 있는지 확인
-  // console.log(
-  //   '있나요~?~?',
-  //   missionData.filter(item => item.state === 'start').length == 0,
-  // );
+
   useEffect(() => {
     sixty.current = setTimeout(() => {
       //시간 미션일 때 미션 시작까지 남은 시간 + 종료 시간까지 남은 시간 계산
@@ -217,16 +207,20 @@ function MissionBox(props) {
         if (endMissionTime[0] <= 0 && endMissionTime[1] <= 0) {
           return (
             <LeftCondition style={{color: 'brown'}}>
-              시간이 지나 시작할 수 없습니다..
+              시간이 지나 시작할 수 없습니다...
             </LeftCondition>
           );
         } else {
-          return (
-            <LeftCondition>
-              {leftTime[0] == 0 ? null : leftTime[0] + '시간'} {leftTime[1]} 분
-              후 시작
-            </LeftCondition>
-          );
+          if (leftTime[1] > 0) {
+            return (
+              <LeftCondition>
+                {leftTime[0] == 0 ? null : leftTime[0] + '시간'} {leftTime[1]}분
+                후 시작
+              </LeftCondition>
+            );
+          } else {
+            return <LeftCondition>미션 대기 중</LeftCondition>;
+          }
         }
 
       case 'start':
@@ -235,7 +229,12 @@ function MissionBox(props) {
         );
       case 'over':
         return (
-          <LeftCondition style={{color: 'green'}}>미션 완료!</LeftCondition>
+          <View>
+            <LeftCondition style={{color: 'green'}}>미션 완료!</LeftCondition>
+            <LeftCondition style={{color: 'green'}}>
+              기록 탭에서 결과를 확인해보세요!
+            </LeftCondition>
+          </View>
         );
       case 'quit':
         return (
@@ -483,5 +482,6 @@ const LeftView = styled.View`
 
 const LeftCondition = styled.Text`
   color: #0891b2;
-  font-size: 12px;
+  font-size: 11px;
+  text-align: right;
 `;

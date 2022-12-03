@@ -131,18 +131,26 @@ function GoalBox(props) {
       <ConditionView>
         <View>
           {props.mission.type !== Mission.TYPE.IN_PLACE && (
-            <Ionicons name={'lock-closed'} size={14} style={styles.timeIcon}>
-              <Text style={[{marginHorizontal: 5}]}>
+            <View style={{flexDirection: 'row'}}>
+              <Ionicons
+                name={'lock-closed'}
+                size={14}
+                style={styles.timeIcon}></Ionicons>
+              <Text style={[{marginHorizontal: 5}, styles.info]}>
                 시작: {timeInfoText(props.mission.time.startTime)}
               </Text>
-            </Ionicons>
+            </View>
           )}
           {props.mission.type === Mission.TYPE.TIME && (
-            <Ionicons name={'lock-open'} size={14} style={styles.timeIcon}>
-              <Text style={[{marginHorizontal: 20}]}>
+            <View style={{flexDirection: 'row'}}>
+              <Ionicons
+                name={'lock-open'}
+                size={14}
+                style={styles.timeIcon}></Ionicons>
+              <Text style={[{marginHorizontal: 5}, styles.info]}>
                 종료: {timeInfoText(props.mission.time.endTime)}
               </Text>
-            </Ionicons>
+            </View>
           )}
           {props.mission.type !== Mission.TYPE.TIME && (
             <View style={{flexDirection: 'row'}}>
@@ -157,9 +165,15 @@ function GoalBox(props) {
             </View>
           )}
         </View>
-        <Ionicons name={'calendar'} size={14} style={styles.timeIcon}>
-          <Text style={[{marginHorizontal: 10}]}> {props.mission.date}</Text>
-        </Ionicons>
+        <View style={{flexDirection: 'row'}}>
+          <Ionicons
+            name={'calendar'}
+            size={14}
+            style={styles.timeIcon}></Ionicons>
+          <Text style={[{marginHorizontal: 3}, styles.info]}>
+            {props.mission.date}
+          </Text>
+        </View>
       </ConditionView>
       <GoalBoxSettingModal
         data={props.mission}
@@ -177,7 +191,7 @@ const styles = StyleSheet.create({
   },
   info: {
     color: Colors.MAIN_COLOR,
-    fontSize: 12,
+    fontSize: 10,
   },
   timeIcon: {
     color: Colors.MAIN_COLOR,
