@@ -47,6 +47,10 @@ const RecordTab = () => {
     );
   };
 
+  let currentDate = '';
+  let beforeDate = '';
+  let flag = 0;
+
   return (
     <View style={recordStyle.canvas}>
       <View style={recordStyle.lineStyle}></View>
@@ -67,96 +71,128 @@ const RecordTab = () => {
           if (isEnabled === true && item.isGiveUp === true) {
             return;
           }
+          if (currentDate === '' && flag == 0) {
+            currentDate = item.date;
+            flag = 1;
+          } else if (currentDate !== item.date && flag == 1) {
+            currentDate = item.date;
+          } else if (currentDate === item.date && flag == 1) {
+            beforeDate = currentDate;
+            currentDate = '';
+          }
+          if (flag === 1 && beforeDate === currentDate) {
+            currentDate = '';
+          }
           return (
-            <View key={item.id} style={{alignItems: 'center', padding: 5}}>
-              <View style={recordStyle.info}>
-                <View style={recordStyle.timeRecord}>
-                  <View style={{flexDirection: 'row', marginBottom: 3}}>
-                    <Text style={recordStyle.lockTime}>
-                      🔒{item.LockTime.useTime}
-                    </Text>
-                    {/* ★ 잠금 시간 */}
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={recordStyle.useTime}>
-                      ❌{item.useTimeLockApp.useTime}
-                    </Text>
-                    {/* ★ 금지앱 사용 시간 */}
-                  </View>
-                </View>
-                <View
-                  style={{
-                    border: 1,
-                    borderWidth: 1,
-                    borderRadius: 25,
-                    padding: '4%',
-                    width: '80%',
-                    borderColor:
-                      item.isGiveUp === false ? Colors.MAIN_COLOR : '#f5a6a3',
-                    // ★ 실패 or 성공 전체적인 테두리
-                  }}>
-                  <View style={[recordStyle.main]}>
-                    <View>
-                      <View style={recordStyle.missionInfo}>
-                        <Text style={recordStyle.category}>
-                          {item.category}
-                        </Text>
-                        {/* ★ 카테고리 */}
-                        <Text style={recordStyle.bar}> | </Text>
-                        <Text style={recordStyle.missionName}>{item.name}</Text>
-                        {/* ★ 미션 이름 */}
-                      </View>
-                    </View>
-                    <View
-                      style={
-                        ([recordStyle.missionStatus],
-                        {
-                          justifyContent: 'center',
-                          borderRadius: 10,
-                        })
-                      }>
-                      <Text
-                        style={{
-                          color: 'black',
-                          fontSize: 10,
-                          backgroundColor:
-                            item.isGiveUp === false ? '#e1f0fb' : '#fae4e1',
-                        }}>
-                        {item.isGiveUp === false ? '성공' : '실패'}
-                        {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
+            <View>
+              <View style={{alignItems: 'center'}}>
+                {currentDate === '' ? (
+                  <Text>{currentDate}</Text>
+                ) : (
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 'bold',
+                      color: 'black',
+                      marginTop: 10,
+                    }}>
+                    ───────{currentDate}
+                    ───────
+                  </Text>
+                )}
+              </View>
+              <View key={item.id} style={{alignItems: 'center', padding: 5}}>
+                <View style={recordStyle.info}>
+                  <View style={recordStyle.timeRecord}>
+                    <View style={{flexDirection: 'row', marginBottom: 3}}>
+                      <Text style={recordStyle.lockTime}>
+                        🔒{item.LockTime.useTime}
                       </Text>
-                      {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
+                      {/* ★ 잠금 시간 */}
+                    </View>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={recordStyle.useTime}>
+                        ❌{item.useTimeLockApp.useTime}
+                      </Text>
+                      {/* ★ 금지앱 사용 시간 */}
                     </View>
                   </View>
-                  <View style={recordStyle.progressBar}>
-                    <View
-                      style={{
-                        width: '100%',
-                      }}>
-                      <MyComponent></MyComponent>
+                  <View
+                    style={{
+                      border: 1,
+                      borderWidth: 1,
+                      borderRadius: 25,
+                      padding: '4%',
+                      width: '80%',
+                      borderColor:
+                        item.isGiveUp === false ? Colors.MAIN_COLOR : '#f5a6a3',
+                      // ★ 실패 or 성공 전체적인 테두리
+                    }}>
+                    <View style={[recordStyle.main]}>
+                      <View>
+                        <View style={recordStyle.missionInfo}>
+                          <Text style={recordStyle.category}>
+                            {item.category}
+                          </Text>
+                          {/* ★ 카테고리 */}
+                          <Text style={recordStyle.bar}> | </Text>
+                          <Text style={recordStyle.missionName}>
+                            {item.name}
+                          </Text>
+                          {/* ★ 미션 이름 */}
+                        </View>
+                      </View>
                       <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Text style={recordStyle.timeText}>
-                          {item.time.startTime}
+                        style={
+                          ([recordStyle.missionStatus],
+                          {
+                            justifyContent: 'center',
+                            borderRadius: 10,
+                          })
+                        }>
+                        <Text
+                          style={{
+                            color: 'black',
+                            fontSize: 10,
+                            backgroundColor:
+                              item.isGiveUp === false ? '#e1f0fb' : '#fae4e1',
+                          }}>
+                          {item.isGiveUp === false ? '성공' : '실패'}
+                          {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
                         </Text>
-                        <View style={recordStyle.timeLineStyle}></View>
-                        <Text style={recordStyle.timeText}>
-                          {item.time.endTime}
-                        </Text>
+                        {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
                       </View>
                     </View>
-                  </View>
-                  <View>
-                    <TextInput
-                      style={recordStyle.inputText}
-                      placeholder="한 줄 평가"
-                      placeholderTextColor={Colors.GREY}
-                      onChangeText={event => setText(event)}
-                      onSubmitEditing={() =>
-                        dispatch(updateComment({...item, inputText: text}))
-                      }
-                    />
-                    {/* ★ 상태 메시지 남기는 곳 */}
+                    <View style={recordStyle.progressBar}>
+                      <View
+                        style={{
+                          width: '100%',
+                        }}>
+                        <MyComponent></MyComponent>
+                        <View
+                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          <Text style={recordStyle.timeText}>
+                            {item.time.startTime}
+                          </Text>
+                          <View style={recordStyle.timeLineStyle}></View>
+                          <Text style={recordStyle.timeText}>
+                            {item.time.endTime}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <TextInput
+                        style={recordStyle.inputText}
+                        placeholder="한 줄 평가"
+                        placeholderTextColor={Colors.GREY}
+                        onChangeText={event => setText(event)}
+                        onSubmitEditing={() =>
+                          dispatch(updateComment({...item, inputText: text}))
+                        }
+                      />
+                      {/* ★ 상태 메시지 남기는 곳 */}
+                    </View>
                   </View>
                 </View>
               </View>
