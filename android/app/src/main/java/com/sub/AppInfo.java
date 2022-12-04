@@ -1,4 +1,4 @@
-package com.sub.info;
+package com.sub;
 
 public class AppInfo {
     private String packageName;

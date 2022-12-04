@@ -3,6 +3,7 @@ package com.sub;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -63,13 +64,25 @@ public class LockAppModule extends ReactContextBaseJavaModule  {
     }
 
     @ReactMethod
-    public void viewLockScreen() {
+    public void viewLockScreen(String goal, String mission, int totalNum, int passedTime, int usedTime, int leftTime) {
         ReactApplicationContext context = getReactApplicationContext();
+
+        Log.i("LockAppModule", goal + " " + mission + " ");
 
         if (checkPermission(context)) {
             // Intent intent = new Intent(context, MainActivity.class);
             Intent intent = new Intent(context, MissionActivity.class);
 
+            Bundle bundle = new Bundle();
+
+            bundle.putString("goal", goal);
+            bundle.putString("mission", mission);
+            bundle.putInt("totalNum", totalNum);
+            bundle.putInt("passedTime", passedTime);
+            bundle.putInt("usedTime", usedTime);
+            bundle.putInt("leftTime", leftTime);
+
+            intent.putExtras(bundle);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

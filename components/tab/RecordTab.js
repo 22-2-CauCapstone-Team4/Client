@@ -1,12 +1,10 @@
-import Categories from '../Categories';
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {TouchableOpacity, Text, ScrollView, View, Switch} from 'react-native';
+import {Text, ScrollView, View, Switch} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import CalendarStrip from 'react-native-calendar-strip';
 import Colors from '../../utils/Colors';
-import * as Progress from 'react-native-progress';
+import {ProgressBar} from 'rn-multi-progress-bar';
 import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../../utils/styles';
 import {updateComment} from '../../store/action';
@@ -34,6 +32,21 @@ const RecordTab = () => {
     else return 1;
   }
 
+  const MyComponent = () => {
+    return (
+      <ProgressBar
+        shouldAnimate={true} // to enable animation, default false
+        animateDuration={700} // if animation enabled
+        data={[
+          {progress: 650, color: Colors.MAIN_PROGRESS_COLOR},
+          {progress: 50, color: Colors.PROGRESS_PAUSE_COLOR},
+          {progress: 100, color: Colors.MAIN_PROGRESS_COLOR},
+          {progress: 200, color: Colors.PROGRESS_FAIL_COLOR},
+        ]}
+      />
+    );
+  };
+
   return (
     <View style={recordStyle.canvas}>
       <View style={recordStyle.lineStyle}></View>
@@ -58,7 +71,7 @@ const RecordTab = () => {
             <View key={item.id} style={{alignItems: 'center', padding: 5}}>
               <View style={recordStyle.info}>
                 <View style={recordStyle.timeRecord}>
-                  <View style={{flexDirection: 'row'}}>
+                  <View style={{flexDirection: 'row', marginBottom: 3}}>
                     <Text style={recordStyle.lockTime}>
                       🔒{item.LockTime.useTime}
                     </Text>
@@ -109,17 +122,28 @@ const RecordTab = () => {
                           backgroundColor:
                             item.isGiveUp === false ? '#e1f0fb' : '#fae4e1',
                         }}>
-                        {item.date}
-                        {item.isGiveUp === false ? '  성공' : '  실패'}
+                        {item.isGiveUp === false ? '성공' : '실패'}
                         {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
                       </Text>
                       {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
                     </View>
                   </View>
                   <View style={recordStyle.progressBar}>
-                    <View>
-                      <Progress.Bar progress={0.3} width={270}></Progress.Bar>
-                      <Text style={{color: 'black', fontSize: 8}}>123</Text>
+                    <View
+                      style={{
+                        width: '100%',
+                      }}>
+                      <MyComponent></MyComponent>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={recordStyle.timeText}>
+                          {item.time.startTime}
+                        </Text>
+                        <View style={recordStyle.timeLineStyle}></View>
+                        <Text style={recordStyle.timeText}>
+                          {item.time.endTime}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                   <View>
@@ -169,6 +193,10 @@ const recordStyle = StyleSheet.create({
     height: 30,
     color: Colors.MAIN_COLOR,
   },
+  timeText: {
+    color: 'black',
+    fontSize: 8,
+  },
   missionInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -192,22 +220,18 @@ const recordStyle = StyleSheet.create({
   missionName: {
     color: 'black',
   },
-  progressBar: {
-    alignItems: 'center',
-    marginTop: '5%',
-  },
   progressBarStyle: {
     width: '100%',
   },
   lockTime: {
     color: 'black',
     fontSize: 10,
-    fontWeight: 'bold',
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
   },
   useTime: {
     color: 'black',
     fontSize: 10,
-    fontWeight: 'bold',
+    backgroundColor: Colors.PROGRESS_FAIL_COLOR,
   },
   timeRecord: {
     width: '20%',
@@ -224,6 +248,13 @@ const recordStyle = StyleSheet.create({
     borderColor: Colors.MAIN_COLOR_INACTIVE,
     marginVertical: 5,
     backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+  },
+  timeLineStyle: {
+    height: 0.5,
+    marginVertical: 5,
+    backgroundColor: Colors.GREY,
+    width: '75%',
+    marginHorizontal: 3,
   },
 });
 export default RecordTab;

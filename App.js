@@ -18,6 +18,7 @@ import CreateSpaceScreen from './components/screen/CreateSpaceScreen';
 const Stack = createStackNavigator();
 const store = createStore(rootReducer);
 function App() {
+  LogBox.ignoreLogs(['Animated']);
   LogBox.ignoreLogs(['Warning: Internal React error']); // 화면 전환 WARNING 생략
   LogBox.ignoreLogs([
     'BSON: For React Native please polyfill crypto.getRandomValues, e.g. using: https://www.npmjs.com/package/react-native-get-random-values.',

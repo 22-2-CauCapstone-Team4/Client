@@ -26,7 +26,7 @@
             android:id="@+id/categoryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="💪운동 | "
+            android:text="💪 운동 | "
             android:textSize="24dp"
             android:textStyle="bold"
             android:layout_marginBottom="5dp"/>
@@ -53,17 +53,17 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/passedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1:30:23 "
+            android:text="1:30:23"
             android:textSize="30dp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/passedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="경과"
+            android:text=" 경과"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -77,14 +77,14 @@
             android:id="@+id/usedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1:30:23 "
+            android:text="1:30:23"
             android:textSize="30dp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="사용"
+            android:text=" 사용"
             android:textSize="16dp" />
     </LinearLayout>
 
@@ -96,6 +96,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/trigger"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="특정 조건 만족 시" />
@@ -133,8 +134,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="사용 가능"
+                android:text="n분 m초 뒤 사용 가능"
                 android:textColor="#ee0000" />
+            <TextView
+                android:id="@+id/ableText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="사용 가능"
+                android:visibility="invisible"
+                android:textColor="#058eb0" />
         </LinearLayout>
 
         <LinearLayout

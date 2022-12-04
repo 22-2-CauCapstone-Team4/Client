@@ -57,7 +57,7 @@ const HomeTab = ({navigation}) => {
         </TouchableOpacity>
       </AboutMission>
       <MainText>
-        {mission ? `진행 중 |` : `오늘 미션 | ${todayMission.length}`}
+        {mission ? `진행 중` : `오늘 미션 | ${todayMission.length}`}
       </MainText>
       <View style={styles.lineStyle}></View>
       {mission ? (

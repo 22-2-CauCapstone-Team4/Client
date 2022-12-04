@@ -1,6 +1,5 @@
 package com.sub;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,13 +23,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.jstasks.HeadlessJsTaskConfig;
-import com.sub.info.AppInfo;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class ForegroundService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 315;
@@ -41,16 +35,12 @@ public class ForegroundService extends Service {
     private boolean isProhibitedApp = false;
     private ArrayList<AppInfo> prohibitedAppList = null;
 
-    // 시간 trigger
-    // 공간 trigger
-
     private NotificationManager notificationManager;
     private Notification notification;
 
     private Thread thread;
 
     private BroadcastReceiver screenReceiver;
-    private BroadcastReceiver missionInfoReceiver;
     private IntentFilter intentFilter;
 
     private boolean isThreadRunning = false;
@@ -188,6 +178,7 @@ public class ForegroundService extends Service {
 
                 String JsonAppListStr = intent.getExtras().getString("appList");
                 if (JsonAppListStr != null) {
+                    // *TODO : 여기서 콘솔 찍어봐서 오류 찾기
                     prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
                 }
             }
@@ -224,7 +215,9 @@ public class ForegroundService extends Service {
         isThreadRunning = false;
     }
     
-    public void notifyMission(String title, String content) {Log.i("ForegroundService", "미션 noti 울리기");
+    public void notifyMission(String title, String content) {
+        Log.i("ForegroundService", "미션 noti 울리기");
+
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 

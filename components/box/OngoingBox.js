@@ -27,10 +27,10 @@ const OngoingBox = () => {
   if (typeof doingMission !== 'undefined') {
     return (
       <Container>
-        <Text
+        {/* <Text
           style={
             styles.infoLeftOver
-          }>{`오늘 진행할 미션이 ${pendingMission.length}개 남았습니다.`}</Text>
+          }>{`오늘 진행할 미션이 ${pendingMission.length}개 있습니다.`}</Text> */}
         <Info1>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={[styles.type1, {marginRight: 20}]}>
