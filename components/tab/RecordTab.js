@@ -13,6 +13,7 @@ const RecordTab = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [text, setText] = useState('');
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const [dateMessage, setDateMessage] = useState('');
 
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
@@ -24,6 +25,11 @@ const RecordTab = () => {
     .reverse();
   const dispatch = useDispatch();
 
+  const arr = Array.from(new Set(newRecord.map(item => item.date)));
+  for (var i = 0; i < arr.length; i++) {
+    console.log(arr[i]);
+  }
+
   function sortRecord(a, b) {
     a = a.date.split('-').join('');
     b = b.date.split('-').join('');
@@ -32,11 +38,9 @@ const RecordTab = () => {
     else return 1;
   }
 
-  const MyComponent = () => {
+  const CustomProgressBar = () => {
     return (
       <ProgressBar
-        shouldAnimate={true} // to enable animation, default false
-        animateDuration={700} // if animation enabled
         data={[
           {progress: 650, color: Colors.MAIN_PROGRESS_COLOR},
           {progress: 50, color: Colors.PROGRESS_PAUSE_COLOR},
@@ -47,13 +51,8 @@ const RecordTab = () => {
     );
   };
 
-  let currentDate = '';
-  let beforeDate = '';
-  let flag = 0;
-
   return (
     <View style={recordStyle.canvas}>
-      <View style={recordStyle.lineStyle}></View>
       <View style={[recordStyle.toggleBtn]}>
         <Text style={recordStyle.selectRecord}>성공 기록만 보기</Text>
         <Switch
@@ -63,142 +62,154 @@ const RecordTab = () => {
           onValueChange={toggleSwitch}
           value={isEnabled}
         />
+
         {/* ★ 성공 기록만 보기 유무 */}
       </View>
 
+      <View style={recordStyle.lineStyle}></View>
       <ScrollView>
-        {newRecord.map(item => {
-          if (isEnabled === true && item.isGiveUp === true) {
-            return;
-          }
-          if (currentDate === '' && flag == 0) {
-            currentDate = item.date;
-            flag = 1;
-          } else if (currentDate !== item.date && flag == 1) {
-            currentDate = item.date;
-          } else if (currentDate === item.date && flag == 1) {
-            beforeDate = currentDate;
-            currentDate = '';
-          }
-          if (flag === 1 && beforeDate === currentDate) {
-            currentDate = '';
-          }
-          return (
-            <View>
-              <View style={{alignItems: 'center'}}>
-                {currentDate === '' ? (
-                  <Text>{currentDate}</Text>
-                ) : (
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: 'bold',
-                      color: 'black',
-                      marginTop: 10,
-                    }}>
-                    ───────{currentDate}
-                    ───────
+        {/* 날짜 선 */}
+        {arr.map(item => (
+          <View key={item} style={{alignItems: 'center'}}>
+            {isEnabled ? (
+              newRecord.filter(
+                record => record.date === item && record.isGiveUp === false,
+              ).length > 0 ? (
+                <View style={{flexDirection: 'row', marginVertical: 10}}>
+                  <View style={recordStyle.dateLineStyle}></View>
+                  <Text style={recordStyle.dateHeader} key={item}>
+                    {item}
                   </Text>
-                )}
+                  <View style={recordStyle.dateLineStyle}></View>
+                </View>
+              ) : null
+            ) : (
+              <View style={{flexDirection: 'row', marginVertical: 10}}>
+                <View style={recordStyle.dateLineStyle}></View>
+                <Text style={recordStyle.dateHeader} key={item}>
+                  {item}
+                </Text>
+                <View style={recordStyle.dateLineStyle}></View>
               </View>
-              <View key={item.id} style={{alignItems: 'center', padding: 5}}>
-                <View style={recordStyle.info}>
-                  <View style={recordStyle.timeRecord}>
-                    <View style={{flexDirection: 'row', marginBottom: 3}}>
-                      <Text style={recordStyle.lockTime}>
-                        🔒{item.LockTime.useTime}
-                      </Text>
-                      {/* ★ 잠금 시간 */}
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
-                      <Text style={recordStyle.useTime}>
-                        ❌{item.useTimeLockApp.useTime}
-                      </Text>
-                      {/* ★ 금지앱 사용 시간 */}
-                    </View>
-                  </View>
+            )}
+            {/* 최신순 기록 컴포넌트 표시 */}
+            {newRecord
+              .filter(record => record.date === item)
+              .map(item => {
+                if (isEnabled === true && item.isGiveUp === true) {
+                  return;
+                }
+                return (
                   <View
-                    style={{
-                      border: 1,
-                      borderWidth: 1,
-                      borderRadius: 25,
-                      padding: '4%',
-                      width: '80%',
-                      borderColor:
-                        item.isGiveUp === false ? Colors.MAIN_COLOR : '#f5a6a3',
-                      // ★ 실패 or 성공 전체적인 테두리
-                    }}>
-                    <View style={[recordStyle.main]}>
-                      <View>
-                        <View style={recordStyle.missionInfo}>
-                          <Text style={recordStyle.category}>
-                            {item.category}
+                    key={item.id}
+                    style={{alignItems: 'center', padding: 5}}>
+                    <View style={recordStyle.info}>
+                      <View style={recordStyle.timeRecord}>
+                        <View style={{flexDirection: 'row', marginBottom: 3}}>
+                          <Text style={recordStyle.lockTime}>
+                            🔒{item.LockTime.useTime}
                           </Text>
-                          {/* ★ 카테고리 */}
-                          <Text style={recordStyle.bar}> | </Text>
-                          <Text style={recordStyle.missionName}>
-                            {item.name}
+                          {/* ★ 잠금 시간 */}
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text style={recordStyle.useTime}>
+                            ❌{item.useTimeLockApp.useTime}
                           </Text>
-                          {/* ★ 미션 이름 */}
+                          {/* ★ 금지앱 사용 시간 */}
                         </View>
                       </View>
-                      <View
-                        style={
-                          ([recordStyle.missionStatus],
-                          {
-                            justifyContent: 'center',
-                            borderRadius: 10,
-                          })
-                        }>
-                        <Text
-                          style={{
-                            color: 'black',
-                            fontSize: 10,
-                            backgroundColor:
-                              item.isGiveUp === false ? '#e1f0fb' : '#fae4e1',
-                          }}>
-                          {item.isGiveUp === false ? '성공' : '실패'}
-                          {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
-                        </Text>
-                        {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
-                      </View>
-                    </View>
-                    <View style={recordStyle.progressBar}>
                       <View
                         style={{
-                          width: '100%',
+                          border: 1,
+                          borderWidth: 1,
+                          borderRadius: 25,
+                          padding: '4%',
+                          width: '80%',
+                          borderColor:
+                            item.isGiveUp === false
+                              ? Colors.MAIN_COLOR
+                              : '#f5a6a3',
+                          // ★ 실패 or 성공 전체적인 테두리
                         }}>
-                        <MyComponent></MyComponent>
-                        <View
-                          style={{flexDirection: 'row', alignItems: 'center'}}>
-                          <Text style={recordStyle.timeText}>
-                            {item.time.startTime}
-                          </Text>
-                          <View style={recordStyle.timeLineStyle}></View>
-                          <Text style={recordStyle.timeText}>
-                            {item.time.endTime}
-                          </Text>
+                        <View style={[recordStyle.main]}>
+                          <View>
+                            <View style={recordStyle.missionInfo}>
+                              <Text style={recordStyle.category}>
+                                {item.category}
+                              </Text>
+                              {/* ★ 카테고리 */}
+                              <Text style={recordStyle.bar}> | </Text>
+                              <Text style={recordStyle.missionName}>
+                                {item.name}
+                              </Text>
+                              {/* ★ 미션 이름 */}
+                            </View>
+                          </View>
+                          <View
+                            style={
+                              ([recordStyle.missionStatus],
+                              {
+                                justifyContent: 'center',
+                                borderRadius: 10,
+                              })
+                            }>
+                            <Text
+                              style={{
+                                color: 'black',
+                                fontSize: 10,
+                                backgroundColor:
+                                  item.isGiveUp === false
+                                    ? '#e1f0fb'
+                                    : '#fae4e1',
+                              }}>
+                              {item.isGiveUp === false ? '성공' : '실패'}
+                              {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
+                            </Text>
+                            {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
+                          </View>
+                        </View>
+                        <View style={recordStyle.progressBar}>
+                          <View
+                            style={{
+                              width: '100%',
+                            }}>
+                            <CustomProgressBar></CustomProgressBar>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}>
+                              <Text style={recordStyle.timeText}>
+                                {item.time.startTime}
+                              </Text>
+                              <View style={recordStyle.timeLineStyle}></View>
+                              <Text style={recordStyle.timeText}>
+                                {item.time.endTime}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                        <View>
+                          <TextInput
+                            style={recordStyle.inputText}
+                            placeholder="한 줄 평가"
+                            placeholderTextColor={Colors.GREY}
+                            onChangeText={event => setText(event)}
+                            onSubmitEditing={() =>
+                              dispatch(
+                                updateComment({...item, inputText: text}),
+                              )
+                            }
+                          />
+                          {/* ★ 상태 메시지 남기는 곳 */}
                         </View>
                       </View>
                     </View>
-                    <View>
-                      <TextInput
-                        style={recordStyle.inputText}
-                        placeholder="한 줄 평가"
-                        placeholderTextColor={Colors.GREY}
-                        onChangeText={event => setText(event)}
-                        onSubmitEditing={() =>
-                          dispatch(updateComment({...item, inputText: text}))
-                        }
-                      />
-                      {/* ★ 상태 메시지 남기는 곳 */}
-                    </View>
                   </View>
-                </View>
-              </View>
-            </View>
-          );
-        })}
+                );
+              })}
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -284,6 +295,19 @@ const recordStyle = StyleSheet.create({
     borderColor: Colors.MAIN_COLOR_INACTIVE,
     marginVertical: 5,
     backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+  },
+  dateLineStyle: {
+    marginVertical: 5,
+    backgroundColor: Colors.GREY,
+    height: 2,
+    flex: 1,
+    alignSelf: 'center',
+  },
+  dateHeader: {
+    color: 'black',
+    fontSize: 18,
+    alignSelf: 'center',
+    paddingHorizontal: 7,
   },
   timeLineStyle: {
     height: 0.5,

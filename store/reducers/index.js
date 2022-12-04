@@ -7,6 +7,7 @@ import placeReducer from './placeReducer';
 import appReducer from './appReducer';
 import blockedAppReducer from './blockedAppReducer';
 import recordReducer from './recordReducer';
+import userReducer from './userReducer';
 const rootReducer = combineReducers({
   missionReducer,
   todayMissionReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   appReducer,
   blockedAppReducer,
   recordReducer,
+  userReducer,
 });
 
 export default rootReducer;

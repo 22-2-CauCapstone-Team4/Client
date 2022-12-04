@@ -89,8 +89,6 @@ const recordReducer = (state = INITIAL_STATE, action) => {
     default:
       return state;
   }
-
-  return state;
 };
 
 export default recordReducer;
