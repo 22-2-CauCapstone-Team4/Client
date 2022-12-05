@@ -7,6 +7,7 @@ import {
   Place,
   CurState,
   PhoneUsageRecord,
+  ProhibitedApp,
 } from '../../schema';
 import {ForegroundServiceModule, MissionSetterModule} from '../../wrap_module';
 import {mkConfig} from '../mkConfig';
@@ -28,6 +29,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
         Goal.schema,
         Place.schema,
         CurState.schema,
+        ProhibitedApp.schema,
       ]),
     );
 
@@ -38,6 +40,11 @@ const acceptMissionTriggerTask = async (user, taskData) => {
         .filtered(`mission._id == oid(${id})`)[0];
       const mission = todayMission.mission;
       const curState = realm.objects('CurState')[0];
+      const prohibitedApps = JSON.parse(
+        JSON.stringify(realm.objects('ProhibitedApp')),
+      ).map(app => {
+        return {name: app.name, packageName: app.packageName};
+      });
 
       // console.log(JSON.parse(JSON.stringify(curState)), mission.name);
       if (todayMission.state === TodayMission.STATE.NONE) {
@@ -49,7 +56,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
           curState.mission = mission;
           todayMission.state = TodayMission.STATE.START;
 
-          ForegroundServiceModule.startService(null, {
+          ForegroundServiceModule.startService(prohibitedApps, {
             title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
             content: '당신의 목표를 응원합니다!',
           });
@@ -113,16 +120,20 @@ const acceptMissionTriggerTask = async (user, taskData) => {
             );
           }
         } else {
-          // *TODO : pending 고려
+          console.log(mission.name, '미션 대기');
+          todayMission.state = TodayMission.STATE.PENDING;
         }
-      } else if (todayMission.state === TodayMission.STATE.START) {
+      } else if (
+        todayMission.state === TodayMission.STATE.START ||
+        todayMission.state === TodayMission.STATE.PENDING
+      ) {
         switch (todayMission.extraState) {
           case TodayMission.STATE.MOVE_PLACE:
             // 상태 이동
             console.log(
               'BOTH_PLACE extraState 변화 - move place 종료, in place로 넘어감',
             );
-            todayMission.extraState = Mission.STATE.IN_PLACE;
+            todayMission.extraState = Mission.TYPE.IN_PLACE;
 
             MissionSetterModule.setPlaceMission(
               mission.place.lat,
@@ -133,21 +144,27 @@ const acceptMissionTriggerTask = async (user, taskData) => {
               parseInt(Math.random() * 10000000),
             );
             break;
-          case Mission.STATE.IN_PLACE:
+          case Mission.TYPE.IN_PLACE:
             delete todayMission.extraState;
           default:
-            // 미션 종료
-            console.log(mission.name, '미션 종료');
+            if (todayMission.state === TodayMission.STATE.START) {
+              // 미션 종료
+              console.log(mission.name, '미션 종료');
 
-            curState.isNowDoingMission = false;
-            delete curState.mission;
+              curState.isNowDoingMission = false;
+              delete curState.mission;
 
-            todayMission.state = TodayMission.STATE.OVER;
+              todayMission.state = TodayMission.STATE.OVER;
 
-            ForegroundServiceModule.startService(null, {
-              title: `감지 중`,
-              content: '금지 앱 접속을 감지 중입니다. ',
-            });
+              ForegroundServiceModule.startService(prohibitedApps, {
+                title: `감지 중`,
+                content: '금지 앱 접속을 감지 중입니다. ',
+              });
+            } else {
+              // pending -> none
+              console.log(mission.name, '대기 미션 조건 종료');
+              todayMission.state = TodayMission.STATE.NONE;
+            }
         }
       }
     });

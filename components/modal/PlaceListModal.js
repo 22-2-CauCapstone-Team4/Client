@@ -121,7 +121,7 @@ export default function PlaceListModal({
 
               <View style={{flexDirection: 'row', marginTop: 15}}>
                 <Pressable
-                  style={[style.button, styles.buttonClose, {marginRight: 30}]}
+                  style={[style.button, styles.buttonClose]}
                   onPress={() => {
                     navigation.navigate('CreateSpace');
                     setModalVisible(!modalVisible);

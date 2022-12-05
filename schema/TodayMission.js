@@ -10,6 +10,7 @@ class TodayMission {
 
   static STATE = {
     NONE: 'none',
+    PENDING: 'pending',
     START: 'start',
     OVER: 'over',
     QUIT: 'quit',

@@ -609,7 +609,8 @@ export default function CreateMissionModal({
                           (lockingType == true && placeValid === ' ')) &&
                         categoryValid === ' ' &&
                         missionNameValid === ' ' &&
-                        placeToggleValid === ' '
+                        (!lockingType ||
+                          (lockingType && placeToggleValid === ' '))
                       ) {
                         setSelectCategory('');
                         setCategoryValid('카테고리를 선택해주세요!');
@@ -683,7 +684,6 @@ export default function CreateMissionModal({
 
                           realm.close();
                         });
-
                         SnackBar.show({
                           text: '미션 생성이 완료되었습니다. ',
                           duration: SnackBar.LENGTH_SHORT,

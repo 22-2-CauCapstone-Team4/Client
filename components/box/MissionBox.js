@@ -20,6 +20,7 @@ import {mkConfig, toggleMissionActiveInRealm} from '../../functions';
 import {TodayMission, Mission, Place, Goal} from '../../schema';
 import Realm from 'realm';
 import {useAuth} from '../../providers/AuthProvider';
+import {usePropsResolution} from 'native-base';
 
 /*
 README 11.27
@@ -119,13 +120,20 @@ function MissionBox(props) {
     //조건: 토글 켜져있고 진행 중인 미션이 없을 때 start로 전환
     if (
       props.mission.state === 'none' &&
-      isEnabled &&
-      missionData.filter(item => item.state === 'start').length == 0
+      isEnabled
+      // && missionData.filter(item => item.state === 'start').length == 0
     ) {
-      const temp = {
-        ...props.mission,
-        state: 'start',
-      };
+      if (missionData.filter(item => item.state === 'start').length === 0) {
+        temp = {
+          ...props.mission,
+          state: 'start',
+        };
+      } else {
+        temp = {
+          ...props.mission,
+          state: 'pending',
+        };
+      }
       // 시간 조건 확인: 1. 시작 시간이 된 상태 2. 뒤늦게 만든 시간 미션의 종료 시간이 지나지 않았을 때
       if (
         props.mission.type === 'TIME' &&
@@ -152,11 +160,22 @@ function MissionBox(props) {
     //start -> over(정상 종료)
     //start -> quit는 포기 버튼 onPress에서 따로 처리됨
     //조건: {시간: 종료 시간까지 채움, 공간: 공간에서 벗어남(IN_PLACE) or 들어옴(MOVE_PLACE)}
-    else if (props.mission.state === 'start') {
-      temp = {
-        ...props.mission,
-        state: 'over',
-      };
+    // pending -> none (걍 아무 일도 벌어지지 않았던 것이므로)
+    else if (
+      props.mission.state === 'start' ||
+      props.mission.state === 'pending'
+    ) {
+      if (props.mission.state === 'start') {
+        temp = {
+          ...props.mission,
+          state: 'over',
+        };
+      } else {
+        temp = {
+          ...props.mission,
+          state: 'none',
+        };
+      }
       //시간 조건 확인
       if (
         props.mission.type === 'TIME' &&
@@ -244,6 +263,10 @@ function MissionBox(props) {
         return (
           <LeftCondition style={{color: 'orange'}}>미션 진행 중</LeftCondition>
         );
+      case 'pending':
+        return (
+          <LeftCondition style={{color: 'purple'}}>미션 대기</LeftCondition>
+        );
       case 'over':
         return (
           <LeftCondition style={{color: 'green'}}>미션 완료!</LeftCondition>
@@ -281,6 +304,10 @@ function MissionBox(props) {
               <LeftCondition style={{color: 'orange'}}>
                 미션 진행 중
               </LeftCondition>
+            );
+          case 'pending':
+            return (
+              <LeftCondition style={{color: 'purple'}}>미션 대기</LeftCondition>
             );
           case 'over':
             return (
