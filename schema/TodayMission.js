@@ -22,6 +22,7 @@ class TodayMission {
       owner_id: 'string',
       mission: 'Mission',
       state: 'string',
+      extraState: 'string?',
     },
     primaryKey: '_id',
   };

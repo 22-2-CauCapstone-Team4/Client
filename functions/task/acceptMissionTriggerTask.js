@@ -12,6 +12,7 @@ import {ForegroundServiceModule, MissionSetterModule} from '../../wrap_module';
 import {mkConfig} from '../mkConfig';
 import {LockAppModule} from '../../wrap_module';
 import {appCheckHeadlessTask} from './appCheckHeadlessTask';
+import {unstable_renderSubtreeIntoContainer} from 'react-dom';
 
 const acceptMissionTriggerTask = async (user, taskData) => {
   let realm = null;
@@ -88,21 +89,66 @@ const acceptMissionTriggerTask = async (user, taskData) => {
               mission._id.toString(),
               parseInt(Math.random() * 10000000),
             );
+          } else {
+            if (mission.type === Mission.TYPE.BOTH_PLACE) {
+              if (!todayMission.extraState) {
+                todayMission.extraState = TodayMission.EXTRA_STATE.MOVE_PLACE;
+              } else {
+                todayMission.extraState = TodayMission.EXTRA_STATE.IN_PLACE;
+              }
+            }
+
+            const isEnter =
+              mission.type === Mission.TYPE.IN_PLACE ||
+              mission.type === Mission.TYPE.BOTH_PLACE
+                ? false // 공간 벗어나기가 종료 조건 (or 다음 상태 이동 조건) 인 미션들
+                : true;
+            MissionSetterModule.setPlaceMission(
+              mission.place.lat,
+              mission.place.lng,
+              parseInt(mission.place.range * 1000),
+              isEnter,
+              mission._id.toString(),
+              parseInt(Math.random() * 10000000),
+            );
           }
+        } else {
+          // *TODO : pending 고려
         }
       } else if (todayMission.state === TodayMission.STATE.START) {
-        // 미션 종료
-        console.log(mission.name, '미션 종료');
+        switch (todayMission.extraState) {
+          case TodayMission.STATE.MOVE_PLACE:
+            // 상태 이동
+            console.log(
+              'BOTH_PLACE extraState 변화 - move place 종료, in place로 넘어감',
+            );
+            todayMission.extraState = Mission.STATE.IN_PLACE;
 
-        curState.isNowDoingMission = false;
-        delete curState.mission;
+            MissionSetterModule.setPlaceMission(
+              mission.place.lat,
+              mission.place.lng,
+              parseInt(mission.place.range * 1000),
+              true,
+              mission._id.toString(),
+              parseInt(Math.random() * 10000000),
+            );
+            break;
+          case Mission.STATE.IN_PLACE:
+            delete todayMission.extraState;
+          default:
+            // 미션 종료
+            console.log(mission.name, '미션 종료');
 
-        todayMission.state = TodayMission.STATE.OVER;
+            curState.isNowDoingMission = false;
+            delete curState.mission;
 
-        ForegroundServiceModule.startService(null, {
-          title: `감지 중`,
-          content: '금지 앱 접속을 감지 중입니다. ',
-        });
+            todayMission.state = TodayMission.STATE.OVER;
+
+            ForegroundServiceModule.startService(null, {
+              title: `감지 중`,
+              content: '금지 앱 접속을 감지 중입니다. ',
+            });
+        }
       }
     });
 

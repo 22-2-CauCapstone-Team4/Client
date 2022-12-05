@@ -21,8 +21,13 @@ const appCheckHeadlessTask = async (user, taskData) => {
     const now = new Date();
 
     console.log('CheckApp 이벤트', taskData);
-    const {appPackageName, appName, isProhibitedApp, isPhoneOn, isPhoneOff} =
-      taskData;
+    const {
+      appPackageName,
+      appName,
+      isProhibitedApp = false,
+      isPhoneOn,
+      isPhoneOff,
+    } = taskData;
     let {type} = taskData;
 
     // Realm 열기

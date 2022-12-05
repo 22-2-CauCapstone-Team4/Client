@@ -94,7 +94,7 @@ function MissionBox(props) {
   useEffect(() => {
     sixty.current = setTimeout(() => {
       //시간 미션일 때 미션 시작까지 남은 시간 + 종료 시간까지 남은 시간 계산
-      if (props.mission.type === 'TIME') {
+      if (props.mission.type !== 'IN_PLACE') {
         setLeftTime(compareTimeBeforeStart(props.mission.time.startTime));
         setEndMissionTime(compareTimeBeforeStart(props.mission.time.endTime));
       }
@@ -104,7 +104,7 @@ function MissionBox(props) {
     // 공간 미션에서의 장소와 현재 위치간 거리
     let distance;
     let range;
-    if (props.mission.type !== 'TIME' && missionLocation.length != 0) {
+    if (props.mission.type === 'IN_PLACE' && missionLocation.length != 0) {
       distance =
         getDistance(
           missionLocation[0].lat,
@@ -136,8 +136,15 @@ function MissionBox(props) {
       }
       // 공간 조건 확인: 안 미션은 안에 있을 때, 이동 미션은 밖에 있을 때
       else if (
-        (props.mission.type == 'IN_PLACE' && distance < range) ||
-        (props.mission.type == 'MOVE_PLACE' && distance > range)
+        props.mission.type == 'IN_PLACE' &&
+        distance < range
+        // (props.mission.type == 'MOVE_PLACE' && distance > range)
+      ) {
+        dispatch(updateTodayMission(temp));
+      } else if (
+        (props.mission.type == 'MOVE_PLACE' ||
+          props.mission.type == 'BOTH_PLACE') &&
+        leftTime[1] <= 0
       ) {
         dispatch(updateTodayMission(temp));
       }
@@ -214,7 +221,11 @@ function MissionBox(props) {
     switch (props.mission.state) {
       case 'none':
         // 뒤늦게 생성됐지만 종료 시간이 지나 시작할 수 없는 미션 처리
-        if (endMissionTime[0] <= 0 && endMissionTime[1] <= 0) {
+        if (
+          props.mission.type === 'TIME' &&
+          endMissionTime[0] <= 0 &&
+          endMissionTime[1] <= 0
+        ) {
           return (
             <LeftCondition style={{color: 'brown'}}>
               시간이 지나 시작할 수 없습니다..
@@ -298,7 +309,7 @@ function MissionBox(props) {
         </View>
         <LeftView>
           <LeftCondition>
-            {props.mission.type === 'TIME'
+            {props.mission.type !== Mission.TYPE.IN_PLACE
               ? timeStateMessage()
               : spaceStateMessage()}
           </LeftCondition>

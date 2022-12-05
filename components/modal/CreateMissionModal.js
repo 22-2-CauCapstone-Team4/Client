@@ -222,6 +222,9 @@ export default function CreateMissionModal({
     useState('미션 이름을 입력해주세요!');
   const [placeValid, setPlaceValid] = useState('장소를 선택해주세요!');
   const [validMessage, setValidMessage] = useState(' ');
+  const [placeToggleValid, setPlaceToggleValid] = useState(
+    '하나 이상의 장소 미션 유형을 선택해주세요!',
+  );
   // console.log('카테고리', selectCategory);
   // console.log('미션 이름', missionName);
   // console.log(selectCategory === '');
@@ -241,6 +244,7 @@ export default function CreateMissionModal({
             setSelectSpace('');
             setPlaceValid('장소를 선택해주세요!');
             setValidMessage(' ');
+            setPlaceToggleValid('하나 이상의 장소 미션 유형을 선택해주세요!');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
@@ -460,19 +464,27 @@ export default function CreateMissionModal({
                           <Switch
                             trackColor={{false: '#767577', true: '#81b0ff'}}
                             onValueChange={() => {
+                              if (moveSpace && !spaceIn)
+                                setPlaceToggleValid(
+                                  '하나 이상의 장소 미션 유형을 선택해주세요!',
+                                );
+                              else setPlaceToggleValid(' ');
                               setMoveSpace(!moveSpace);
                               // console.log(`moveSpace: ${moveSpace}`);
                             }}
                             value={moveSpace}
                           />
+                        </View>
+                        <View>
                           {
                             // 레이아웃 수정 필요
                             /* 출발 시간 */ moveSpace && (
-                              <View style={{marginTop: 10}}>
+                              <View>
                                 <View
                                   style={{
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    paddingHorizontal: 10,
                                   }}>
                                   {/* 시간 선택 영역 */}
                                   <TouchableOpacity
@@ -491,25 +503,36 @@ export default function CreateMissionModal({
                                   date={departureTime}
                                 />
                                 <Text style={missionStyle.timeData}>
-                                  {departureTime.getHours()}시
-                                  {departureTime.getMinutes()}분
+                                  {`${departureTime.getHours()}시 ${departureTime.getMinutes()}분`}
                                 </Text>
                               </View>
                             )
                           }
                         </View>
-
                         <View style={missionStyle.toggleBtn}>
                           <Text style={missionStyle.spaceText}>공간 안</Text>
                           <Switch
                             trackColor={{false: '#767577', true: '#81b0ff'}}
                             onValueChange={() => {
+                              if (!moveSpace && spaceIn)
+                                setPlaceToggleValid(
+                                  '하나 이상의 장소 미션 유형을 선택해주세요!',
+                                );
+                              else setPlaceToggleValid(' ');
                               setSpaceIn(!spaceIn);
                               // console.log(`spaceIn: ${spaceIn}`);
                             }}
                             value={spaceIn}
                           />
                         </View>
+                        <Text
+                          style={{
+                            color: 'red',
+                            paddingHorizontal: 10,
+                            fontSize: 10,
+                          }}>
+                          {placeToggleValid}
+                        </Text>
                       </View>
                     ) : (
                       <View>
@@ -585,7 +608,8 @@ export default function CreateMissionModal({
                         (lockingType == false ||
                           (lockingType == true && placeValid === ' ')) &&
                         categoryValid === ' ' &&
-                        missionNameValid === ' '
+                        missionNameValid === ' ' &&
+                        placeToggleValid === ' '
                       ) {
                         setSelectCategory('');
                         setCategoryValid('카테고리를 선택해주세요!');
@@ -594,6 +618,9 @@ export default function CreateMissionModal({
                         setSelectSpace('');
                         setPlaceValid('장소를 선택해주세요!');
                         setValidMessage(' ');
+                        setPlaceToggleValid(
+                          '하나 이상의 장소 미션 유형을 선택해주세요!',
+                        );
                         const mission = mkMissionObjToRealmObj({
                           user,
                           missionName,
@@ -678,6 +705,9 @@ export default function CreateMissionModal({
                       setMissionNameValid('미션 이름을 입력해주세요!');
                       setSelectSpace('');
                       setPlaceValid('장소를 선택해주세요!');
+                      setPlaceToggleValid(
+                        '하나 이상의 장소 미션 유형을 선택해주세요!',
+                      );
                       setModalVisible(!modalVisible);
                     }}>
                     <Text style={styles.textStyle}>취소</Text>

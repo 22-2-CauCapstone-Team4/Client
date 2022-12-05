@@ -33,7 +33,7 @@ public class ForegroundService extends Service {
     private String phoneUsageState = "INIT";
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
-    private ArrayList<AppInfo> prohibitedAppList = null;
+    private ArrayList<AppInfo> prohibitedAppList;
 
     private NotificationManager notificationManager;
     private Notification notification;
@@ -105,7 +105,7 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate() {
         Log.i("ForegroundService", "서비스 첫 생성");
-        Context context = getApplicationContext();
+        prohibitedAppList = null;
 
         createNotificationChannel(); // Creating channel for API 26+
 
