@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {compareToday} from '../../functions/time';
-import {updateMission} from '../../store/action';
+import {updateMission, updateTodayMission} from '../../store/action';
 
 const OngoingBox = () => {
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ const OngoingBox = () => {
     store => store.todayMissionReducer.todayMissionData,
   );
   const doingMission = missionData.filter(item => item.state == 'start')[0];
-
+  console.log('오늘의 미션', missionData);
   useEffect(() => {}, [doingMission]);
   //console.log('바뀔까요?', doingMission);
   const pendingMission = missionData.filter(
@@ -84,16 +84,13 @@ const OngoingBox = () => {
             <Text
               style={styles.btnStyle}
               onPress={() => {
-                let temp = missionData.slice();
-                temp[temp.map(item => item.id).indexOf(doingMission.id)] = {
-                  ...doingMission,
-                  state: 'quit',
-                };
                 Alert.alert('미션 포기!', '정말 미션을 포기하시겠습니까?', [
                   {
                     text: '포기',
                     onPress: () => {
-                      dispatch(updateMission(temp));
+                      dispatch(
+                        updateTodayMission({...doingMission, state: 'quit'}),
+                      );
                     },
                   },
                   {

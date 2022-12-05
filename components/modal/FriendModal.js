@@ -81,21 +81,12 @@ export default function FriendModal({
                               {data.nickname}
                             </Text>
                           </View>
-                          {friendList.map(f => f._id).indexOf(data._id) !=
-                          -1 ? (
+                          {friendList
+                            .map(f => f.nickname)
+                            .indexOf(data.nickname) == -1 ? (
                             <TouchableOpacity
                               style={styles.followButton}
-                              onPress={() => {
-                                // const temp =
-                                //   candidates[
-                                //     candidates.map(cd => cd._id).indexOf(item._id)
-                                //   ];
-                                // dispatch(addFriend(temp));
-                                // SnackBar.show({
-                                //   text: `\'${item.nickname}\'님을 친구로 추가했습니다.`,
-                                //   duration: SnackBar.LENGTH_SHORT,
-                                // });
-                              }}>
+                              onPress={() => {}}>
                               <Text style={styles.followButtonText}>
                                 팔로우
                               </Text>
@@ -224,12 +215,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     padding: 10,
     marginBottom: 5,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
     margin: 20,
