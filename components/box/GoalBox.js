@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   info: {
     color: Colors.MAIN_COLOR,
-    fontSize: 10,
+    // fontSize: 10,
   },
   timeIcon: {
     color: Colors.MAIN_COLOR,

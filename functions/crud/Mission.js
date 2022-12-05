@@ -128,8 +128,14 @@ const mkMissionRealmObjToObj = mission => {
   } else {
     const date = new Date(mission.date);
     tempObj.date = `${date.getFullYear()}-${
-      date.getMonth() + 1
-    }-${date.getDate()}`; // 년, 월, 일
+      date.getMonth() + 1 < 10
+        ? '0' + (date.getMonth() + 1).toString()
+        : date.getMonth() + 1
+    }-${
+      date.getDate() + 1 < 10
+        ? '0' + (date.getDate() + 1).toString()
+        : date.getDate() + 1
+    }`; // 년, 월, 일
   }
 
   return tempObj;

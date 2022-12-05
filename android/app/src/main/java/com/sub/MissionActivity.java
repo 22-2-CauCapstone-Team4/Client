@@ -47,10 +47,11 @@ public class MissionActivity extends AppCompatActivity {
         leftTimeInt = bundle.getInt("leftTime");
         leftTime = findViewById(R.id.leftText);
         ableText = findViewById(R.id.ableText);
-        if (leftTimeInt > 0)
+        if (leftTimeInt > 0) {
             ableText.setVisibility(View.GONE);
-        leftTime.setVisibility(View.VISIBLE);
-        leftTime.setText(mkTimeIntToStrWithText(leftTimeInt) + " 뒤 사용 가능");
+            leftTime.setVisibility(View.VISIBLE);
+            leftTime.setText(mkTimeIntToStrWithText(leftTimeInt) + " 뒤 사용 가능");
+        }
 
         Button quitButton = findViewById(R.id.quit);
         quitButton.setOnClickListener(new View.OnClickListener() {

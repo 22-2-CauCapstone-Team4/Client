@@ -7,6 +7,10 @@ import {
   Mission,
   TodayMission,
   PhoneUsageRecord,
+  MissionRecord,
+  UserInfo,
+  GiveUpAppEmbedded,
+  AppUsageEmbedded,
 } from '../schema';
 
 const openRealmBehaviorConfig = {
@@ -38,6 +42,10 @@ const mkConfigWithSubscriptions = user => {
       Mission.schema,
       PhoneUsageRecord.schema,
       TodayMission.schema,
+      UserInfo.schema,
+      GiveUpAppEmbedded.schema,
+      AppUsageEmbedded.schema,
+      MissionRecord.schema,
     ],
     sync: {
       user,
@@ -70,6 +78,9 @@ const mkConfigWithSubscriptions = user => {
           );
           subs.add(
             realm.objects('TodayMission').filtered(`owner_id == "${user.id}"`),
+          );
+          subs.add(
+            realm.objects('MissionRecord').filtered(`owner_id == "${user.id}"`),
           );
         },
       },

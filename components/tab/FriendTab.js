@@ -110,7 +110,7 @@ export default function FriendTab({navigation}) {
               })}
       </ScrollView>
       <AddFriendBtn onPress={() => setModalVisible(true)}>
-        <Ionicons name="add-circle" size={50} color={'#0891b2'} />
+        <Ionicons name="add-circle" size={45} color={'#0891b2'} />
         <Text
           style={{
             color: Colors.MAIN_COLOR,

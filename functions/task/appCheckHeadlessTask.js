@@ -9,6 +9,10 @@ import {
   Mission,
   Place,
   Goal,
+  MissionRecord,
+  GiveUpAppEmbedded,
+  AppUsageEmbedded,
+  UserInfo,
 } from '../../schema';
 import moment from 'moment';
 import {mkConfig} from '../mkConfig';
@@ -39,12 +43,17 @@ const appCheckHeadlessTask = async (user, taskData) => {
         Mission.schema,
         Place.schema,
         Goal.schema,
+        UserInfo.schema,
+        GiveUpAppEmbedded.schema,
+        AppUsageEmbedded.schema,
+        MissionRecord.schema,
       ]),
     );
     console.log('0. realm open');
 
     // 1. 현 상태 업데이트
     let curState,
+      missionRecord,
       isPrevUsedProhibitedApp,
       prevAppPackageName,
       prevAppName,
@@ -68,15 +77,24 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
       // 금지 앱 화면 실행
       if (isProhibitedApp && curState.isNowDoingMission) {
+        // missionRecord
+        missionRecord = realm
+          .objects('MissionRecord')
+          .sorted('startTime', true)[0];
+
+        let leftTime = curState.lastBreakTime
+          ? parseInt(moment().diff(curState.lastBreakTime) / 1000)
+          : 0;
+        if (leftTime < 0) leftTime = 0;
+
         try {
           LockAppModule.viewLockScreen(
             curState.mission.goal.name,
             curState.mission.name,
-            5,
-            1540,
-            643,
-            123, // test int
-            // * TODO : 미션 수행 기록 데이터 구조 만들어서 여기다가 해야 함
+            curState.mission.goal.nowDoingMissionCnt, // totalNum
+            parseInt(moment().diff(missionRecord.startTime) / 1000), // passedTime
+            missionRecord.totalProhibitedAppUsageSec, // usedTime
+            leftTime, // left time (10min)
           );
         } catch (err) {
           console.error(err.message);
@@ -419,6 +437,27 @@ const appCheckHeadlessTask = async (user, taskData) => {
         }
 
         console.log('3. AppUsageRecord 종료 기록');
+
+        // missionRecord update
+        if (type !== PhoneUsageRecord.TYPE.DEFAULT) {
+          const missionRecord = realm
+            .objects('MissionRecord')
+            .sorted('startTime', true)[0];
+
+          const startTimeInt = parseInt(
+              moment().diff(curState.startAppTime) / 1000,
+            ),
+            endTimeInt = parseInt(moment().diff(curState.endAppTime) / 1000);
+
+          missionRecord.prohibitedAppUsages.push({
+            name: prevAppName,
+            startTime: startTimeInt,
+            endTime: endTimeInt,
+          });
+          missionRecord.totalProhibitedAppUsageSec += endTimeInt - startTimeInt;
+
+          console.log('4. MissionRecord 금지 앱 기록');
+        }
       }
     });
 

@@ -2,7 +2,6 @@
  * @format
  */
 
-import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import {getRealmApp} from './getRealmApp';
@@ -17,6 +16,17 @@ import {
 import {ForegroundServiceModule, MissionSetterModule} from './wrap_module';
 import Realm from 'realm';
 import {ProhibitedApp} from './schema';
+import {AppRegistry, Text, TextInput} from 'react-native';
+
+// 텍스트 크기 기본으로 고정
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.autoCorrect = false;
+TextInput.defaultProps.allowFontScaling = false;
+
+AppRegistry.registerComponent(appName, () => App);
 
 AppRegistry.registerComponent(appName, () => App);
 

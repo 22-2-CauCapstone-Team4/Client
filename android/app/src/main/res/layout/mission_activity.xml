@@ -134,6 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="n분 m초 뒤 사용 가능"
                 android:textColor="#ee0000" />
             <TextView
@@ -142,7 +143,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="사용 가능"
-                android:visibility="invisible"
                 android:textColor="#058eb0" />
         </LinearLayout>
 

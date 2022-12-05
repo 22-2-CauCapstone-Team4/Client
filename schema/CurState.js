@@ -14,7 +14,7 @@ class CurState {
     isNowDoingMission,
     missionStartTime,
     isNowGivingUp,
-    lastBreaktime,
+    lastBreakTime,
     mission,
   }) {
     this._id = id;
@@ -29,7 +29,7 @@ class CurState {
     if (isNowDoingMission) this.isNowDoingMission = isNowDoingMission;
     if (missionStartTime) this.missionStartTime = missionStartTime;
     if (isNowGivingUp) this.isNowGivingUp = isNowGivingUp;
-    if (lastBreaktime) this.lastBreaktime = lastBreaktime;
+    if (lastBreakTime) this.lastBreakTime = lastBreakTime;
     if (mission) this.mission = mission;
   }
 
@@ -48,7 +48,7 @@ class CurState {
       isNowDoingMission: {type: 'bool', default: false},
       missionStartTime: {type: 'date?'},
       isNowGivingUp: {type: 'bool', default: false},
-      lastBreaktime: 'date?',
+      lastBreakTime: 'date?',
       mission: 'Mission?',
     },
     primaryKey: '_id',

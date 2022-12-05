@@ -359,12 +359,12 @@ function MissionBox(props) {
         ) : (
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.info}>장소: {props.mission.space} |</Text>
-            <Text style={[styles.info, {marginLeft: 10}]}>
+            <Text style={[styles.info]}>
               {props.mission.type === 'IN_PLACE'
-                ? '안'
+                ? ' 안'
                 : props.mission.type === 'MOVE_PLACE'
-                ? '이동'
-                : '이동 + 안'}
+                ? ' 이동'
+                : ' 이동 + 안'}
             </Text>
           </View>
         )}
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   },
   info: {
     color: Colors.MAIN_COLOR,
-    fontSize: 12,
+    // fontSize: 12,
   },
   timeIcon: {
     color: Colors.MAIN_COLOR,
