@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Text,
   ScrollView,
@@ -15,19 +15,37 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
 import FriendBox from '../box/FriendBox';
 import FriendModal from '../modal/FriendModal';
+import FriendCandidateModal from '../modal/FriendCandidateModal';
 import {useDispatch, useSelector} from 'react-redux';
 
 export default function FriendTab({navigation}) {
   const [friendState, setFriendState] = useState('whole');
   const [modalVisible, setModalVisible] = useState(false);
+  const [followModalVisible, setFollowModalVisible] = useState(false);
   const whole = () => setFriendState('whole');
   const locked = () => setFriendState('lock');
   const giveUp = () => setFriendState('quit');
   const cheat = () => setFriendState('unlock');
   const friends = useSelector(store => store.friendReducer.data);
+  const friendCandidates = useSelector(store => store.friendReducer.candidate);
+
+  useEffect(() => {}, [friendCandidates]);
+
   return (
     <Container>
-      <Text style={{color: 'black'}}>친구 상태</Text>
+      <View style={styles.headerInfo}>
+        <Text style={{color: 'black'}}>친구 상태</Text>
+        <TouchableOpacity
+          style={styles.followButton}
+          onPress={() => {
+            setFollowModalVisible(true);
+          }}>
+          <Text style={{color: Colors.MAIN_COLOR, fontSize: 12}}>
+            {friendCandidates.length} 신청
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <FriendState>
         <TouchableOpacity onPress={whole}>
           <Text
@@ -75,8 +93,8 @@ export default function FriendTab({navigation}) {
         {friendState === 'whole'
           ? friends.map(item => (
               <FriendBox
-                key={item.name}
-                name={item.name}
+                key={item.nickname}
+                name={item.nickname}
                 state={item.state}></FriendBox>
             ))
           : friends
@@ -85,14 +103,21 @@ export default function FriendTab({navigation}) {
                 console.log(item);
                 return (
                   <FriendBox
-                    key={item.name}
-                    name={item.name}
+                    key={item.nickname}
+                    name={item.nickname}
                     state={item.state}></FriendBox>
                 );
               })}
       </ScrollView>
       <AddFriendBtn onPress={() => setModalVisible(true)}>
         <Ionicons name="add-circle" size={50} color={'#0891b2'} />
+        <Text
+          style={{
+            color: Colors.MAIN_COLOR,
+            fontSize: 10,
+          }}>
+          친구 추가
+        </Text>
       </AddFriendBtn>
       {/* modal */}
       <View style={styles.centeredView}>
@@ -100,6 +125,10 @@ export default function FriendTab({navigation}) {
           navigation={navigation}
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}></FriendModal>
+        <FriendCandidateModal
+          navigation={navigation}
+          followModalVisible={followModalVisible}
+          setFollowModalVisible={setFollowModalVisible}></FriendCandidateModal>
       </View>
     </Container>
   );
@@ -146,6 +175,19 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  followButton: {
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+    width: 55,
+    height: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 25,
+  },
+  headerInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

@@ -1,9 +1,8 @@
 import React from 'react';
-import {Text, View, TouchableOpacity} from 'react-native';
+import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
-import {baseFontSize} from 'native-base/lib/typescript/theme/tools';
 
 function FriendBox(props) {
   return (
@@ -43,7 +42,7 @@ function FriendBox(props) {
                   : props.state === 'unlock'
                   ? 'orange'
                   : 'red',
-              size: 1,
+              fontSize: 12,
             }}>
             {props.state === 'lock'
               ? '미션 진행 중'
@@ -51,6 +50,11 @@ function FriendBox(props) {
               ? '금지 앱 사용 중'
               : '포기'}
           </Text>
+          {props.state !== 'lock' ? (
+            <TouchableOpacity style={styles.wakeButton}>
+              <Text style={styles.wakeButtonText}>깨우기</Text>
+            </TouchableOpacity>
+          ) : null}
         </ConditionView>
       </MissionContainer>
     </Container>
@@ -120,3 +124,15 @@ const Category = styled.Text`
 const MissionName = styled.Text`
   color: black;
 `;
+
+const styles = StyleSheet.create({
+  wakeButton: {
+    backgroundColor: Colors.MAIN_COLOR_INACTIVE,
+    width: 55,
+    height: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 25,
+  },
+  wakeButtonText: {color: Colors.MAIN_COLOR, fontSize: 10},
+});

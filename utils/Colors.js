@@ -4,6 +4,10 @@ const Colors = {
   MAP_CIRCLE_COLOR: '#0891B233',
   WHITE: '#FFFFFF',
   GREY: '#666666',
+
+  MAIN_PROGRESS_COLOR: 'rgb(8,145,178)',
+  PROGRESS_PAUSE_COLOR: 'rgb(255, 193, 2)',
+  PROGRESS_FAIL_COLOR: 'rgb(245,166,163)',
 };
 
 export default Colors;

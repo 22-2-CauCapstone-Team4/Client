@@ -163,3 +163,10 @@ export const addBlockedApps = items => {
     payload: items,
   };
 };
+
+export const updateComment = items => {
+  return {
+    type: 'UPDATE_COMMENT',
+    payload: items,
+  };
+};

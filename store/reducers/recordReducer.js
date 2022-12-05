@@ -61,15 +61,34 @@ const INITIAL_STATE = {
       isFinished: true,
       inputText: '',
     },
+    {
+      num: 5,
+      id: 'qwer1234', // 미션 이름
+      category: '수업', // 카테고리
+      name: '캡스톤', // 미션 이름
+      type: 'time', // 시간 or 공간
+      date: '2022-11-27',
+      time: {startTime: '07:30', endTime: '09:00'}, // 시작시간, 종료시간
+      space: {}, // 공간
+      isGiveUp: false, // 포기 여부
+      LockTime: {useTime: '3h 31m'},
+      useTimeLockApp: {useTime: '2h 21m'},
+      isFinished: true,
+      inputText: '',
+    },
   ],
 };
 
 const recordReducer = (state = INITIAL_STATE, action) => {
-  if (action.type === 'EVALUEATION') {
-    state.inputText;
+  switch (action.type) {
+    case 'UPDATE_COMMENT':
+      const oldComment = state.data.filter(
+        item => item.id != action.payload.id,
+      );
+      return {...state, data: [...oldComment, action.payload]};
+    default:
+      return state;
   }
-
-  return state;
 };
 
 export default recordReducer;
