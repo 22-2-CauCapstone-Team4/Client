@@ -27,13 +27,15 @@ import com.facebook.react.HeadlessJsTaskService;
 import java.util.ArrayList;
 
 public class ForegroundService extends Service {
+    // 미션 새로 생길 때마다 다시 앱 리스트 넣어 줄 필요 없도록
+    private static ArrayList<AppInfo> prohibitedAppList = null;
+
     private static final int SERVICE_NOTIFICATION_ID = 315;
     private static final String CHANNEL_ID = "PHONELOCK";
 
     private String phoneUsageState = "INIT";
     private String appPackageName = "";
     private boolean isProhibitedApp = false;
-    private ArrayList<AppInfo> prohibitedAppList;
 
     private NotificationManager notificationManager;
     private Notification notification;
@@ -178,7 +180,6 @@ public class ForegroundService extends Service {
 
                 String JsonAppListStr = intent.getExtras().getString("appList");
                 if (JsonAppListStr != null) {
-                    // *TODO : 여기서 콘솔 찍어봐서 오류 찾기
                     prohibitedAppList = JsonTransmitter.convertJsonToAppListStr(JsonAppListStr);
                 }
             }
@@ -203,6 +204,7 @@ public class ForegroundService extends Service {
             sendAppPackageNameToJS(getApplicationContext(), "", "", false, "PHONE_ON");
         }
 
+        Log.i("ForegroundService", "현재 금지 앱 개수 = " + prohibitedAppList.size());
         Log.i("ForegroundService", "서비스 생성 종료");
         return START_REDELIVER_INTENT;
     }
@@ -285,7 +287,7 @@ public class ForegroundService extends Service {
     }
 
     private void sendAppPackageNameToJS(Context context, String nowAppPackageName, String nowAppName, boolean nowIsProhibitedApp, String phoneUsageState) {
-        Intent checkAppIntent = new Intent(context, CheckAppEventService.class);
+        Intent checkAppIntent = new Intent(context, HeadlessEventService.class);
         Bundle bundle = new Bundle();
 
         bundle.putString("appPackageName", nowAppPackageName);
@@ -295,6 +297,7 @@ public class ForegroundService extends Service {
         else if (phoneUsageState.equals("PHONE_OFF")) bundle.putBoolean("isPhoneOff", true);
 
         checkAppIntent.putExtras(bundle);
+        checkAppIntent.putExtra("key", "CheckApp");
 
         Log.i("ForegroundService", "checkAppEvnet JS쪽으로 전송");
         context.startService(checkAppIntent);

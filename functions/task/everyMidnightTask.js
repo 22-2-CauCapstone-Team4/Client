@@ -30,17 +30,29 @@ const everyMidnightTask = async (user, taskData) => {
     todayMissions.forEach(todayMission => {
       const mission = todayMission.mission;
 
-      MissionSetterModule.setTimeMission(
-        parseInt(mission.startTime / 60),
-        mission.startTime % 60,
-        mission._id,
-        parseInt(Math.random() * 10000000),
-      );
+      if (mission.type !== Mission.TYPE.IN_PLACE) {
+        // 예약 설정
+        MissionSetterModule.setTimeMission(
+          parseInt(mission.startTime / 60),
+          mission.startTime % 60,
+          mission._id.toString(),
+          parseInt(Math.random() * 10000000),
+        );
+      } else {
+        MissionSetterModule.setPlaceMission(
+          mission.place.lat,
+          mission.place.lng,
+          parseInt(mission.place.range * 1000),
+          true, // isEnter
+          mission._id.toString(),
+          parseInt(Math.random() * 10000000),
+        );
+      }
     });
 
     realm.close();
   } catch (err) {
-    console.log(err.message());
+    console.log(err.message);
     if (realm !== null) realm.close();
   }
 };

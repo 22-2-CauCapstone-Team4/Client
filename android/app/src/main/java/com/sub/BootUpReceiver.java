@@ -17,7 +17,8 @@ public class BootUpReceiver extends BroadcastReceiver {
 
             Log.i("BootUpService", "부트 이벤트 발생");
 
-            Intent bootIntent = new Intent(context, BootEventService.class);
+            Intent bootIntent = new Intent(context, HeadlessEventService.class);
+            bootIntent.putExtra("key", "Boot");
             bootIntent.putExtra("Boot", true);
 
             context.startService(bootIntent);

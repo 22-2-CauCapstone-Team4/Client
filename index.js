@@ -10,6 +10,8 @@ import {
   startServiceTask,
   everyMidnightTask,
   acceptMissionTriggerTask,
+  breakTimeEndTask,
+  btnClickTask,
   mkConfig,
   readProhibitedAppsInRealm,
 } from './functions';
@@ -49,20 +51,12 @@ if (user !== null && user.providerType === 'local-userpass') {
     AppRegistry.registerHeadlessTask('MissionTrigger', () =>
       acceptMissionTriggerTask.bind(null, user),
     );
-
-    // const prohibitedApps = await readProhibitedAppsInRealm(user, realm);
-    // console.log('index.js - 금지 앱 불러오기 완료');
-    // console.log(prohibitedApps);
-
-    // ForegroundServiceModule.startService(
-    //   prohibitedApps.map(prohibitedApp => {
-    //     return {
-    //       packageName: prohibitedApp.packageName,
-    //       name: prohibitedApp.name,
-    //     };
-    //   }),
-    //   null,
-    // );
+    AppRegistry.registerHeadlessTask('BreakTimeEnd', () =>
+      breakTimeEndTask.bind(null, user),
+    );
+    AppRegistry.registerHeadlessTask('ClickBtn', () =>
+      btnClickTask.bind(null, user),
+    );
 
     // *TODO : 정보 불러오기
     MissionSetterModule.startMidnightAlarm();

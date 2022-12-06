@@ -6,8 +6,26 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {compareToday} from '../../functions/time';
 import {updateMission, updateTodayMission} from '../../store/action';
+import {mkConfig, giveUp, takeBreakTime} from '../../functions';
+
+import Realm from 'realm';
+import {useAuth} from '../../providers/AuthProvider';
+import SnackBar from 'react-native-snackbar';
+import {
+  CurState,
+  TodayMission,
+  Goal,
+  Place,
+  Mission,
+  ProhibitedApp,
+  AppUsageEmbedded,
+  GiveUpAppEmbedded,
+  MissionRecord,
+  UserInfo,
+} from '../../schema';
 
 const OngoingBox = () => {
+  const {user} = useAuth();
   const dispatch = useDispatch();
   const missionData = useSelector(
     store => store.todayMissionReducer.todayMissionData,
@@ -67,10 +85,28 @@ const OngoingBox = () => {
             onPress={() => {
               Alert.alert(
                 '10분 사용',
-                '제한한 어플을 10분동안 사용할 수 있습니다.',
+                '지금부터 10분간 금지 앱을 사용하시겠습니까?',
                 [
                   {
                     text: '사용',
+                    onPress: async () => {
+                      const realm = await Realm.open(
+                        mkConfig(user, [
+                          CurState.schema,
+                          Mission.schema,
+                          Goal.schema,
+                          Place.schema,
+                          ProhibitedApp.schema,
+                        ]),
+                      );
+                      await takeBreakTime(realm);
+                      realm.close();
+
+                      SnackBar.show({
+                        text: '지금부터 10분간 금지 앱을 사용할 수 있습니다. ',
+                        duration: SnackBar.LENGTH_SHORT,
+                      });
+                    },
                   },
                   {
                     text: '취소',
@@ -78,7 +114,7 @@ const OngoingBox = () => {
                 ],
               );
             }}>
-            <Text style={styles.btnStyle}>10분 휴식</Text>
+            <Text style={styles.btnStyle}>10분 사용</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn2}>
             <Text
@@ -87,7 +123,28 @@ const OngoingBox = () => {
                 Alert.alert('미션 포기!', '정말 미션을 포기하시겠습니까?', [
                   {
                     text: '포기',
-                    onPress: () => {
+                    onPress: async () => {
+                      const realm = await Realm.open(
+                        mkConfig(user, [
+                          CurState.schema,
+                          TodayMission.schema,
+                          Mission.schema,
+                          MissionRecord.schema,
+                          GiveUpAppEmbedded.schema,
+                          AppUsageEmbedded.schema,
+                          Goal.schema,
+                          Place.schema,
+                          ProhibitedApp.schema,
+                          UserInfo.schema,
+                        ]),
+                      );
+                      await giveUp(realm);
+                      realm.close();
+
+                      SnackBar.show({
+                        text: '미션 포기가 완료되었습니다. ',
+                        duration: SnackBar.LENGTH_SHORT,
+                      });
                       dispatch(
                         updateTodayMission({...doingMission, state: 'quit'}),
                       );

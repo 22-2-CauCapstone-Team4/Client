@@ -1,6 +1,4 @@
 /* eslint-disable no-labels */
-// import {LockAppModule} from './wrap_module';
-
 import Realm from 'realm';
 import {
   AppUsageRecord,
@@ -57,6 +55,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
       isPrevUsedProhibitedApp,
       prevAppPackageName,
       prevAppName,
+      leftTime,
+      isBreakTime = false,
       prevStartTime = null;
     realm.write(() => {
       // 상태 데이터 없으면 err
@@ -82,22 +82,32 @@ const appCheckHeadlessTask = async (user, taskData) => {
           .objects('MissionRecord')
           .sorted('startTime', true)[0];
 
-        let leftTime = curState.lastBreakTime
-          ? parseInt(moment().diff(curState.lastBreakTime) / 1000)
-          : 0;
-        if (leftTime < 0) leftTime = 0;
+        if (curState.lastBreakTime === null) {
+          leftTime = 0;
+        } else {
+          leftTime = parseInt(moment().diff(curState.lastBreakTime) / 1000);
+          if (leftTime < 10 * 60) isBreakTime = true; // 아직 쉬는 시간
 
-        try {
+          leftTime = 60 * 60 - leftTime;
+          if (leftTime < 0) leftTime = 0;
+        }
+
+        console.log(
+          '마지막 쉬는 시간',
+          curState.lastBreakTime,
+          ', 쉬는 시간 사용 가능까지 남은 시간',
+          leftTime,
+        );
+
+        if (!isBreakTime) {
           LockAppModule.viewLockScreen(
             curState.mission.goal.name,
             curState.mission.name,
             curState.mission.goal.nowDoingMissionCnt, // totalNum
             parseInt(moment().diff(missionRecord.startTime) / 1000), // passedTime
             missionRecord.totalProhibitedAppUsageSec, // usedTime
-            leftTime, // left time (10min)
+            leftTime, // left time (저번 쉬는시간으로부터 60min 뒤)
           );
-        } catch (err) {
-          console.error(err.message);
         }
       }
 
@@ -439,7 +449,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
         console.log('3. AppUsageRecord 종료 기록');
 
         // missionRecord update
-        if (type !== PhoneUsageRecord.TYPE.DEFAULT) {
+        if (type !== PhoneUsageRecord.TYPE.DEFAULT && !isBreakTime) {
+          // 쉬는 시간 아닐 때만
           const missionRecord = realm
             .objects('MissionRecord')
             .sorted('startTime', true)[0];
@@ -455,9 +466,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
             endTime: endTimeInt,
           });
           missionRecord.totalProhibitedAppUsageSec += endTimeInt - startTimeInt;
-
-          console.log('4. MissionRecord 금지 앱 기록');
         }
+
+        console.log('4. MissionRecord 금지 앱 기록');
       }
     });
 

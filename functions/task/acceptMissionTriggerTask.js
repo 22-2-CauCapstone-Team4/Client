@@ -13,9 +13,12 @@ import {
   AppUsageEmbedded,
   UserInfo,
 } from '../../schema';
-import {ForegroundServiceModule, MissionSetterModule} from '../../wrap_module';
+import {
+  ForegroundServiceModule,
+  MissionSetterModule,
+  LockAppModule,
+} from '../../wrap_module';
 import {mkConfig} from '../mkConfig';
-import {LockAppModule} from '../../wrap_module';
 import {appCheckHeadlessTask} from './appCheckHeadlessTask';
 import moment from 'moment';
 
@@ -41,6 +44,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
       ]),
     );
 
+    const now = new Date();
     let appPackageName, appName, isProhibitedApp;
     let prevType,
       curType,
@@ -72,7 +76,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
         : PhoneUsageRecord.TYPE.DEFAULT;
 
       // console.log(JSON.parse(JSON.stringify(curState)), mission.name);
-      if (todayMission.state === TodayMission.STATE.NONE) {
+      if (todayMission.state === TodayMission.STATE.NONE && mission.isActive) {
         if (!curState.isNowDoingMission) {
           // 미션 수행
           console.log(mission.name, '미션 시작');
@@ -84,11 +88,14 @@ const acceptMissionTriggerTask = async (user, taskData) => {
           const missionRecord = new MissionRecord({
             owner_id: user.id,
             mission,
-            startTime: new Date(),
+            startTime: now,
           });
           realm.create('MissionRecord', missionRecord);
 
           curState.isNowDoingMission = true;
+          curState.missionStartTime = now;
+          curState.isNowGivingUp = false;
+          curState.lastBreakTime = null;
           curState.mission = mission;
           todayMission.state = TodayMission.STATE.START;
 
@@ -156,8 +163,9 @@ const acceptMissionTriggerTask = async (user, taskData) => {
           todayMission.state = TodayMission.STATE.PENDING;
         }
       } else if (
-        todayMission.state === TodayMission.STATE.START ||
-        todayMission.state === TodayMission.STATE.PENDING
+        (todayMission.state === TodayMission.STATE.START ||
+          todayMission.state === TodayMission.STATE.PENDING) &&
+        mission.isActive
       ) {
         switch (todayMission.extraState) {
           case TodayMission.STATE.MOVE_PLACE:
@@ -188,7 +196,9 @@ const acceptMissionTriggerTask = async (user, taskData) => {
               curType = PhoneUsageRecord.TYPE.DEFAULT;
 
               curState.isNowDoingMission = false;
-              delete curState.mission;
+              curState.isNowGivingUp = false;
+              curState.lastBreakTime = null;
+              curState.mission = null;
 
               todayMission.state = TodayMission.STATE.OVER;
 
@@ -211,6 +221,30 @@ const acceptMissionTriggerTask = async (user, taskData) => {
               todayMission.state = TodayMission.STATE.NONE;
             }
         }
+      } else if (todayMission.state === TodayMission.STATE.QUIT) {
+        console.log(mission.name, '포기한 미션 실제 종료');
+
+        if (curState.mission._id.toString() === id) {
+          // 다른 미션 진행 중이지 않은 경우, 예전 내용 초기화 및 다시 알림 주기 필요
+          curState.isNowDoingMission = false;
+          curState.isNowGivingUp = false;
+          curState.lastBreakTime = null;
+          curState.mission = null;
+
+          ForegroundServiceModule.startService(prohibitedApps, {
+            title: `감지 중`,
+            content: '금지 앱 접속을 감지 중입니다. ',
+          });
+        }
+
+        const missionRecord = realm
+          .objects('MissionRecord')
+          .filtered(`mission._id == oid(${id})`)[0];
+
+        // 종료 시간 기록
+        missionRecord.endTime = parseInt(
+          moment().diff(missionRecord.startTime) / 1000,
+        );
       }
     });
 

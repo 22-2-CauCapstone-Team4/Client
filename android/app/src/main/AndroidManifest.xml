@@ -39,10 +39,8 @@
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="false" />
-        <service android:name=".CheckAppEventService" />
-        <service android:name=".BootEventService" />
-        <service android:name=".MissionEventService" />
-        <service android:name=".MidnightEventService" />
+        <service android:name=".HeadlessEventService" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"

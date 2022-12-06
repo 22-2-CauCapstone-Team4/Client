@@ -90,12 +90,31 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    // 10분 뒤 휴식 종료
+    @ReactMethod
+    public void setBreakTimeEndAlarm() {
+        Log.i("MissionSetterModule", "휴식 종료 알람 세팅 시작");
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("isTime", true);
+        bundle.putBoolean("isMidnight", false);
+        bundle.putBoolean("isBreaktimeEnd", true);
+
+        Date date = new Date(); // 현재 시간
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE, 10);
+
+        setTime(bundle, calendar, 1);
+    }
+
     @ReactMethod
     public void startMidnightAlarm() {
         Log.i("MissionSetterModule", "정각 알람 세팅 시작");
         Bundle bundle = new Bundle();
         bundle.putBoolean("isTime", true);
         bundle.putBoolean("isMidnight", true);
+        bundle.putBoolean("isBreaktimeEnd", false);
 
         Date date = new Date(); // 현재 시간
 
@@ -108,7 +127,7 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
         calendar.set(Calendar.MILLISECOND, 0);
 
         // test code
-//        calendar.set(Calendar.MINUTE, 1);
+        // calendar.set(Calendar.MINUTE, 1);
 
         setTime(bundle, calendar, 0);
     }
@@ -121,6 +140,8 @@ public class MissionSetterModule extends ReactContextBaseJavaModule {
 
         Bundle bundle = new Bundle();
         bundle.putBoolean("isTime", true);
+        bundle.putBoolean("isMidnight", false);
+        bundle.putBoolean("isBreaktimeEnd", false);
         bundle.putString("id", id);
 
         Calendar calendar = Calendar.getInstance();

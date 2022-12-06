@@ -8,6 +8,8 @@ import {
   appCheckHeadlessTask,
   everyMidnightTask,
   acceptMissionTriggerTask,
+  breakTimeEndTask,
+  btnClickTask,
 } from '../functions';
 import {app} from '../index';
 import {ForegroundServiceModule} from '../wrap_module';
@@ -55,6 +57,12 @@ const AuthProvider = ({children}) => {
     );
     AppRegistry.registerHeadlessTask('MissionTrigger', () =>
       acceptMissionTriggerTask.bind(null, newUser),
+    );
+    AppRegistry.registerHeadlessTask('BreakTimeEnd', () =>
+      breakTimeEndTask.bind(null, newUser),
+    );
+    AppRegistry.registerHeadlessTask('ClickBtn', () =>
+      btnClickTask.bind(null, newUser),
     );
 
     setUser(newUser);
@@ -132,6 +140,12 @@ const AuthProvider = ({children}) => {
     );
     AppRegistry.registerHeadlessTask('MissionTrigger', () =>
       acceptMissionTriggerTask.bind(null, newUser),
+    );
+    AppRegistry.registerHeadlessTask('BreakTimeEnd', () =>
+      breakTimeEndTask.bind(null, newUser),
+    );
+    AppRegistry.registerHeadlessTask('ClickBtn', () =>
+      btnClickTask.bind(null, newUser),
     );
 
     setUser(newUser);

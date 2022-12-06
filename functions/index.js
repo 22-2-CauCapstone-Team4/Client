@@ -1,4 +1,5 @@
 import {mkConfig, mkConfigWithSubscriptions} from './mkConfig';
+import {takeBreakTime, giveUp} from './MissionBtn';
 import {
   readProhibitedAppsInRealm,
   updateProhibitedAppsInRealm,
@@ -30,6 +31,8 @@ import {
   startServiceTask,
   everyMidnightTask,
   acceptMissionTriggerTask,
+  breakTimeEndTask,
+  btnClickTask,
 } from './task';
 
 module.exports = {
@@ -63,4 +66,8 @@ module.exports = {
   readAppCntInRealm,
   mkConfig,
   mkConfigWithSubscriptions,
+  takeBreakTime,
+  giveUp,
+  breakTimeEndTask,
+  btnClickTask,
 };

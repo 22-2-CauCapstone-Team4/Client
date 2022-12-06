@@ -9,19 +9,22 @@ import androidx.annotation.Nullable;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
-public class BootEventService extends HeadlessJsTaskService {
-    public BootEventService() {
+
+public class HeadlessEventService extends HeadlessJsTaskService {
+    public HeadlessEventService() {
     }
 
     @Override
     protected @Nullable
     HeadlessJsTaskConfig getTaskConfig(Intent intent) {
         Bundle extras = intent.getExtras();
-        Log.i("BootEventService", "headless로 전송");
+        String key = intent.getStringExtra("key");
+
+        Log.i("HeadlessEventService", key + " 트리거, headless로 이벤트 전송");
 
         if (extras != null) {
             return new HeadlessJsTaskConfig(
-                    "Boot",
+                    key,
                     Arguments.fromBundle(extras),
                     5000,
                     true
