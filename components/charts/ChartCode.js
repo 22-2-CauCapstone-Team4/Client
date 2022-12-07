@@ -25,7 +25,7 @@ let chartcode = `
   }
 </style>
 <h1>금지 앱 사용 시간 비율</h1>
-<canvas id="myChart1" width ="1000vh" height = "700vh"></canvas>
+<canvas id="myChart1" width ="970vh" height = "700vh"></canvas>
 <div class="swiper mySwiper">
   <div class="swiper-wrapper">
     <div class="swiper-slide">
@@ -75,6 +75,8 @@ const ctx4 = document.getElementById('myChart4');
 const ctx5 = document.getElementById('myChart5');
 const ctx6 = document.getElementById('myChart6');
 Chart.defaults.font.size = 30;
+Chart.defaults.font.weight = 'bold';
+
 
 // ★1. 미션 중/포기 중/평소 전체 시간 대비 금지 앱 사용 시간
 
