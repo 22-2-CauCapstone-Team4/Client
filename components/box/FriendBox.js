@@ -27,9 +27,15 @@ function FriendBox(props) {
         <ContentContainer>
           <View>
             <ContentView>
-              <Category>✏️수업</Category>
-              <Category>|</Category>
-              <MissionName>모바일 앱</MissionName>
+              {props.mission ? (
+                <>
+                  <Category>props.mission.name</Category>
+                  <Category>|</Category>
+                  <MissionName>props.mission.goal.name</MissionName>
+                </>
+              ) : (
+                <MissionName>미션 수행 전</MissionName>
+              )}
             </ContentView>
           </View>
         </ContentContainer>
@@ -46,11 +52,15 @@ function FriendBox(props) {
             }}>
             {props.state === 'lock'
               ? '미션 진행 중'
+              : props.state === 'none'
+              ? null
               : props.state === 'unlock'
               ? '금지 앱 사용 중'
+              : props.state === 'unlock_quit'
+              ? '포기하고 금지 앱 사용 중'
               : '포기'}
           </Text>
-          {props.state !== 'lock' ? (
+          {props.state === 'unlock_quit' ? (
             <TouchableOpacity style={styles.wakeButton}>
               <Text style={styles.wakeButtonText}>깨우기</Text>
             </TouchableOpacity>

@@ -17,8 +17,10 @@ import FriendBox from '../box/FriendBox';
 import FriendModal from '../modal/FriendModal';
 import FriendCandidateModal from '../modal/FriendCandidateModal';
 import {useDispatch, useSelector} from 'react-redux';
+import {useAuth} from '../../providers/AuthProvider';
 
 export default function FriendTab({navigation}) {
+  const {user} = useAuth();
   const [friendState, setFriendState] = useState('whole');
   const [modalVisible, setModalVisible] = useState(false);
   const [followModalVisible, setFollowModalVisible] = useState(false);
@@ -28,6 +30,23 @@ export default function FriendTab({navigation}) {
   const cheat = () => setFriendState('unlock');
   const friends = useSelector(store => store.friendReducer.data);
   const friendCandidates = useSelector(store => store.friendReducer.candidate);
+  console.log(friends, friendCandidates);
+
+  // const test = async () => {
+  //   const {friendInfo, friendCurStates} = await user.callFunction(
+  //     'friend/readFriends',
+  //     {
+  //       owner_id: user.id,
+  //     },
+  //   );
+  //   // console.log(friendInfo, friends);
+  //   let tempArr = [];
+  //   for (let i = 0; i < friendInfo.length; i++) {
+  //     tempArr.push({...friendInfo, friendCurStates});
+
+  //   }
+  // };
+  // test();
 
   useEffect(() => {}, [friendCandidates]);
 
@@ -86,8 +105,14 @@ export default function FriendTab({navigation}) {
           : friendState == 'lock'
           ? '잠금 중 | ' + friends.filter(el => el.state === 'lock').length
           : friendState == 'quit'
-          ? '포기 | ' + friends.filter(el => el.state === 'quit').length
-          : '금지 앱 | ' + friends.filter(el => el.state === 'unlock').length}
+          ? '포기 | ' +
+            friends.filter(
+              el => el.state === 'quit' || el.state === 'unlock_quit',
+            ).length
+          : '금지 앱 | ' +
+            friends.filter(
+              el => el.state === 'unlock' || el.state === 'unlock_quit',
+            ).length}
       </StateText>
       <ScrollView>
         {friendState === 'whole'

@@ -466,6 +466,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
             endTime: endTimeInt,
           });
           missionRecord.totalProhibitedAppUsageSec += endTimeInt - startTimeInt;
+          console.log(JSON.parse(JSON.stringify(missionRecord)));
         }
 
         console.log('4. MissionRecord 금지 앱 기록');

@@ -9,20 +9,28 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {addFriend} from '../../store/action';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
+import {useAuth} from '../../providers/AuthProvider';
+import {useEffect} from 'react';
+import SnackBar from 'react-native-snackbar';
 
 export default function FriendModal({
   navigation,
   modalVisible,
   setModalVisible,
 }) {
+  const {user} = useAuth();
   const dispatch = useDispatch();
-  const userList = useSelector(store => store.userReducer.data);
+  // const userList = useSelector(store => store.userReducer.data);
   const friendList = useSelector(store => store.friendReducer.data);
   const [searchText, setSearchText] = useState('');
   const [result, setResult] = useState('');
+
+  React.useEffect(() => {}, [result, friendList]);
   // console.log(userList);
+  // console.log(friendList);
 
   return (
     <>
@@ -50,63 +58,91 @@ export default function FriendModal({
                     }}></TextInput>
                   <TouchableOpacity
                     style={styles.searchButton}
-                    onPress={() => {
-                      setResult(searchText);
+                    onPress={async () => {
+                      const {userInfos} = await user.callFunction(
+                        'user/readUserInfos',
+                        {
+                          nickname: searchText,
+                        },
+                      );
+                      // console.log(userInfos);
+                      setResult(userInfos);
                     }}>
                     <Icon name={'search'} size={20} color={'black'}></Icon>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.lineStyle}></View>
-                {result !== '' ? (
-                  userList.filter(user => user.nickname.indexOf(result) != -1)
-                    .length > 0 ? (
-                    userList
-                      .filter(user => user.nickname.indexOf(result) != -1)
-                      .map(data => (
-                        <View
-                          key={data._id}
-                          style={{
-                            flexDirection: 'row',
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            marginVertical: 6,
+                {result.length > 0 ? (
+                  result.map(data => (
+                    <View
+                      key={data._id}
+                      style={{
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'space-between',
+                        marginVertical: 6,
+                      }}>
+                      <View style={{flexDirection: 'row'}}>
+                        <Icon
+                          name={'person'}
+                          color="green"
+                          size={20}
+                          style={{marginRight: 5}}></Icon>
+                        <Text style={{color: 'black'}}>{data.nickname}</Text>
+                      </View>
+                      {friendList.map(f => f.nickname).indexOf(data.nickname) ==
+                      -1 ? (
+                        <TouchableOpacity
+                          style={styles.followButton}
+                          onPress={async () => {
+                            // console.log(data);
+                            const {friendInfo, myFriendCurState} =
+                              await user.callFunction('friend/reqToBeFriend', {
+                                owner_id: user.id,
+                                friendId: data.owner_id,
+                              });
+                            // console.log(friendInfo, myFriendCurState);
+
+                            const state =
+                              myFriendCurState.isNowUsingProhibitedApp
+                                ? myFriendCurState.isNowGivingUp
+                                  ? 'unlock_quit'
+                                  : 'quit'
+                                : myFriendCurState.isNowDoingMission
+                                ? 'lock'
+                                : 'none';
+
+                            const friend = {
+                              _id: friendInfo.owner_id,
+                              nickname: friendInfo.nickname,
+                              state,
+                            };
+                            // console.log(friend);
+                            dispatch(addFriend({data: friend}));
+
+                            SnackBar.show({
+                              text: `${data.nickname} 친구를 팔로우하였습니다. `,
+                              duration: SnackBar.LENGTH_SHORT,
+                            });
+                            // setResult(userInfos);
                           }}>
-                          <View style={{flexDirection: 'row'}}>
-                            <Icon
-                              name={'person'}
-                              color="green"
-                              size={20}
-                              style={{marginRight: 5}}></Icon>
-                            <Text style={{color: 'black'}}>
-                              {data.nickname}
-                            </Text>
-                          </View>
-                          {friendList
-                            .map(f => f.nickname)
-                            .indexOf(data.nickname) == -1 ? (
-                            <TouchableOpacity
-                              style={styles.followButton}
-                              onPress={() => {}}>
-                              <Text style={styles.followButtonText}>
-                                팔로우
-                              </Text>
-                            </TouchableOpacity>
-                          ) : null}
-                        </View>
-                      ))
-                  ) : (
-                    <Text style={{color: Colors.GREY, fontSize: 20}}>
-                      목록 없음
-                    </Text>
-                  )
-                ) : null}
+                          <Text style={styles.followButtonText}>팔로우</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  ))
+                ) : (
+                  <Text style={{color: Colors.GREY, fontSize: 20}}>
+                    목록 없음
+                  </Text>
+                )}
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
                     setSearchText('');
-                    setResult('');
+                    setResult([]);
                     setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>취소</Text>
