@@ -28,9 +28,9 @@ export default function FriendModal({
   const [searchText, setSearchText] = useState('');
   const [result, setResult] = useState('');
 
-  React.useEffect(() => {}, [result]);
+  React.useEffect(() => {}, [result, friendList]);
   // console.log(userList);
-  console.log(friendList);
+  // console.log(friendList);
 
   return (
     <>
@@ -65,7 +65,7 @@ export default function FriendModal({
                           nickname: searchText,
                         },
                       );
-                      console.log(userInfos);
+                      // console.log(userInfos);
                       setResult(userInfos);
                     }}>
                     <Icon name={'search'} size={20} color={'black'}></Icon>
@@ -101,7 +101,7 @@ export default function FriendModal({
                                 owner_id: user.id,
                                 friendId: data.owner_id,
                               });
-                            console.log(friendInfo, myFriendCurState);
+                            // console.log(friendInfo, myFriendCurState);
 
                             const state =
                               myFriendCurState.isNowUsingProhibitedApp
@@ -117,7 +117,7 @@ export default function FriendModal({
                               nickname: friendInfo.nickname,
                               state,
                             };
-                            console.log(friend);
+                            // console.log(friend);
                             dispatch(addFriend({data: friend}));
 
                             SnackBar.show({

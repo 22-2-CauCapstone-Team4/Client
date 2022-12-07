@@ -27,9 +27,15 @@ function FriendBox(props) {
         <ContentContainer>
           <View>
             <ContentView>
-              <Category>✏️수업</Category>
-              <Category>|</Category>
-              <MissionName>모바일 앱</MissionName>
+              {props.mission ? (
+                <>
+                  <Category>props.mission.name</Category>
+                  <Category>|</Category>
+                  <MissionName>props.mission.goal.name</MissionName>
+                </>
+              ) : (
+                <MissionName>미션 수행 전</MissionName>
+              )}
             </ContentView>
           </View>
         </ContentContainer>

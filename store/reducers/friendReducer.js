@@ -10,23 +10,47 @@ const INITIAL_STATE = {
 };
 
 const friendReducer = (state = INITIAL_STATE, action) => {
+  let temp;
   switch (action.type) {
     case 'INIT_FRIEND':
-      return {
-        ...state,
-        data: action.payload.data,
-        candidate: action.payload.candidate,
-      };
+      temp = state;
+      if (action.payload.data) {
+        temp = {...temp, data: action.payload.data};
+      }
+      if (action.payload.candidate) {
+        temp = {
+          ...temp,
+          candidate: action.payload.candidate,
+        };
+      }
+      return temp;
     case 'ADD_FRIEND':
       // const newCandidates = state.candidate.filter(
       //   item => item._id !== action.payload._id,
       // );
-      return {
-        ...state,
-        data: [...state.data, action.payload.data],
-      };
+      temp = state;
+      if (action.payload.data) {
+        temp = {...temp, data: [...state.data, action.payload.data]};
+      }
+      if (action.payload.candidate) {
+        temp = {
+          ...temp,
+          candidate: [...state.candidate, action.payload.candidate],
+        };
+      }
+      return temp;
     case 'DELETE_FRIEND':
-      return {...state, data: action.payload};
+      temp = state;
+      if (action.payload.data) {
+        temp = {...temp, data: action.payload.data};
+      }
+      if (action.payload.candidate) {
+        temp = {
+          ...temp,
+          candidate: action.payload.candidate,
+        };
+      }
+      return temp;
     case 'SELECT_FRIEND':
       return {...state, filter: action.payload};
     default:

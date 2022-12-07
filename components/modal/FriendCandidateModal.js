@@ -13,8 +13,9 @@ import {
 import SnackBar from 'react-native-snackbar';
 import {useDispatch, useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useAuth} from '../../providers/AuthProvider';
 
-import {addFriend} from '../../store/action';
+import {addFriend, deleteFriend} from '../../store/action';
 import Colors from '../../utils/Colors';
 
 export default function FriendCandidateModal({
@@ -22,8 +23,10 @@ export default function FriendCandidateModal({
   followModalVisible,
   setFollowModalVisible,
 }) {
+  const {user} = useAuth();
   const dispatch = useDispatch();
   const candidates = useSelector(store => store.friendReducer.candidate);
+  const friendList = useSelector(store => store.friendReducer.data);
   return (
     <>
       {followModalVisible ? (
@@ -59,30 +62,72 @@ export default function FriendCandidateModal({
                     <View style={{flexDirection: 'row'}}>
                       <TouchableOpacity
                         style={styles.followButton}
-                        onPress={() => {
-                          const temp =
-                            candidates[
-                              candidates.map(cd => cd._id).indexOf(item._id)
-                            ];
-                          dispatch(addFriend(temp));
+                        onPress={async () => {
+                          console.log({
+                            owner_id: user.id,
+                            friendId: item._id,
+                            isAccepted: true,
+                          });
+                          const {friendInfo, myFriendCurState} =
+                            await user.callFunction('friend/resToBeFriend', {
+                              owner_id: user.id,
+                              friendId: item._id,
+                              isAccepted: true,
+                            });
+                          // console.log(friendInfo, myFriendCurState);
+
+                          const state = myFriendCurState.isNowUsingProhibitedApp
+                            ? myFriendCurState.isNowGivingUp
+                              ? 'unlock_quit'
+                              : 'quit'
+                            : myFriendCurState.isNowDoingMission
+                            ? 'lock'
+                            : 'none';
+
+                          const friend = {
+                            _id: friendInfo._id,
+                            nickname: friendInfo.nickname,
+                            state,
+                          };
+                          // console.log(friend);
+                          dispatch(addFriend({data: friend}));
+                          dispatch(
+                            deleteFriend({
+                              candidate: candidates.filter(
+                                el => el._id != item._id,
+                              ),
+                            }),
+                          );
+
                           SnackBar.show({
-                            text: `\'${item.nickname}\'님을 친구로 추가했습니다.`,
+                            text: `${item.nickname} 친구를 팔로우하였습니다. `,
                             duration: SnackBar.LENGTH_SHORT,
                           });
                         }}>
                         <Text style={styles.followButtonText}>팔로우</Text>
                       </TouchableOpacity>
+
                       <TouchableOpacity
                         style={styles.followButton}
                         onPress={async () => {
-                          // const {userInfos} = await user.callFunction(
-                          //   'user/reqFrined',
-                          //   {
-                          //     nickname: searchText,
-                          //   },
-                          // );
-                          // console.log(userInfos);
-                          // setResult(userInfos);
+                          await user.callFunction('friend/resToBeFriend', {
+                            owner_id: user.id,
+                            friendId: item._id,
+                            isAccepted: false,
+                          });
+
+                          dispatch(
+                            deleteFriend({
+                              candidate: candidates.filter(
+                                el => el._id != item._id,
+                              ),
+                            }),
+                          );
+
+                          SnackBar.show({
+                            text: `${item.nickname} 친구를 거절하였습니다. `,
+                            duration: SnackBar.LENGTH_SHORT,
+                          });
                         }}>
                         <Text style={styles.followButtonText}>거절</Text>
                       </TouchableOpacity>
