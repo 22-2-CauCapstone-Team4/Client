@@ -14,12 +14,13 @@ import {Text, ScrollView, TouchableOpacity, View, Alert} from 'react-native';
 // } from '../../functions';
 // import {AppUsageRecord, PhoneUsageRecord, CurState} from '../../schema';
 // import {useAuth} from '../../providers/AuthProvider';
-import chartcode from '../charts/ChartCode';
+
 import {WebView} from 'react-native-webview';
+
+import chartcode from '../charts/ChartCode';
 
 const StatisticsTab = () => {
   let html = chartcode;
-
   const webviewRef = useRef();
 
   /** 웹뷰 ref */
@@ -34,9 +35,7 @@ const StatisticsTab = () => {
     Alert.alert(e.nativeEvent.data);
   };
   return (
-    <View style={{flex: 1}}>
-      <WebView onMessage={handleOnMessage} source={{html}} ref={handleSetRef} />
-    </View>
+    <WebView onMessage={handleOnMessage} source={{html}} ref={handleSetRef} />
   );
 };
 
