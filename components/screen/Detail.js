@@ -33,6 +33,7 @@ import {
   addApps,
   addBlockedApps,
   initCategory,
+  initFriend,
   initMission,
   initPlace,
   initTodayMission,
@@ -131,6 +132,40 @@ function Detail({navigation}) {
           ),
         ),
       );
+
+      const {friendInfo, friendCurStates} = await user.callFunction(
+        'friend/readFriends',
+        {
+          owner_id: user.id,
+        },
+      );
+      console.log(friendInfo, friendCurStates);
+      let tempFriends = !friendInfo.items ? [] : friendInfo.items,
+        tempCandidates = !friendInfo.receivedRequests
+          ? []
+          : friendInfo.receivedRequests.map(cand => {
+              return {_id: cand.owner_id, nickname: cand.nickname};
+            });
+
+      const resultFriends = [];
+      for (let i = 0; i < tempFriends.length; i++) {
+        const state = friendCurStates[i].isNowUsingProhibitedApp
+          ? friendCurStates[i].isNowGivingUp
+            ? 'unlock_quit'
+            : 'quit'
+          : friendCurStates[i].isNowDoingMission
+          ? 'lock'
+          : 'none';
+
+        const friend = {
+          _id: tempFriends[i].owner_id,
+          nickname: tempFriends[i].nickname,
+          state,
+        };
+        resultFriends.push(friend);
+      }
+      dispatch(initFriend({data: resultFriends, candidate: tempCandidates}));
+      // console.log(tempFriends, tempCandidates);
       // console.log(
       //   '오늘 미션!!!',
       //   tempTodayMissions.map(mission => mkTodayMissionRealmObjToObj(mission)),

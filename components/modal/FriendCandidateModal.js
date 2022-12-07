@@ -56,21 +56,37 @@ export default function FriendCandidateModal({
                         style={{marginRight: 5}}></Icon>
                       <Text style={{color: 'black'}}>{item.nickname}</Text>
                     </View>
-                    <TouchableOpacity
-                      style={styles.followButton}
-                      onPress={() => {
-                        const temp =
-                          candidates[
-                            candidates.map(cd => cd._id).indexOf(item._id)
-                          ];
-                        dispatch(addFriend(temp));
-                        SnackBar.show({
-                          text: `\'${item.nickname}\'님을 친구로 추가했습니다.`,
-                          duration: SnackBar.LENGTH_SHORT,
-                        });
-                      }}>
-                      <Text style={styles.followButtonText}>팔로우</Text>
-                    </TouchableOpacity>
+                    <View style={{flexDirection: 'row'}}>
+                      <TouchableOpacity
+                        style={styles.followButton}
+                        onPress={() => {
+                          const temp =
+                            candidates[
+                              candidates.map(cd => cd._id).indexOf(item._id)
+                            ];
+                          dispatch(addFriend(temp));
+                          SnackBar.show({
+                            text: `\'${item.nickname}\'님을 친구로 추가했습니다.`,
+                            duration: SnackBar.LENGTH_SHORT,
+                          });
+                        }}>
+                        <Text style={styles.followButtonText}>팔로우</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.followButton}
+                        onPress={async () => {
+                          // const {userInfos} = await user.callFunction(
+                          //   'user/reqFrined',
+                          //   {
+                          //     nickname: searchText,
+                          //   },
+                          // );
+                          // console.log(userInfos);
+                          // setResult(userInfos);
+                        }}>
+                        <Text style={styles.followButtonText}>거절</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 ))}
               </View>
@@ -99,6 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
+    marginRight: 5,
   },
   followButtonText: {
     color: Colors.MAIN_COLOR,

@@ -100,6 +100,13 @@ export const selectTodayMission = item => {
 };
 
 //친구
+export const initFriend = item => {
+  return {
+    type: 'INIT_FRIEND',
+    payload: item,
+  };
+};
+
 export const addFriend = item => {
   return {
     type: 'ADD_FRIEND',

@@ -46,11 +46,15 @@ function FriendBox(props) {
             }}>
             {props.state === 'lock'
               ? '미션 진행 중'
+              : props.state === 'none'
+              ? null
               : props.state === 'unlock'
               ? '금지 앱 사용 중'
+              : props.state === 'unlock_quit'
+              ? '포기하고 금지 앱 사용 중'
               : '포기'}
           </Text>
-          {props.state !== 'lock' ? (
+          {props.state === 'unlock_quit' ? (
             <TouchableOpacity style={styles.wakeButton}>
               <Text style={styles.wakeButtonText}>깨우기</Text>
             </TouchableOpacity>
