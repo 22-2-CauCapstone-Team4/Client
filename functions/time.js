@@ -88,10 +88,14 @@ export function getActualMissionTime(startT, endT, giveUpT, breakTimes) {
   /// 휴식 중에 미션 클리어: 종료 시간 - 마지막 휴식 시간 < 600 확인하고 처리
   // console.log(timeToInteger(endT), giveUpT, breakTimes);
   let totalBreakTime = 0;
+  console.log(endT - breakTimes[breakTimes.length - 1]);
   if (breakTimes.length > 0) {
     totalBreakTime += (breakTimes.length - 1) * 600;
-    if (!giveUpT && endT - breakTimes[breakTimes.length - 1] < 600)
-      totalBreakTime += endT - breakTimes[breakTimes.length - 1];
+    if (
+      !giveUpT &&
+      timeToInteger(endT) - breakTimes[breakTimes.length - 1] < 600
+    )
+      totalBreakTime += timeToInteger(endT) - breakTimes[breakTimes.length - 1];
     else if (giveUpT && giveUpT - breakTimes[breakTimes.length - 1] < 600)
       totalBreakTime += giveUpT - breakTimes[breakTimes.length - 1];
     else totalBreakTime += 600;
