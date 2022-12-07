@@ -47,6 +47,23 @@ export function compareTimeBeforeStart(startTime) {
   }
 }
 
+// 경과 시간 구하기 - return int
+export function getElapsedTime(startTime) {
+  if (startTime !== undefined) {
+    let date = new Date();
+    date.setHours(date.getHours() + 9);
+    value =
+      timeToInteger(date.toISOString().replace('T', ' ').substring(11, 16)) -
+      timeToInteger(startTime);
+
+    // hh:mm:ss 형식 문자열 처리
+    if (startTime.split(':').length == 3) {
+      value += parseInt(startTime.split(':')[2]);
+    }
+    return value;
+  }
+}
+
 // 시간 미션 컴포넌트의 시간 정보 텍스트
 export function timeInfoText(data) {
   let timeData = data.split(':');

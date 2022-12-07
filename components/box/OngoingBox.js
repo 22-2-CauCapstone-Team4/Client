@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity, Text, View, Alert} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {compareToday} from '../../functions/time';
+import * as Time from '../../functions/time';
 import {updateMission, updateTodayMission} from '../../store/action';
 import {mkConfig, giveUp, takeBreakTime} from '../../functions';
 
@@ -31,24 +31,31 @@ const OngoingBox = () => {
     store => store.todayMissionReducer.todayMissionData,
   );
   const doingMission = missionData.filter(item => item.state == 'start')[0];
-  console.log('오늘의 미션', missionData);
-  useEffect(() => {}, [doingMission]);
-  //console.log('바뀔까요?', doingMission);
-  const pendingMission = missionData.filter(
-    item =>
-      item.state == 'none' &&
-      (item.dayOfWeek.length == 0
-        ? compareToday(item.date)
-        : item.dayOfWeek.includes(new Date().getDay())),
+
+  // 경과 시간: 미션 시작 시간(hh:mm) -> 약간 부정확한 형식 (hh:mm:ss)여야 정확
+  // 경과 시간은 휴식 시간을 제외한 상태이기 때문에 time.js에서 getActualMissionTime(startTime,endTime,null,breakTimes)를 이용하면 정확한 경과 시간을 얻을 것이라 예상
+  const [elapsedTime, setElapsedTime] = useState(
+    Time.getElapsedTime(doingMission.time.startTime),
   );
-  //console.log('pending중인 미션', pendingMission);
+
+  // 금지 앱 시간: 저장된 금지 앱 사용 시간
+  const [pauseTime, setPauseTime] = useState(0); //0 대신에 DB에 저장된 금지 앱 사용시간을 넣어줘야겠다
+
+  // 경과시간 실시간 측정
+  useEffect(() => {
+    const timeOutId = setInterval(() => {
+      setElapsedTime(second => second + 1);
+      //
+      if ('금지앱사용가능한상태'.length != 0) {
+        setPauseTime(second => second + 1);
+      }
+    }, 1000);
+    return () => clearInterval(timeOutId);
+  }, [doingMission, elapsedTime]);
+
   if (typeof doingMission !== 'undefined') {
     return (
       <Container>
-        {/* <Text
-          style={
-            styles.infoLeftOver
-          }>{`오늘 진행할 미션이 ${pendingMission.length}개 있습니다.`}</Text> */}
         <Info1>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={[styles.type1, {marginRight: 5}]}>
@@ -56,18 +63,20 @@ const OngoingBox = () => {
             </Text>
             <Text style={styles.type2}>| {doingMission.name}</Text>
           </View>
-
-          {/* <Text style={styles.info1}>
-              전체 <Text>123</Text>명 · 친구 <Text>3</Text>명이 함께함
-            </Text> */}
         </Info1>
         <Info2>
           <Text style={styles.info2}>
-            🔒 <Text style={{fontWeight: '500'}}>1:30:23</Text>{' '}
+            🔒{' '}
+            <Text style={{fontWeight: '500'}}>
+              {Time.integerToTime(elapsedTime)}
+            </Text>{' '}
             <Text style={{fontSize: 20}}>경과</Text>
           </Text>
           <Text style={styles.info3}>
-            📵 <Text style={{fontWeight: '500'}}>0:17:23 </Text>
+            📵{' '}
+            <Text style={{fontWeight: '500'}}>
+              {Time.integerToTime(pauseTime)}
+            </Text>
             <Text style={{fontSize: 20}}>사용</Text>
           </Text>
           <Text style={styles.info4}>
