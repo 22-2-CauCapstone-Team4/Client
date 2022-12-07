@@ -8,6 +8,7 @@ import {ProgressBar} from 'rn-multi-progress-bar';
 import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../../utils/styles';
 import {updateComment} from '../../store/action';
+import * as Time from '../../functions/time.js';
 
 const RecordTab = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -17,38 +18,68 @@ const RecordTab = () => {
 
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
-  const newRecord = recordList
-    .filter(value => {
-      return value.isFinished === true;
-    })
-    .sort(sortRecord)
-    .reverse();
+  const newRecord = recordList.sort(sortRecord).reverse();
   const dispatch = useDispatch();
 
-  const arr = Array.from(new Set(newRecord.map(item => item.date)));
-  for (var i = 0; i < arr.length; i++) {
-    console.log(arr[i]);
-  }
+  const arr = Array.from(new Set(newRecord.map(item => item.mission.date)));
 
   function sortRecord(a, b) {
-    a = a.date.split('-').join('');
-    b = b.date.split('-').join('');
-    if (a < b) return -1;
-    else if (a == b) return 0;
-    else return 1;
+    aDate = a.mission.date.split('-').join('');
+    bDate = b.mission.date.split('-').join('');
+    if (aDate < bDate) return -1;
+    else if (aDate == bDate) {
+      aStartTime = a.startTime.split(':').join('');
+      bStartTime = b.startTime.split(':').join('');
+      if (aStartTime <= bStartTime) return 1;
+      else return -1;
+    } else return 1;
   }
 
-  const CustomProgressBar = () => {
-    return (
-      <ProgressBar
-        data={[
-          {progress: 650, color: Colors.MAIN_PROGRESS_COLOR},
-          {progress: 50, color: Colors.PROGRESS_PAUSE_COLOR},
-          {progress: 100, color: Colors.MAIN_PROGRESS_COLOR},
-          {progress: 200, color: Colors.PROGRESS_FAIL_COLOR},
-        ]}
-      />
-    );
+  // 초시간 배열로 관리하는 프로그레스 바
+  // BLUE: 시작, 종료 시간, 휴식 종료 시간(startTime, endTime, breakTimes[i] + extraTime(less than 600))
+  // YELLOW: 휴식 시작 시간(breakTimes elements)
+  // RED: 포기 시간(giveUpTime)
+  const CustomProgressBar = props => {
+    let BLUE = [
+      Time.timeToInteger(props.timeData.startTime),
+      Time.timeToInteger(props.timeData.endTime),
+    ];
+    let YELLOW = props.timeData.breakTimes;
+    let RED = [props.timeData.giveUpTime];
+    let breakTimes = props.timeData.breakTimes;
+    // 휴식 종료 시간 BLUE에 append (마지막 휴식 종료 시간 제외)
+    if (breakTimes.length > 0) {
+      for (var i = 0; i < breakTimes.length - 1; i++)
+        BLUE.push(breakTimes[i] + 600);
+
+      // 마지막 휴식 종료 시간 처리
+      // 휴식 중에 포기했거나 미션 종료됐다면 마지막 휴식 종료 시간은 포기 시간 or 미션 종료 시간이 된다. 즉, push 안함
+      let lastBreakTime = breakTimes[breakTimes.length - 1];
+      if (
+        (props.timeData.giveUpTime &&
+          props.timeData.giveUpTime - lastBreakTime > 600) ||
+        (!props.timeData.giveUpTime &&
+          Time.timeToInteger(props.timeData.endTime) - lastBreakTime > 600)
+      ) {
+        BLUE.push(lastBreakTime + 600);
+      }
+    }
+    let times = [];
+    if (RED[0] !== null) times = BLUE.concat(YELLOW, RED); //null처리
+    else times = BLUE.concat(YELLOW);
+    times.sort();
+
+    let bars = [];
+    for (var i = 0; i < times.length - 1; i++)
+      bars.push({
+        progress: times[i + 1] - times[i],
+        color: BLUE.includes(times[i])
+          ? Colors.MAIN_PROGRESS_COLOR
+          : YELLOW.includes(times[i])
+          ? Colors.PROGRESS_PAUSE_COLOR
+          : Colors.PROGRESS_FAIL_COLOR,
+      });
+    return <ProgressBar data={bars} />;
   };
 
   return (
@@ -73,7 +104,7 @@ const RecordTab = () => {
           <View key={item} style={{alignItems: 'center'}}>
             {isEnabled ? (
               newRecord.filter(
-                record => record.date === item && record.isGiveUp === false,
+                record => record.mission.date === item && !record.giveUpTime,
               ).length > 0 ? (
                 <View style={{flexDirection: 'row', marginVertical: 10}}>
                   <View style={recordStyle.dateLineStyle}></View>
@@ -94,29 +125,54 @@ const RecordTab = () => {
             )}
             {/* 최신순 기록 컴포넌트 표시 */}
             {newRecord
-              .filter(record => record.date === item)
+              .filter(record => record.mission.date === item)
               .map(item => {
-                if (isEnabled === true && item.isGiveUp === true) {
+                if (isEnabled === true && item.giveUpTime) {
                   return;
                 }
                 return (
                   <View
-                    key={item.id}
+                    key={item._id}
                     style={{alignItems: 'center', padding: 5}}>
                     <View style={recordStyle.info}>
                       <View style={recordStyle.timeRecord}>
                         <View style={{flexDirection: 'row', marginBottom: 3}}>
                           <Text style={recordStyle.lockTime}>
-                            🔒{item.LockTime.useTime}
+                            🔒
+                            {Time.getActualMissionTime(
+                              item.startTime,
+                              item.endTime,
+                              item.giveUpTime,
+                              item.breakTimes,
+                            )}
                           </Text>
                           {/* ★ 잠금 시간 */}
                         </View>
-                        <View style={{flexDirection: 'row'}}>
-                          <Text style={recordStyle.useTime}>
-                            ❌{item.useTimeLockApp.useTime}
-                          </Text>
-                          {/* ★ 금지앱 사용 시간 */}
-                        </View>
+                        {!item.totalProhibitedAppUsageSec ? null : (
+                          <View style={{flexDirection: 'row', marginBottom: 3}}>
+                            <Text style={recordStyle.useTime}>
+                              📵
+                              {Time.integerToTime(
+                                item.totalProhibitedAppUsageSec,
+                              )}
+                            </Text>
+                            {/* ★ 금지앱 사용 시간 */}
+                          </View>
+                        )}
+
+                        {/* 미션 성공시 포기 시간 표시 안함 */}
+                        {!item.giveUpTime ? null : (
+                          <View style={{flexDirection: 'row'}}>
+                            <Text style={recordStyle.quitTime}>
+                              ❌
+                              {Time.getGiveUpTime(
+                                item.endTime,
+                                item.giveUpTime,
+                              )}
+                            </Text>
+                            {/* ★ 금지앱 사용 시간 */}
+                          </View>
+                        )}
                       </View>
                       <View
                         style={{
@@ -125,22 +181,21 @@ const RecordTab = () => {
                           borderRadius: 25,
                           padding: '4%',
                           width: '80%',
-                          borderColor:
-                            item.isGiveUp === false
-                              ? Colors.MAIN_COLOR
-                              : '#f5a6a3',
+                          borderColor: !item.giveUpTime
+                            ? Colors.MAIN_COLOR
+                            : '#f5a6a3',
                           // ★ 실패 or 성공 전체적인 테두리
                         }}>
                         <View style={[recordStyle.main]}>
                           <View>
                             <View style={recordStyle.missionInfo}>
                               <Text style={recordStyle.category}>
-                                {item.category}
+                                {item.mission.category}
                               </Text>
                               {/* ★ 카테고리 */}
                               <Text style={recordStyle.bar}> | </Text>
                               <Text style={recordStyle.missionName}>
-                                {item.name}
+                                {item.mission.name}
                               </Text>
                               {/* ★ 미션 이름 */}
                             </View>
@@ -157,12 +212,11 @@ const RecordTab = () => {
                               style={{
                                 color: 'black',
                                 fontSize: 10,
-                                backgroundColor:
-                                  item.isGiveUp === false
-                                    ? '#e1f0fb'
-                                    : '#fae4e1',
+                                backgroundColor: !item.giveUpTime
+                                  ? '#e1f0fb'
+                                  : '#fae4e1',
                               }}>
-                              {item.isGiveUp === false ? '성공' : '실패'}
+                              {!item.giveUpTime ? '성공' : '실패'}
                               {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
                             </Text>
                             {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
@@ -173,18 +227,19 @@ const RecordTab = () => {
                             style={{
                               width: '100%',
                             }}>
-                            <CustomProgressBar></CustomProgressBar>
+                            <CustomProgressBar
+                              timeData={item}></CustomProgressBar>
                             <View
                               style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
                               }}>
                               <Text style={recordStyle.timeText}>
-                                {item.time.startTime}
+                                {item.startTime}
                               </Text>
                               <View style={recordStyle.timeLineStyle}></View>
                               <Text style={recordStyle.timeText}>
-                                {item.time.endTime}
+                                {item.endTime}
                               </Text>
                             </View>
                           </View>
@@ -196,9 +251,7 @@ const RecordTab = () => {
                             placeholderTextColor={Colors.GREY}
                             onChangeText={event => setText(event)}
                             onSubmitEditing={() =>
-                              dispatch(
-                                updateComment({...item, inputText: text}),
-                              )
+                              dispatch(updateComment({...item, comment: text}))
                             }
                           />
                           {/* ★ 상태 메시지 남기는 곳 */}
@@ -278,6 +331,11 @@ const recordStyle = StyleSheet.create({
   useTime: {
     color: 'black',
     fontSize: 10,
+    backgroundColor: Colors.PROGRESS_PAUSE_COLOR,
+  },
+  quitTime: {
+    color: 'black',
+    fontSize: 10,
     backgroundColor: Colors.PROGRESS_FAIL_COLOR,
   },
   timeRecord: {
@@ -313,7 +371,7 @@ const recordStyle = StyleSheet.create({
     height: 0.5,
     marginVertical: 5,
     backgroundColor: Colors.GREY,
-    width: '75%',
+    width: '80%',
     marginHorizontal: 3,
   },
 });

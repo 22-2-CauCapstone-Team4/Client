@@ -1,4 +1,5 @@
 import {startTransition} from 'react';
+import {interpolate} from 'react-native-reanimated';
 
 // 현재 시간 정보
 export const curr = new Date();
@@ -59,4 +60,45 @@ export function timeInfoText(data) {
     parseInt(timeData[1]).toString() +
     '분';
   return result;
+}
+
+// MissionRecord startTime/endTime 프로퍼티 int 변환
+export function timeToInteger(data) {
+  const parsed = data.split(':');
+  return parseInt(parsed[0] * 3600) + parseInt(parsed[1] * 60);
+}
+
+// 초 단위 시간 hh:mm:ss 문자열 변환
+export function integerToTime(data) {
+  return new Date(data * 1000).toISOString().substr(11, 8);
+}
+
+// 포기 시간 구하기
+export function getGiveUpTime(endT, giveUpT) {
+  const result = timeToInteger(endT) - (giveUpT === null ? 0 : giveUpT);
+  return integerToTime(result);
+}
+
+// 실질적 미션 진행 시간 = 전체 시간 - (포기 시간) - 휴식 시간들
+export function getActualMissionTime(startT, endT, giveUpT, breakTimes) {
+  /// 총 휴식 시간
+  /// 일반적인 상황: breakTimes 길이 * 10분
+  /// 휴식 시간 중 포기: 포기 시간 - 마지막 휴식 시간 < 600 이면 휴식 시간 중에 포기한 것
+  /// 이 경우 600 이 아니고 포기 시간 - 마지막 휴식 시간을 더해준다
+  /// 휴식 중에 미션 클리어: 종료 시간 - 마지막 휴식 시간 < 600 확인하고 처리
+  // console.log(timeToInteger(endT), giveUpT, breakTimes);
+  let totalBreakTime = 0;
+  if (breakTimes.length > 0) {
+    totalBreakTime += (breakTimes.length - 1) * 600;
+    if (!giveUpT && endT - breakTimes[breakTimes.length - 1] < 600)
+      totalBreakTime += endT - breakTimes[breakTimes.length - 1];
+    else if (giveUpT && giveUpT - breakTimes[breakTimes.length - 1] < 600)
+      totalBreakTime += giveUpT - breakTimes[breakTimes.length - 1];
+    else totalBreakTime += 600;
+  }
+  return integerToTime(
+    (giveUpT === null ? timeToInteger(endT) : giveUpT) -
+      timeToInteger(startT) -
+      totalBreakTime,
+  );
 }

@@ -1,81 +1,106 @@
-// 장소
 const INITIAL_STATE = {
   data: [
     {
-      num: 1,
-      id: '리액트', // 미션 이름
-      category: '공부', // 카테고리
-      name: '리액트', // 미션 이름
-      type: 'time', // 시간 or 공간
-      date: '2022-11-10',
-      time: {startTime: '16:50', endTime: '22:00'}, // 시작시간, 종료시간
-      space: {}, // 공간
-      isGiveUp: true, // 포기 여부
-      LockTime: {useTime: '1h 55m'}, // 잠금 시간
-      useTimeLockApp: {useTime: '55m'}, // 잠금 앱 사용시간
-      isFinished: true, // 미션 끝났는지 여부
-      inputText: '',
+      _id: '1',
+      owner_id: '한신',
+      mission: {
+        category: '공부',
+        name: '플러터',
+        date: '2022-12-06',
+      },
+      startTime: '14:30',
+      endTime: '17:00',
+      //prohibitedAppCnts: [],
+      prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
+      totalProhibitedAppUsageSec: 1100,
+      // breakTimes, giveUpTime은 int 형으로 해주었다.
+      breakTimes: [53200, 55000],
+      giveUpTime: 55500,
+      giveUpApp: {name: 'btd6', icon: ''},
+      comment: '',
+      // heartNum: 60,
+      // heartIds:['?'],
     },
     {
-      num: 2,
-      id: '하체', // 미션 이름
-      category: '운동', // 카테고리
-      name: '하체', // 미션 이름
-      type: 'time', // 시간 or 공간
-      time: {startTime: '12:31', endTime: '14:00'}, // 시작시간, 종료시간
-      date: '2022-11-10',
-      space: {}, // 공간
-      isGiveUp: false, // 포기 여부
-      LockTime: {useTime: '2h 52m'},
-      useTimeLockApp: {useTime: '1h 20m'},
-      isFinished: true,
-      inputText: '',
+      _id: '2',
+      owner_id: '한신',
+      mission: {
+        category: '공부',
+        name: '리액트',
+        date: '2022-12-07',
+      },
+      startTime: '13:50',
+      endTime: '17:00',
+      //prohibitedAppCnts: [],
+      prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
+      totalProhibitedAppUsageSec: 600,
+      breakTimes: [52200],
+      giveUpTime: null,
+      giveUpApp: {name: 'btd6', icon: ''},
+      comment: '',
+      // heartNum: 60,
+      // heartIds:['?'],
     },
     {
-      num: 3,
-      id: '인공지능', // 미션 이름
-      category: '과제', // 카테고리
-      name: '인공지능', // 미션 이름
-      type: 'time', // 시간 or 공간
-      date: '2022-11-25',
-      time: {startTime: '07:30', endTime: '09:00'}, // 시작시간, 종료시간
-      space: {}, // 공간
-      isGiveUp: true, // 포기 여부
-      LockTime: {useTime: '3h 31m'},
-      useTimeLockApp: {useTime: '2h 21m'},
-      isFinished: true,
-      inputText: '',
+      _id: '3',
+      owner_id: '한신',
+      mission: {
+        category: '공부',
+        name: '리눅스',
+        date: '2022-12-05',
+      },
+      startTime: '18:50',
+      endTime: '21:00',
+      //prohibitedAppCnts: [],
+      prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
+      totalProhibitedAppUsageSec: 1800,
+      breakTimes: [70800, 73000, 75000],
+      giveUpTime: null,
+      giveUpApp: {name: 'btd6', icon: ''},
+      comment: '',
+      // heartNum: 60,
+      // heartIds:['?'],
     },
     {
-      num: 4,
-      id: '해리포터', // 미션 이름
-      category: '독서', // 카테고리
-      name: '해리포터', // 미션 이름
-      type: 'time', // 시간 or 공간
-      date: '2022-11-30',
-      time: {startTime: '12:45', endTime: '14:20'}, // 시작시간, 종료시간
-      space: {}, // 공간
-      isGiveUp: false, // 포기 여부
-      LockTime: {useTime: '20m'},
-      useTimeLockApp: {useTime: '15m'},
-      isFinished: true,
-      inputText: '',
+      _id: '4',
+      owner_id: '한신',
+      mission: {
+        category: '운동',
+        name: '홈트',
+        date: '2022-12-07',
+      },
+      startTime: '16:50',
+      endTime: '22:00',
+      //prohibitedAppCnts: [],
+      prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
+      totalProhibitedAppUsageSec: 1800,
+      breakTimes: [65600, 70000, 74000],
+      giveUpTime: 78000,
+      giveUpApp: {name: 'btd6', icon: ''},
+      comment: '',
+      // heartNum: 60,
+      // heartIds:['?'],
     },
-    {
-      num: 5,
-      id: 'qwer1234', // 미션 이름
-      category: '수업', // 카테고리
-      name: '캡스톤', // 미션 이름
-      type: 'time', // 시간 or 공간
-      date: '2022-11-27',
-      time: {startTime: '07:30', endTime: '09:00'}, // 시작시간, 종료시간
-      space: {}, // 공간
-      isGiveUp: false, // 포기 여부
-      LockTime: {useTime: '3h 31m'},
-      useTimeLockApp: {useTime: '2h 21m'},
-      isFinished: true,
-      inputText: '',
-    },
+    // {
+    //   _id: '5',
+    //   owner_id: '한신',
+    //   mission: {
+    //     category: '수업',
+    //     name: '모바일',
+    //     date: '2022-11-10',
+    //   },
+    //   startTime: '10:00',
+    //   endTime: '11:00',
+    //   //prohibitedAppCnts: [],
+    //   prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
+    //   totalProhibitedAppUsageSec: 400,
+    //   breakTimes: [],
+    //   giveUpTime: 39500,
+    //   giveUpApp: {name: 'btd6', icon: ''},
+    //   comment: '',
+    //   // heartNum: 60,
+    //   // heartIds:['?'],
+    // },
   ],
 };
 
@@ -83,7 +108,7 @@ const recordReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case 'UPDATE_COMMENT':
       const oldComment = state.data.filter(
-        item => item.id != action.payload.id,
+        item => item._id != action.payload._id,
       );
       return {...state, data: [...oldComment, action.payload]};
     default:
