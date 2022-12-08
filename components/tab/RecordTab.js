@@ -51,7 +51,6 @@ const RecordTab = () => {
   }
 
   function getMostUsedProhibitedAppIcon(usages) {
-    console.log(usages);
     let appNameList = new Set(usages.map(item => item.name));
     let appCounter = {};
     for (var app of appNameList) {
@@ -114,9 +113,7 @@ const RecordTab = () => {
         });
       }
     }
-    return (
-      <ProgressBar shouldAnimate={true} animateDuration={300} data={bars} />
-    );
+    return <ProgressBar data={bars} />;
   };
 
   return (
@@ -181,7 +178,10 @@ const RecordTab = () => {
                               justifyContent: 'center',
                             }}>
                             <Text style={recordStyle.mostUsedApp}>
-                              가장 많이 사용한 제한 앱
+                              가장 많이 사용한
+                            </Text>
+                            <Text style={recordStyle.mostUsedApp}>
+                              제한 어플
                             </Text>
                             <Image
                               source={{
@@ -285,6 +285,8 @@ const RecordTab = () => {
                           <View
                             style={{
                               width: '100%',
+                              justifyContent: 'center',
+                              alignItems: 'center',
                             }}>
                             <CustomProgressBar
                               timeData={item}></CustomProgressBar>
@@ -306,6 +308,7 @@ const RecordTab = () => {
                         <View>
                           <TextInput
                             style={recordStyle.inputText}
+                            defaultValue={item.comment}
                             placeholder="한 줄 평가"
                             placeholderTextColor={Colors.GREY}
                             onChangeText={event => setText(event)}
@@ -400,9 +403,9 @@ const recordStyle = StyleSheet.create({
     width: '100%',
   },
   mostUsedApp: {
-    marginBottom: 5,
-    color: 'black',
-    fontSize: 7,
+    marginBottom: 2,
+    color: 'red',
+    fontSize: 9,
   },
   lockTime: {
     color: 'black',
@@ -452,7 +455,7 @@ const recordStyle = StyleSheet.create({
     height: 0.5,
     marginVertical: 5,
     backgroundColor: Colors.GREY,
-    width: '80%',
+    width: '85%',
     marginHorizontal: 3,
   },
 });
