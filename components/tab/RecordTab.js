@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {Text, ScrollView, View, Switch} from 'react-native';
+import {Text, ScrollView, View, Switch, Image} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Colors from '../../utils/Colors';
@@ -32,11 +32,10 @@ const RecordTab = () => {
 
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
+  const appList = useSelector(store => store.appReducer.data); // 가장 많이 사용한 금지 앱 이미지 뽑기
 
-  //console.log(recordList);
   const newRecord = recordList.sort(sortRecord).reverse();
   const dispatch = useDispatch();
-
   const arr = Array.from(new Set(newRecord.map(item => item.mission.date)));
 
   function sortRecord(a, b) {
@@ -51,7 +50,25 @@ const RecordTab = () => {
     } else return 1;
   }
 
-  // 초시간 배열로 관리하는 프로그레스 바
+  function getMostUsedProhibitedAppIcon(usages) {
+    console.log(usages);
+    let appNameList = new Set(usages.map(item => item.name));
+    let appCounter = {};
+    for (var app of appNameList) {
+      appCounter[app] = 0;
+    }
+    for (var data of usages) {
+      appCounter[data.name] +=
+        parseInt(data.endTime) - parseInt(data.startTime);
+    }
+    let mostUsedApp = Object.entries(appCounter).sort(function (a, b) {
+      return b[1] - a[1];
+    })[0][0];
+    let mostUsedAppIcon = appList.filter(data => {
+      return data.name === mostUsedApp;
+    })[0].icon;
+    return mostUsedAppIcon;
+  }
   // BLUE: 시작, 종료 시간, 휴식 종료 시간(startTime, endTime, breakTimes[i] + extraTime(less than 600))
   // YELLOW: 휴식 시작 시간(breakTimes elements)
   // RED: 포기 시간(giveUpTime)
@@ -67,7 +84,6 @@ const RecordTab = () => {
     if (endAppTimes.length > 0) {
       for (var i = 0; i < endAppTimes.length - 1; i++) {
         BLUE.push(endAppTimes[i].endTime);
-        //console.log(endAppTimes[i]);
       }
 
       // 마지막 휴식 종료 시간 처리
@@ -85,13 +101,8 @@ const RecordTab = () => {
     times.sort(function (a, b) {
       return a - b;
     });
-    // console.log('시간정보', times);
-    // console.log('BLUE', BLUE);
-    // console.log('YELLOW', YELLOW);
-    // console.log('RED', RED);
     let bars = [];
     for (var i = 0; i < times.length - 1; i++) {
-      //console.log('log', times[i + 1], times[i]);
       if (times[i + 1] - times[i] !== 0) {
         bars.push({
           progress: times[i + 1] - times[i],
@@ -162,7 +173,29 @@ const RecordTab = () => {
                     style={{alignItems: 'center', padding: 5}}>
                     <View style={recordStyle.info}>
                       <View style={recordStyle.timeRecord}>
-                        <View style={{flexDirection: 'row', marginBottom: 3}}>
+                        {/* 가장 많이 사용한 금지 앱 */}
+                        {item.prohibitedAppUsages.length == 0 ? null : (
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Text style={recordStyle.mostUsedApp}>
+                              가장 많이 사용한 제한 앱
+                            </Text>
+                            <Image
+                              source={{
+                                uri: getMostUsedProhibitedAppIcon(
+                                  item.prohibitedAppUsages,
+                                ),
+                              }}
+                              style={{width: 60, height: 60}}
+                              color={Colors.MAIN_COLOR}
+                            />
+                          </View>
+                        )}
+
+                        <View style={{flexDirection: 'row', marginVertical: 3}}>
                           <Text style={recordStyle.lockTime}>
                             🔒
                             {Time.getActualMissionTime(
@@ -365,6 +398,11 @@ const recordStyle = StyleSheet.create({
   },
   progressBarStyle: {
     width: '100%',
+  },
+  mostUsedApp: {
+    marginBottom: 5,
+    color: 'black',
+    fontSize: 7,
   },
   lockTime: {
     color: 'black',
