@@ -30,6 +30,7 @@ import {
   mkTodayMissionRealmObjToObj,
   readMissionRecordsInRealm,
   mkStaticStr,
+  nowRecordInRealm,
 } from '../../functions';
 import {
   addApps,
@@ -126,6 +127,7 @@ function Detail({navigation}) {
         tempTodayMissions,
         tempRecords,
         tempStatics,
+        tempRecord,
       ] = await Promise.all([
         readProhibitedAppsInRealm(user, realm),
         readGoalsInRealm(user, realm),
@@ -134,6 +136,7 @@ function Detail({navigation}) {
         readTodayMissionsInRealm(user, realm),
         readMissionRecordsInRealm(user, realm),
         mkStaticStr(user, realm),
+        nowRecordInRealm(user, realm),
       ]);
       realm.close();
 
@@ -157,7 +160,7 @@ function Detail({navigation}) {
           ),
         ),
       );
-      dispatch(initRecord(tempRecords));
+      dispatch(initRecord({data: tempRecords, data2: tempRecord}));
       dispatch(initStatics(tempStatics));
 
       const {friendInfo, friendCurStates} = await user.callFunction(

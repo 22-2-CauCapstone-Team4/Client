@@ -168,7 +168,7 @@ new Chart(ctx2, {
       },
       {
         type: 'line',
-        label: '휴식/포기로 이어진 횟수',
+        label: '휴식 및 포기 횟수',
         data: ${'[' + breakTimeOrGiveUpCnt + ']'},
         backgroundColor: ['rgba(48,128,208, 0.5)'],
         borderColor: ['rgba(48,128,208, 0.5)'],
@@ -228,7 +228,7 @@ new Chart(ctx3, {
     labels: ${'["' + ctx3_label.join('","') + '"]'},
     datasets: [
       {
-        label: '포기 상태일 확률',
+        label: '포기 상태였던 횟수',
         data: ${'[' + giveUpPer + ']'},
         borderWidth: 1,
       },

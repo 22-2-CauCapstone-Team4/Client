@@ -31,9 +31,9 @@ const OngoingBox = () => {
     store => store.todayMissionReducer.todayMissionData,
   );
   const doingMission = missionData.filter(item => item.state == 'start')[0];
-  const record = useSelector(store => store.recordReducer.data);
-  // console.log('기록을 봐보자', record.length);
-  //console.log(doingMission);
+  // const record = useSelector(store => store.recordReducer.data2)[0];
+  // console.log('기록을 봐보자', record);
+  // console.log(doingMission);
 
   // 경과 시간: 미션 시작 시간(hh:mm) -> 약간 부정확한 형식 (hh:mm:ss)여야 정확
   // 경과 시간은 휴식 시간을 제외한 상태이기 때문에 time.js에서 getActualMissionTime(startTime,endTime,null,breakTimes)를 이용하면 정확한 경과 시간을 얻을 것이라 예상
