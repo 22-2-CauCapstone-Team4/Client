@@ -52,14 +52,14 @@ export function getElapsedTime(startTime) {
   if (startTime !== undefined) {
     let date = new Date();
     date.setHours(date.getHours() + 9);
-    let value = timeToInteger(
-      date.toISOString().replace('T', ' ').substring(11, 16),
-    );
+    let value =
+      timeToInteger(date.toISOString().replace('T', ' ').substring(11, 16)) -
+      timeToInteger(startTime);
 
-    // // hh:mm:ss 형식 문자열 처리
-    // if (startTime.split(':').length == 3) {
-    //   value += parseInt(startTime.split(':')[2]);
-    // }
+    // hh:mm:ss 형식 문자열 처리
+    if (startTime.split(':').length == 3) {
+      value += parseInt(startTime.split(':')[2]);
+    }
     return value;
   }
 }
