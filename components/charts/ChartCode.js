@@ -162,20 +162,20 @@ new Chart(ctx2, {
       {
         type: 'bar',
         label: '금지 앱 클릭 횟수',
-        data: [10, 20, 30, 10, 20, 1, 2],
+        data: ${'[' + prohibitedAppClickCnts + ']'},
         backgroundColor: ['rgba(255, 26, 104, 0.2)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
       },
       {
         type: 'line',
         label: '휴식/포기로 이어진 횟수',
-        data: [40, 10, 30, 20, 20, 2, 4],
+        data: ${'[' + breakTimeOrGiveUpCnt + ']'},
         backgroundColor: ['rgba(48,128,208, 0.5)'],
         borderColor: ['rgba(48,128,208, 0.5)'],
         
       },
     ],
-    labels: ['January', 'February', 'March', 'April','a', 's'],
+    labels: ${'["' + ctx2_label.join('","') + '"]'},
   },
   options: {
     responsive: false,
@@ -225,11 +225,11 @@ new Chart(ctx2, {
 new Chart(ctx3, {
   type: 'line',
   data: {
-    labels: ['일', '월', '화', '수', '목', '금', '토'],
+    labels: ${'["' + ctx3_label.join('","') + '"]'},
     datasets: [
       {
         label: '포기 상태일 확률',
-        data: [12, 19, 3, 5, 2, 3, 1],
+        data: ${'[' + giveUpPer + ']'},
         borderWidth: 1,
       },
     ],

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {GiveUpAppEmbedded} from '../schema/MissionRecord';
 import {TodayMission} from '../schema/TodayMission';
 import {ForegroundServiceModule, MissionSetterModule} from '../wrap_module';
 
@@ -121,6 +122,19 @@ const giveUp = async realm => {
         missionRecord.giveUpTime = parseInt(
           moment(now).diff(missionRecord.startTime) / 1000,
         );
+
+        if (
+          curState.appName &&
+          moment(curState.startAppTime).isAfter(missionRecord.startTime)
+        ) {
+          const icon = prohibitedApps.filter(
+            el => el.name === curState.appName,
+          );
+          missionRecord.giveUpApp(
+            new GiveUpAppEmbedded({name: curState.appName, icon}),
+          );
+        }
+
         todayMission.state = TodayMission.STATE.QUIT;
 
         curState.isNowDoingMission = false;

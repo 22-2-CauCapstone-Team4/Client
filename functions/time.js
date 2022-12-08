@@ -1,5 +1,6 @@
 import {startTransition} from 'react';
 import {interpolate} from 'react-native-reanimated';
+import moment from 'moment';
 
 // 현재 시간 정보
 export const curr = new Date();
