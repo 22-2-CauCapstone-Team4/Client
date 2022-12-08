@@ -27,6 +27,7 @@ import {
   isTodayMission,
   readMissionRecordsInRealm,
   updateCommentInRealm,
+  mkStaticStr,
 } from './crud';
 import {
   appCheckHeadlessTask,
@@ -74,4 +75,5 @@ module.exports = {
   giveUp,
   breakTimeEndTask,
   btnClickTask,
+  mkStaticStr,
 };

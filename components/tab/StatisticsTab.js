@@ -1,6 +1,7 @@
-import React, {useEffect, useState, useCallback, useRef} from 'react';
+import React, {useMemo, useState, useCallback, useRef} from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, TouchableOpacity, View, Alert} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
 
 // import {Dimensions} from 'react-native';
 // import Colors from '../../utils/Colors';
@@ -17,10 +18,8 @@ import {Text, ScrollView, TouchableOpacity, View, Alert} from 'react-native';
 
 import {WebView} from 'react-native-webview';
 
-import chartcode from '../charts/ChartCode';
-
 const StatisticsTab = () => {
-  let html = chartcode;
+  let html = useSelector(store => store.staticsReducer.data);
   const webviewRef = useRef();
 
   /** 웹뷰 ref */
@@ -28,12 +27,13 @@ const StatisticsTab = () => {
     webviewRef.current = _ref;
   };
 
-  //웹뷰에서 RN으로 값을 보낼때 함수
+  // 웹뷰에서 RN으로 값을 보낼때 함수
   const handleOnMessage = e => {
     // postMessage 담겨있는 결과 값이 웹뷰에서 값을 출력
     console.log('콘솔', e.nativeEvent.data);
     Alert.alert(e.nativeEvent.data);
   };
+
   return (
     <WebView onMessage={handleOnMessage} source={{html}} ref={handleSetRef} />
   );

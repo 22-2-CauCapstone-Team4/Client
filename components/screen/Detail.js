@@ -29,6 +29,7 @@ import {
   mkMissionRealmObjToObj,
   mkTodayMissionRealmObjToObj,
   readMissionRecordsInRealm,
+  mkStaticStr,
 } from '../../functions';
 import {
   addApps,
@@ -39,6 +40,7 @@ import {
   initPlace,
   initTodayMission,
   initRecord,
+  initStatics,
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
@@ -53,6 +55,8 @@ import {
   GiveUpAppEmbedded,
   MissionRecord,
   UserInfo,
+  AppUsageRecord,
+  PhoneUsageRecord,
 } from '../../schema';
 import moment from 'moment';
 
@@ -95,6 +99,8 @@ function Detail({navigation}) {
           MissionRecord.schema,
           GiveUpAppEmbedded.schema,
           AppUsageEmbedded.schema,
+          AppUsageRecord.schema,
+          PhoneUsageRecord.schema,
           UserInfo.schema,
         ]),
       );
@@ -119,6 +125,7 @@ function Detail({navigation}) {
         tempMissions,
         tempTodayMissions,
         tempRecords,
+        tempStatics,
       ] = await Promise.all([
         readProhibitedAppsInRealm(user, realm),
         readGoalsInRealm(user, realm),
@@ -126,9 +133,8 @@ function Detail({navigation}) {
         readMissionsInRealm(user, realm),
         readTodayMissionsInRealm(user, realm),
         readMissionRecordsInRealm(user, realm),
+        mkStaticStr(user, realm),
       ]);
-
-      console.log(tempRecords);
       realm.close();
 
       dispatch(addBlockedApps(tempBlockedApps));
@@ -152,6 +158,7 @@ function Detail({navigation}) {
         ),
       );
       dispatch(initRecord(tempRecords));
+      dispatch(initStatics(tempStatics));
 
       const {friendInfo, friendCurStates} = await user.callFunction(
         'friend/readFriends',

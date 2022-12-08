@@ -184,3 +184,10 @@ export const updateComment = items => {
     payload: items,
   };
 };
+
+export const initStatics = item => {
+  return {
+    type: 'INIT_STATICS',
+    payload: item,
+  };
+};

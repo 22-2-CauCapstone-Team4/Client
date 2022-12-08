@@ -1,3 +1,123 @@
+// import {mkChartCode} from '../../components/charts/ChartCode';
+import {AppUsageRecord, PhoneUsageRecord} from '../../schema';
+
+const mkStaticStr = async (user, realm) => {
+  console.log('통계 결과 읽기 시작');
+  let temp = {};
+  try {
+    const appUsageRecord = realm.objects('AppUsageRecord');
+    const phoneUsageRecord = realm.objects('PhoneUsageRecord');
+    const missionRecord = realm.objects('MissionRecord');
+
+    // {
+    //   nonProhibitedAppMins,
+    //   prohibitedAppMins,
+    //   ctx2_label,
+    //   prohibitedAppClickCnts,
+    //   breakTimeOrGiveUpCnt,
+    //   ctx3_label,
+    //   giveUpPer,
+    //   ctx4_label,
+    //   giveUpAppPer,
+    //   ctx5_label,
+    //   giveUpAppCllickCnt,
+    //   ctx6_label,
+    //   giveUpAppUsages
+    // }
+    // 그래프 1
+    temp.prohibitedAppMins = [
+      appUsageRecord.reduce((acc, curr) => {
+        if (curr.type === AppUsageRecord.TYPE.MISSION) acc += curr.usageSec;
+        return acc;
+      }, 0),
+      appUsageRecord.reduce((acc, curr) => {
+        if (curr.type === AppUsageRecord.TYPE.GIVE_UP) acc += curr.usageSec;
+        return acc;
+      }, 0),
+      appUsageRecord.reduce((acc, curr) => {
+        if (curr.type === AppUsageRecord.TYPE.DEFAULT) acc += curr.usageSec;
+        return acc;
+      }, 0),
+    ];
+    temp.nonProhibitedAppMins = [
+      phoneUsageRecord.reduce((acc, curr) => {
+        if (curr.type === PhoneUsageRecord.TYPE.MISSION) acc += curr.usageSec;
+        return acc;
+      }, 0) - temp.prohibitedAppMins[0],
+      phoneUsageRecord.reduce((acc, curr) => {
+        if (curr.type === PhoneUsageRecord.TYPE.GIVE_UP) acc += curr.usageSec;
+        return acc;
+      }, 0) - temp.prohibitedAppMins[1],
+      phoneUsageRecord.reduce((acc, curr) => {
+        if (curr.type === PhoneUsageRecord.TYPE.DEFAULT) acc += curr.usageSec;
+        return acc;
+      }, 0) - temp.prohibitedAppMins[2],
+    ];
+
+    // 그래프 2
+
+    // 그래프 3
+
+    // 그래프 4
+    const missionRecordByGroupingApp = missionRecord.reduce((acc, curr) => {
+      const giveUpApp = curr.giveUpApp ? curr.giveUpApp.name : null;
+      if (!giveUpApp) return acc;
+
+      if (acc[giveUpApp]) acc[giveUpApp].push(curr);
+      else acc[giveUpApp] = [curr];
+      return acc;
+    }, {});
+
+    temp.ctx4_label = Object.keys(missionRecordByGroupingApp);
+
+    let totalGiveUpAppNum = 0;
+    temp.giveUpAppPer = [];
+    for (let i = 0; i < length; i++) {
+      const key = temp.ctx4_label[i];
+      // console.log(key);
+      temp.giveUpAppPer.push(missionRecordByGroupingApp[key].length);
+      totalGiveUpAppNum += temp.giveUpAppPer[temp.giveUpAppPer.length - 1];
+    }
+    temp.giveUpAppPer = temp.giveUpAppPer.map(
+      num => (num / totalGiveUpAppNum) * 100,
+    );
+
+    // 그래프 5
+    const appUsageGroupByApp = appUsageRecord.reduce((acc, curr) => {
+      const {appName} = curr;
+      if (acc[appName]) acc[appName].push(curr);
+      else acc[appName] = [curr];
+      return acc;
+    }, {});
+    temp.ctx5_label = temp.ctx6_label = Object.keys(appUsageGroupByApp);
+    // console.log(
+    //   appUsageGroupByApp['10x10'],
+    //   temp.ctx5_label,
+    //   temp.ctx6_label,
+    // );
+    temp.giveUpAppClickCnt = [];
+    temp.giveUpAppUsages = [];
+
+    const length = temp.ctx5_label.length;
+    for (let i = 0; i < length; i++) {
+      const key = temp.ctx5_label[i];
+      //   console.log(key);
+      temp.giveUpAppClickCnt.push(
+        appUsageGroupByApp[key].reduce((a, b) => a + b.clickCnt, 0),
+      );
+      temp.giveUpAppUsages.push(
+        appUsageGroupByApp[key].reduce((a, b) => a + b.usageSec, 0),
+      );
+    }
+
+    console.log('읽기 완료');
+  } catch (err) {
+    console.log(err.message);
+  }
+
+  return mkChartCode(temp);
+};
+
 const mkChartCode = ({
   nonProhibitedAppMins,
   prohibitedAppMins,
@@ -350,152 +470,4 @@ new Chart(ctx6, {
 });`;
 };
 
-export default mkChartCode;
-
-{
-  /* <h1 id="title1">1.</h1>
-<canvas id="myChart1"></canvas>
-<h1 id="title2">2-a</h1>
-<canvas id="myChart2"></canvas>
-<h1 id="title3">2-b</h1>
-<canvas id="myChart3"></canvas> */
-}
-
-// const ctx1 = document.getElementById('myChart1');
-//   const ctx2 = document.getElementById('myChart2');
-//   const ctx3 = document.getElementById('myChart3');
-
-// ★1. 미션 중/포기 중/평소 전체 시간 대비 금지 앱 사용 시간
-// new Chart(ctx1, {
-//   type: 'bar',
-//   data: {
-//     labels: ['미션 중', '포기 중', '평소'],
-//     datasets: [
-//       {
-//         label: 'Data 1',
-//         data: [18, 12, 10],
-//         backgroundColor: [
-//           'rgba(54, 162, 235, 0.7)',
-//         ],
-//         borderColor: [
-//           'rgba(255, 26, 104, 0.2)',
-//         ],
-//         borderWidth: 1,
-//       },
-//       {
-//         label: 'Data 2',
-//         data: [18, 12, 10],
-//         backgroundColor: [
-//           'rgba(255, 26, 104, 0.7)',
-
-//         ],
-//         borderColor: [
-//           'rgba(255, 26, 104, 0.2)',
-
-//         ],
-//         borderWidth: 1,
-//       },
-//     ],
-//   },
-//   options: {
-//       plugins: {
-//           legend: {
-//               labels: {
-//                   font: {
-//                       size: 40
-//                   }
-//               }
-//           }
-//       },
-//       layout: {
-//           padding:{
-//               left: 10,
-//               right: 10,
-//               bottom: 10,
-//           }
-//       },
-//     scales: {
-//       x: {
-//         stacked: true,
-//       },
-//       y: {
-//         beginAtZero: true,
-//         stacked: true,
-//       },
-//     },
-//   },
-// });
-// // ★2-a 시간 경과에 따른 금지 앱 클릭 횟수 ~~
-// new Chart(ctx2, {
-//   type: 'bar',
-//   data: {
-//     datasets: [{
-//       type: 'bar',
-//       label: 'Bar Dataset',
-//       data: [10, 20, 30, 10],
-//   }, {
-//       type: 'line',
-//       label: 'Line Dataset',
-//       data: [40, 10, 30, 20],
-//   }],
-//   labels: ['January', 'February', 'March', 'April']
-//   },
-//   options: {
-//       plugins: {
-//           legend: {
-//               labels: {
-//                   font: {
-//                       size: 35
-//                   }
-//               }
-//           }
-//       },
-//       layout: {
-//           padding:{
-//               left: 10,
-//               right: 10,
-//               bottom: 10,
-//           }
-//       },
-//     scales: {
-//       y: {
-//         beginAtZero: true
-//       }
-//     }
-//   }
-// });
-// // ★2-b 시간 경과에 따른 포기 상태일 확률
-// new Chart(ctx3, {
-//   type: 'line',
-//   data: {
-//     labels: ['일', '월', '화', '수', '목', '금', '토'],
-//     datasets: [{
-//       label: '포기 상태일 확률',
-//       data: [12, 19, 3, 5, 2, 3, 1],
-//       borderWidth: 1
-//     }]
-//   },
-//   options: {
-//       plugins: {
-//           legend: {
-//               labels: {
-//                   font: {
-//                       size: 35
-//                   }
-//               }
-//           }
-//       },
-//       layout: {
-//           padding:{
-//               left: 10,
-//               right: 10,
-//               bottom: 10,
-//           }
-//       },
-//     scales: {
-//       y: {
-//         beginAtZero: true
-//       }
-//     }
-//   }
-// });
+export {mkStaticStr};

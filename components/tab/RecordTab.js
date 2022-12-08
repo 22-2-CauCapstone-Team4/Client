@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, View, Switch} from 'react-native';
 import {StyleSheet} from 'react-native';
@@ -8,7 +8,7 @@ import {ProgressBar} from 'rn-multi-progress-bar';
 import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../../utils/styles';
 import {updateComment} from '../../store/action';
-import {updateCommentInRealm} from '../../functions';
+import {updateCommentInRealm, readMissionRecordsInRealm} from '../../functions';
 import * as Time from '../../functions/time.js';
 import {mkConfig} from '../../functions/mkConfig';
 import Realm from 'realm';
@@ -22,6 +22,7 @@ import {
   MissionRecord,
   UserInfo,
 } from '../../schema';
+import {initRecord} from '../../store/action';
 
 const RecordTab = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -30,10 +31,49 @@ const RecordTab = () => {
   const [dateMessage, setDateMessage] = useState('');
   const {user} = useAuth();
 
+  // useEffect(() => {
+  //   try {
+  //     Realm.open(
+  //       mkConfig(user, [
+  //         Goal.schema,
+  //         Place.schema,
+  //         Mission.schema,
+  //         MissionRecord.schema,
+  //         GiveUpAppEmbedded.schema,
+  //         AppUsageEmbedded.schema,
+  //         UserInfo.schema,
+  //       ]),
+  //     ).then(realm => {
+  //       realm.addListener('change', onRealmChange);
+  //       realm.close();
+  //     });
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // });
+
+  // const onRealmChange = async () => {
+  //   const realm = await Realm.open(
+  //     mkConfig(user, [
+  //       Goal.schema,
+  //       Place.schema,
+  //       Mission.schema,
+  //       MissionRecord.schema,
+  //       GiveUpAppEmbedded.schema,
+  //       AppUsageEmbedded.schema,
+  //       UserInfo.schema,
+  //     ]),
+  //   );
+  //   let tempRecords = await readMissionRecordsInRealm(user, realm);
+  //   dispatch(initRecord(tempRecords));
+
+  //   realm.close();
+  // };
+
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
 
-  console.log(recordList);
+  // console.log(recordList);
   const newRecord = recordList.sort(sortRecord).reverse();
   const dispatch = useDispatch();
 
@@ -59,7 +99,7 @@ const RecordTab = () => {
     let BLUE = [0, props.timeData.endTime];
     let YELLOW = props.timeData.prohibitedAppUsages.map(el => el.startTime);
     let RED = props.timeData.giveUpTime ? [props.timeData.giveUpTime] : [];
-    console.log(BLUE, YELLOW, RED);
+    // console.log(BLUE, YELLOW, RED);
     let endAppTimes = props.timeData.prohibitedAppUsages.map(el => {
       return {startTime: el.startTime, endTime: el.endTime};
     });
@@ -67,7 +107,7 @@ const RecordTab = () => {
     if (endAppTimes.length > 0) {
       for (var i = 0; i < endAppTimes.length - 1; i++) {
         BLUE.push(endAppTimes[i].endTime);
-        console.log(endAppTimes[i]);
+        // console.log(endAppTimes[i]);
       }
 
       // 마지막 휴식 종료 시간 처리
@@ -86,7 +126,7 @@ const RecordTab = () => {
 
     let bars = [];
     for (var i = 0; i < times.length - 1; i++) {
-      console.log('log', times[i + 1], times[i]);
+      // console.log('log', times[i + 1], times[i]);
       if (times[i + 1] - times[i] !== 0) {
         bars.push({
           progress: times[i + 1] - times[i],
