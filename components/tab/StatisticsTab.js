@@ -20,6 +20,7 @@ import {WebView} from 'react-native-webview';
 
 const StatisticsTab = () => {
   let html = useSelector(store => store.staticsReducer.data);
+  console.log(html);
   const webviewRef = useRef();
 
   /** 웹뷰 ref */

@@ -9,7 +9,7 @@ const mkChartCode = ({
   ctx4_label,
   giveUpAppPer,
   ctx5_label,
-  giveUpAppCllickCnt,
+  giveUpAppClickCnt,
   ctx6_label,
   giveUpAppUsages,
 }) => {
@@ -88,6 +88,8 @@ const ctx3 = document.getElementById('myChart3');
 const ctx4 = document.getElementById('myChart4');
 const ctx5 = document.getElementById('myChart5');
 const ctx6 = document.getElementById('myChart6');
+Chart.defaults.font.size = 30;
+Chart.defaults.font.weight = 'bold';
 
 // ★1. 미션 중/포기 중/평소 전체 시간 대비 금지 앱 사용 시간
 
@@ -97,15 +99,15 @@ new Chart(ctx1, {
     labels: ['미션 중', '포기 중', '평소'],
     datasets: [
       {
-        label: '금지 X 앱 사용시간',
-        data: ${nonProhibitedAppMins},
+        label: '일반 앱 사용시간',
+        data: ${'[' + nonProhibitedAppMins + ']'},
         backgroundColor: ['rgba(54, 162, 235, 0.7)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
         borderWidth: 1,
       },
       {
         label: '금지 앱 사용시간',
-        data: ${prohibitedAppMins},
+        data: ${'[' + prohibitedAppMins + ']'},
         backgroundColor: ['rgba(255, 26, 104, 0.7)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
         borderWidth: 1,
@@ -147,7 +149,131 @@ new Chart(ctx1, {
             bottom: 20
           }
         }
+             },
+    },
+  },
+});
+
+// ★2-a 시간 경과에 따른 금지 앱 유혹 정도
+new Chart(ctx2, {
+  type: 'bar',
+  data: {
+    datasets: [
+      {
+        type: 'bar',
+        label: '금지 앱 클릭 횟수',
+        data: [10, 20, 30, 10, 20, 1, 2],
+        backgroundColor: ['rgba(255, 26, 104, 0.2)'],
+        borderColor: ['rgba(255, 26, 104, 0.2)'],
+      },
+      {
+        type: 'line',
+        label: '휴식/포기로 이어진 횟수',
+        data: [40, 10, 30, 20, 20, 2, 4],
+        backgroundColor: ['rgba(48,128,208, 0.5)'],
+        borderColor: ['rgba(48,128,208, 0.5)'],
         
+      },
+    ],
+    labels: ['January', 'February', 'March', 'April','a', 's'],
+  },
+  options: {
+    responsive: false,
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            size: 35,
+          },
+          color:"black",
+        },
+      },
+    },
+    layout: {
+      padding: {
+        left: 10,
+        right: 10,
+        bottom: 10,
+      },
+    },
+    scales: {
+      x:{
+        title:{
+          display: true,
+          text:'미션 시작으로부터 시간 경과',
+          color: 'black',
+          padding:{
+            bottom: 20
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+          title:{
+            display: true,
+            text:'횟수',
+            color: 'black',
+            padding:{
+              bottom: 20
+            }
+          }
+      },
+    },
+  },
+});
+// ★2-b 시간 경과에 따른 포기 상태일 확률
+new Chart(ctx3, {
+  type: 'line',
+  data: {
+    labels: ['일', '월', '화', '수', '목', '금', '토'],
+    datasets: [
+      {
+        label: '포기 상태일 확률',
+        data: [12, 19, 3, 5, 2, 3, 1],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: false,
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            size: 35,
+          },
+          color:"black",
+        },
+      },
+    },
+    layout: {
+      padding: {
+        left: 10,
+        right: 10,
+        bottom: 10,
+      },
+    },
+    scales: {
+      x:{
+        title:{
+          display: true,
+          text:'미션 시작으로부터 시간 경과',
+          color: 'black',
+          padding:{
+            bottom: 20
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        title:{
+          display: true,
+          text:'포기 중일 확률(%)',
+          color: 'black',
+          padding:{
+            bottom: 20
+          }
+        }
       },
     },
   },
@@ -156,11 +282,11 @@ new Chart(ctx1, {
 new Chart(ctx4, {
   type: 'doughnut',
   data: {
-    labels: ${ctx4_label},
+    labels: ${'["' + ctx4_label.join('","') + '"]'},
     datasets: [
       {
         label: 'My First Dataset',
-        data: ${giveUpAppPer},
+        data: ${'[' + giveUpAppPer + ']'},
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
@@ -200,11 +326,11 @@ new Chart(ctx4, {
 new Chart(ctx5, {
   type: 'bar',
   data: {
-    labels: ${ctx5_label},
+    labels: ${'["' + ctx5_label.join('","') + '"]'},
     datasets: [
       {
         label: '클릭 횟수',
-        data: ${giveUpAppCllickCnt},
+        data: ${'[' + giveUpAppClickCnt + ']'},
         borderWidth: 1,
       },
     ],
@@ -276,11 +402,11 @@ new Chart(ctx5, {
 new Chart(ctx6, {
   type: 'bar',
   data: {
-    labels: ${ctx6_label},
+    labels: ${'["' + ctx6_label.join('","') + '"]'},
     datasets: [
       {
         label: '사용 시간',
-        data: ${giveUpAppUsages},
+        data: ${'[' + giveUpAppUsages + ']'},
         borderWidth: 1,
       },
     ],
@@ -347,7 +473,10 @@ new Chart(ctx6, {
       },
     },
   },
-});`;
+});
+
+</script>
+`;
 };
 
 export default mkChartCode;
