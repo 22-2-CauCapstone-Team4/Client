@@ -128,6 +128,7 @@ function Detail({navigation}) {
         readMissionRecordsInRealm(user, realm),
       ]);
 
+      console.log(tempRecords);
       realm.close();
 
       dispatch(addBlockedApps(tempBlockedApps));

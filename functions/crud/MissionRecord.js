@@ -10,30 +10,39 @@ const readMissionRecords = async (user, realm) => {
     list = list.filter(el => el.endTime);
     // tempRecords = JSON.parse(JSON.stringify(tempRecords));
     list = list.map(el => {
+      console.log('????????????????', el.startTime, el.endTime);
       const startTime = `${
+        el.startTime.getHours() < 10
+          ? '0' + el.startTime.getHours()
+          : el.startTime.getHours()
+      }:${
         el.startTime.getMinutes() < 10
           ? '0' + el.startTime.getMinutes()
           : el.startTime.getMinutes()
-      }:${
-        el.startTime.getSeconds() < 10
-          ? '0' + el.startTime.getSeconds()
-          : el.startTime.getSeconds()
       }`;
 
-      let endTime = moment(el.startTime).add(el.endTime, 's');
-      endTime = `${
-        endTime.minutes() < 10 ? '0' + endTime.minutes() : endTime.minutes()
+      let endTimeStr = moment(el.startTime).add(el.endTime, 's');
+      endTimeStr = `${
+        endTimeStr.hours() < 10 ? '0' + endTimeStr.hours() : endTimeStr.hours()
       }:${
-        endTime.seconds() < 10 ? '0' + endTime.seconds() : endTime.seconds()
+        endTimeStr.minutes() < 10
+          ? '0' + endTimeStr.minutes()
+          : endTimeStr.minutes()
       }`;
 
+      console.log('????????????????', startTime, el.endTime);
       const mission = mkMissionRealmObjToObj(el.mission);
+      const prohibitedAppUsages = JSON.parse(
+        JSON.stringify(el.prohibitedAppUsages),
+      );
+      console.log(prohibitedAppUsages);
 
       return {
         ...JSON.parse(JSON.stringify(el)),
         startTime,
-        endTime,
+        endTimeStr,
         mission,
+        prohibitedAppUsages,
         comment: el.comment ? el.comment : '',
       };
     });

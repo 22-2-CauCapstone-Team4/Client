@@ -34,7 +34,7 @@ const INITIAL_STATE = {
       //prohibitedAppCnts: [],
       prohibitedAppUsages: [{name: 'btd6', startTime: 12000, endTime: 12500}],
       totalProhibitedAppUsageSec: 600,
-      breakTimes: [52200],
+      // breakTimes: [52200],
       giveUpTime: null,
       giveUpApp: {name: 'btd6', icon: ''},
       comment: '',

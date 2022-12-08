@@ -52,14 +52,14 @@ export function getElapsedTime(startTime) {
   if (startTime !== undefined) {
     let date = new Date();
     date.setHours(date.getHours() + 9);
-    value =
-      timeToInteger(date.toISOString().replace('T', ' ').substring(11, 16)) -
-      timeToInteger(startTime);
+    value = timeToInteger(
+      date.toISOString().replace('T', ' ').substring(11, 16),
+    );
 
-    // hh:mm:ss 형식 문자열 처리
-    if (startTime.split(':').length == 3) {
-      value += parseInt(startTime.split(':')[2]);
-    }
+    // // hh:mm:ss 형식 문자열 처리
+    // if (startTime.split(':').length == 3) {
+    //   value += parseInt(startTime.split(':')[2]);
+    // }
     return value;
   }
 }
@@ -92,7 +92,7 @@ export function integerToTime(data) {
 
 // 포기 시간 구하기
 export function getGiveUpTime(endT, giveUpT) {
-  const result = timeToInteger(endT) - (giveUpT === null ? 0 : giveUpT);
+  const result = endT - (giveUpT === null ? 0 : giveUpT);
   return integerToTime(result);
 }
 
@@ -103,23 +103,20 @@ export function getActualMissionTime(startT, endT, giveUpT, breakTimes) {
   /// 휴식 시간 중 포기: 포기 시간 - 마지막 휴식 시간 < 600 이면 휴식 시간 중에 포기한 것
   /// 이 경우 600 이 아니고 포기 시간 - 마지막 휴식 시간을 더해준다
   /// 휴식 중에 미션 클리어: 종료 시간 - 마지막 휴식 시간 < 600 확인하고 처리
-  // console.log(timeToInteger(endT), giveUpT, breakTimes);
+  // console.log(endT, giveUpT, breakTimes);
   let totalBreakTime = 0;
 
   if (breakTimes.length > 0) {
     totalBreakTime += (breakTimes.length - 1) * 600;
-    if (
-      !giveUpT &&
-      timeToInteger(endT) - breakTimes[breakTimes.length - 1] < 600
-    )
-      totalBreakTime += timeToInteger(endT) - breakTimes[breakTimes.length - 1];
+    if (!giveUpT && endT - breakTimes[breakTimes.length - 1] < 600)
+      totalBreakTime += endT - breakTimes[breakTimes.length - 1];
     else if (giveUpT && giveUpT - breakTimes[breakTimes.length - 1] < 600)
       totalBreakTime += giveUpT - breakTimes[breakTimes.length - 1];
     else totalBreakTime += 600;
   }
   return integerToTime(
-    (giveUpT === null ? timeToInteger(endT) : giveUpT) -
-      timeToInteger(startT) -
+    (giveUpT === null ? endT : giveUpT) -
+      // timeToInteger(startT) -
       totalBreakTime,
   );
 }

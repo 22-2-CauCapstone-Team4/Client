@@ -32,6 +32,8 @@ const RecordTab = () => {
 
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
+
+  console.log(recordList);
   const newRecord = recordList.sort(sortRecord).reverse();
   const dispatch = useDispatch();
 
@@ -54,28 +56,27 @@ const RecordTab = () => {
   // YELLOW: 휴식 시작 시간(breakTimes elements)
   // RED: 포기 시간(giveUpTime)
   const CustomProgressBar = props => {
-    let BLUE = [
-      Time.timeToInteger(props.timeData.startTime),
-      Time.timeToInteger(props.timeData.endTime),
-    ];
-    let YELLOW = props.timeData.breakTimes;
-    let RED = [props.timeData.giveUpTime];
-    let breakTimes = props.timeData.breakTimes;
+    let BLUE = [0, props.timeData.endTime];
+    let YELLOW = props.timeData.prohibitedAppUsages.map(el => el.startTime);
+    let RED = props.timeData.giveUpTime ? [props.timeData.giveUpTime] : [];
+    console.log(BLUE, YELLOW, RED);
+    let endAppTimes = props.timeData.prohibitedAppUsages.map(el => {
+      return {startTime: el.startTime, endTime: el.endTime};
+    });
     // 휴식 종료 시간 BLUE에 append (마지막 휴식 종료 시간 제외)
-    if (breakTimes.length > 0) {
-      for (var i = 0; i < breakTimes.length - 1; i++)
-        BLUE.push(breakTimes[i] + 600);
+    if (endAppTimes.length > 0) {
+      for (var i = 0; i < endAppTimes.length - 1; i++) {
+        BLUE.push(endAppTimes[i].endTime);
+        console.log(endAppTimes[i]);
+      }
 
       // 마지막 휴식 종료 시간 처리
       // 휴식 중에 포기했거나 미션 종료됐다면 마지막 휴식 종료 시간은 포기 시간 or 미션 종료 시간이 된다. 즉, push 안함
-      let lastBreakTime = breakTimes[breakTimes.length - 1];
-      if (
-        (props.timeData.giveUpTime &&
-          props.timeData.giveUpTime - lastBreakTime > 600) ||
-        (!props.timeData.giveUpTime &&
-          Time.timeToInteger(props.timeData.endTime) - lastBreakTime > 600)
-      ) {
-        BLUE.push(lastBreakTime + 600);
+      let lastAppTime = endAppTimes[endAppTimes.length - 1].endTime;
+      if (!lastAppTime || lastAppTime > props.timeData.endTime) {
+        BLUE.push(props.timeData.endTime);
+      } else {
+        BLUE.push(lastAppTime);
       }
     }
     let times = [];
@@ -84,16 +85,22 @@ const RecordTab = () => {
     times.sort();
 
     let bars = [];
-    for (var i = 0; i < times.length - 1; i++)
-      bars.push({
-        progress: times[i + 1] - times[i],
-        color: BLUE.includes(times[i])
-          ? Colors.MAIN_PROGRESS_COLOR
-          : YELLOW.includes(times[i])
-          ? Colors.PROGRESS_PAUSE_COLOR
-          : Colors.PROGRESS_FAIL_COLOR,
-      });
-    return <ProgressBar data={bars} />;
+    for (var i = 0; i < times.length - 1; i++) {
+      console.log('log', times[i + 1], times[i]);
+      if (times[i + 1] - times[i] !== 0) {
+        bars.push({
+          progress: times[i + 1] - times[i],
+          color: BLUE.includes(times[i])
+            ? Colors.MAIN_PROGRESS_COLOR
+            : YELLOW.includes(times[i])
+            ? Colors.PROGRESS_PAUSE_COLOR
+            : Colors.PROGRESS_FAIL_COLOR,
+        });
+      }
+    }
+    return (
+      <ProgressBar shouldAnimate={true} animateDuration={300} data={bars} />
+    );
   };
 
   return (
@@ -253,7 +260,7 @@ const RecordTab = () => {
                               </Text>
                               <View style={recordStyle.timeLineStyle}></View>
                               <Text style={recordStyle.timeText}>
-                                {item.endTime}
+                                {item.endTimeStr}
                               </Text>
                             </View>
                           </View>
