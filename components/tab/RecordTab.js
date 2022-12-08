@@ -82,7 +82,6 @@ const RecordTab = () => {
     newRecord !== null
       ? Array.from(new Set(newRecord.map(item => item.mission.date)))
       : null;
-
   function sortRecord(a, b) {
     let aDate = a.mission.date.split('-').join('');
     let bDate = b.mission.date.split('-').join('');
@@ -246,10 +245,9 @@ const RecordTab = () => {
                               <Text style={recordStyle.lockTime}>
                                 🔒
                                 {Time.getActualMissionTime(
-                                  item.startTime,
                                   item.endTime,
                                   item.giveUpTime,
-                                  item.breakTimes,
+                                  item.totalProhibitedAppUsageSec,
                                 )}
                               </Text>
                               {/* ★ 잠금 시간 */}

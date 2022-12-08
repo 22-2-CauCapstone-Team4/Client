@@ -66,7 +66,7 @@ export default function FriendModal({
                           nickname: searchText,
                         },
                       );
-                      console.log('사용자', userInfos);
+                      //console.log('사용자', userInfos);
                       setResult(userInfos);
                     }}>
                     <Icon name={'search'} size={20} color={'black'}></Icon>
