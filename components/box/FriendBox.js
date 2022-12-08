@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
 
 function FriendBox(props) {
+  console.log(props);
   return (
     <Container>
       <FriendContainer>
@@ -27,15 +28,15 @@ function FriendBox(props) {
         <ContentContainer>
           <View>
             <ContentView>
-              {props.mission ? (
+              {/* {props.state !== 'none' ? (
                 <>
                   <Category>props.mission.name</Category>
                   <Category>|</Category>
-                  <MissionName>props.mission.goal.name</MissionName>
+                  <MissionName>props.mission.goal</MissionName>
                 </>
               ) : (
                 <MissionName>미션 수행 전</MissionName>
-              )}
+              )} */}
             </ContentView>
           </View>
         </ContentContainer>
@@ -47,13 +48,15 @@ function FriendBox(props) {
                   ? Colors.MAIN_COLOR
                   : props.state === 'unlock'
                   ? 'orange'
+                  : props.state === 'none'
+                  ? 'black'
                   : 'red',
               fontSize: 12,
             }}>
             {props.state === 'lock'
               ? '미션 진행 중'
               : props.state === 'none'
-              ? null
+              ? '미션 수행 전'
               : props.state === 'unlock'
               ? '금지 앱 사용 중'
               : props.state === 'unlock_quit'
