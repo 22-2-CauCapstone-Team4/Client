@@ -65,6 +65,12 @@ export default function PlaceListModal({
                       <TouchableOpacity
                         key={item._id}
                         style={style.place}
+                        onPress={() => {
+                          navigation.navigate('WatchLocation', {
+                            location: item,
+                          });
+                          setModalVisible(!modalVisible);
+                        }}
                         onLongPress={async () => {
                           Alert.alert(
                             '장소 삭제',
