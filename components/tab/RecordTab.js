@@ -73,7 +73,7 @@ const RecordTab = () => {
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
   const appList = useSelector(store => store.appReducer.data); // 가장 많이 사용한 금지 앱 이미지 뽑기
-
+  // console.log(recordList[0].mission.goal);
   const newRecord =
     recordList !== null ? recordList.sort(sortRecord).reverse() : null;
 
@@ -294,7 +294,7 @@ const RecordTab = () => {
                               <View>
                                 <View style={recordStyle.missionInfo}>
                                   <Text style={recordStyle.category}>
-                                    {item.mission.category}
+                                    {item.mission.goal.name}
                                   </Text>
                                   {/* ★ 카테고리 */}
                                   <Text style={recordStyle.bar}> | </Text>
