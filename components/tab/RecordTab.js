@@ -83,8 +83,8 @@ const RecordTab = () => {
       ? Array.from(new Set(newRecord.map(item => item.date)))
       : null;
   function sortRecord(a, b) {
-    let aDate = a.mission.date.split('-').join('');
-    let bDate = b.mission.date.split('-').join('');
+    let aDate = a.date.split('-').join('');
+    let bDate = b.date.split('-').join('');
     if (aDate < bDate) return -1;
     else if (aDate == bDate) {
       let aStartTime = a.startTime.split(':').join('');
