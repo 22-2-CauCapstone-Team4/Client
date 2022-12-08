@@ -98,26 +98,18 @@ export function getGiveUpTime(endT, giveUpT) {
 }
 
 // 실질적 미션 진행 시간 = 전체 시간 - (포기 시간) - 휴식 시간들
-export function getActualMissionTime(startT, endT, giveUpT, breakTimes) {
-  /// 총 휴식 시간
-  /// 일반적인 상황: breakTimes 길이 * 10분
-  /// 휴식 시간 중 포기: 포기 시간 - 마지막 휴식 시간 < 600 이면 휴식 시간 중에 포기한 것
-  /// 이 경우 600 이 아니고 포기 시간 - 마지막 휴식 시간을 더해준다
-  /// 휴식 중에 미션 클리어: 종료 시간 - 마지막 휴식 시간 < 600 확인하고 처리
-  // console.log(endT, giveUpT, breakTimes);
-  let totalBreakTime = 0;
-
-  if (breakTimes.length > 0) {
-    totalBreakTime += (breakTimes.length - 1) * 600;
-    if (!giveUpT && endT - breakTimes[breakTimes.length - 1] < 600)
-      totalBreakTime += endT - breakTimes[breakTimes.length - 1];
-    else if (giveUpT && giveUpT - breakTimes[breakTimes.length - 1] < 600)
-      totalBreakTime += giveUpT - breakTimes[breakTimes.length - 1];
-    else totalBreakTime += 600;
+export function getActualMissionTime(endT, giveUpT, totalPT) {
+  // console.log(
+  //   '종료 시간: ',
+  //   endT,
+  //   '포기 시간: ',
+  //   giveUpT,
+  //   '금지 앱 사용 시간: ',
+  //   totalPT,
+  // );
+  if (giveUpT) {
+    return integerToTime(giveUpT - totalPT);
+  } else {
+    return integerToTime(endT - totalPT);
   }
-  return integerToTime(
-    (giveUpT === null ? endT : giveUpT) -
-      // timeToInteger(startT) -
-      totalBreakTime,
-  );
 }
