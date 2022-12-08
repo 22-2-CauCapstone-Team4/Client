@@ -106,6 +106,10 @@ const OngoingBox = () => {
                           Goal.schema,
                           Place.schema,
                           ProhibitedApp.schema,
+                          MissionRecord.schema,
+                          GiveUpAppEmbedded.schema,
+                          AppUsageEmbedded.schema,
+                          UserInfo.schema,
                         ]),
                       );
                       await takeBreakTime(realm);
@@ -141,10 +145,10 @@ const OngoingBox = () => {
                           MissionRecord.schema,
                           GiveUpAppEmbedded.schema,
                           AppUsageEmbedded.schema,
+                          UserInfo.schema,
                           Goal.schema,
                           Place.schema,
                           ProhibitedApp.schema,
-                          UserInfo.schema,
                         ]),
                       );
                       await giveUp(realm);

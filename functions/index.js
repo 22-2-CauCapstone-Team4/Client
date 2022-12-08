@@ -25,6 +25,8 @@ import {
   readTodayMissionsInRealm,
   getTodayMissionInRealm,
   isTodayMission,
+  readMissionRecordsInRealm,
+  updateCommentInRealm,
 } from './crud';
 import {
   appCheckHeadlessTask,
@@ -60,6 +62,8 @@ module.exports = {
   mkTodayMissionsInRealm,
   readTodayMissionsInRealm,
   getTodayMissionInRealm,
+  readMissionRecordsInRealm,
+  updateCommentInRealm,
   isTodayMission,
   readUsageInRealm,
   readAppSecInRealm,

@@ -8,13 +8,27 @@ import {ProgressBar} from 'rn-multi-progress-bar';
 import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../../utils/styles';
 import {updateComment} from '../../store/action';
+import {updateCommentInRealm} from '../../functions';
 import * as Time from '../../functions/time.js';
+import {mkConfig} from '../../functions/mkConfig';
+import Realm from 'realm';
+import {useAuth} from '../../providers/AuthProvider';
+import {
+  Goal,
+  Place,
+  Mission,
+  AppUsageEmbedded,
+  GiveUpAppEmbedded,
+  MissionRecord,
+  UserInfo,
+} from '../../schema';
 
 const RecordTab = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [text, setText] = useState('');
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   const [dateMessage, setDateMessage] = useState('');
+  const {user} = useAuth();
 
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
@@ -24,12 +38,12 @@ const RecordTab = () => {
   const arr = Array.from(new Set(newRecord.map(item => item.mission.date)));
 
   function sortRecord(a, b) {
-    aDate = a.mission.date.split('-').join('');
-    bDate = b.mission.date.split('-').join('');
+    let aDate = a.mission.date.split('-').join('');
+    let bDate = b.mission.date.split('-').join('');
     if (aDate < bDate) return -1;
     else if (aDate == bDate) {
-      aStartTime = a.startTime.split(':').join('');
-      bStartTime = b.startTime.split(':').join('');
+      let aStartTime = a.startTime.split(':').join('');
+      let bStartTime = b.startTime.split(':').join('');
       if (aStartTime <= bStartTime) return 1;
       else return -1;
     } else return 1;
@@ -250,9 +264,26 @@ const RecordTab = () => {
                             placeholder="한 줄 평가"
                             placeholderTextColor={Colors.GREY}
                             onChangeText={event => setText(event)}
-                            onSubmitEditing={() =>
-                              dispatch(updateComment({...item, comment: text}))
-                            }
+                            onSubmitEditing={() => {
+                              Realm.open(
+                                mkConfig(user, [
+                                  Goal.schema,
+                                  Place.schema,
+                                  Mission.schema,
+                                  MissionRecord.schema,
+                                  GiveUpAppEmbedded.schema,
+                                  AppUsageEmbedded.schema,
+                                  UserInfo.schema,
+                                ]),
+                              ).then(realm => {
+                                updateCommentInRealm(user, realm, {
+                                  ...item,
+                                  comment: text,
+                                });
+                                realm.close();
+                              });
+                              dispatch(updateComment({...item, comment: text}));
+                            }}
                           />
                           {/* ★ 상태 메시지 남기는 곳 */}
                         </View>

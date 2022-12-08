@@ -14,6 +14,7 @@ import {
   getTodayMission,
   isTodayMission,
 } from './Mission';
+import {readMissionRecords, updateComment} from './MissionRecord';
 
 import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
 
@@ -42,4 +43,6 @@ module.exports = {
   readUsageInRealm: readUsage,
   readAppSecInRealm: readAppSec,
   readAppCntInRealm: readAppCnt,
+  readMissionRecordsInRealm: readMissionRecords,
+  updateCommentInRealm: updateComment,
 };

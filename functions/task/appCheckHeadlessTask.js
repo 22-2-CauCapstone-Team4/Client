@@ -75,29 +75,31 @@ const appCheckHeadlessTask = async (user, taskData) => {
 
       curState.isNowUsingProhibitedApp = isProhibitedApp;
 
+      if (curState.lastBreakTime === null) {
+        leftTime = 0;
+      } else {
+        leftTime = parseInt(moment().diff(curState.lastBreakTime) / 1000);
+        if (leftTime < 10 * 60) isBreakTime = true; // 아직 쉬는 시간
+
+        leftTime = 60 * 60 - leftTime;
+        if (leftTime < 0) leftTime = 0;
+      }
+
+      console.log(
+        '마지막 쉬는 시간',
+        curState.lastBreakTime,
+        ', 쉬는 시간 사용 가능까지 남은 시간',
+        leftTime,
+        '현재 쉬는 시간',
+        isBreakTime ? 'O' : 'X',
+      );
+
       // 금지 앱 화면 실행
       if (isProhibitedApp && curState.isNowDoingMission) {
         // missionRecord
         missionRecord = realm
           .objects('MissionRecord')
           .sorted('startTime', true)[0];
-
-        if (curState.lastBreakTime === null) {
-          leftTime = 0;
-        } else {
-          leftTime = parseInt(moment().diff(curState.lastBreakTime) / 1000);
-          if (leftTime < 10 * 60) isBreakTime = true; // 아직 쉬는 시간
-
-          leftTime = 60 * 60 - leftTime;
-          if (leftTime < 0) leftTime = 0;
-        }
-
-        console.log(
-          '마지막 쉬는 시간',
-          curState.lastBreakTime,
-          ', 쉬는 시간 사용 가능까지 남은 시간',
-          leftTime,
-        );
 
         if (!isBreakTime) {
           LockAppModule.viewLockScreen(
@@ -449,16 +451,27 @@ const appCheckHeadlessTask = async (user, taskData) => {
         console.log('3. AppUsageRecord 종료 기록');
 
         // missionRecord update
-        if (type !== PhoneUsageRecord.TYPE.DEFAULT && !isBreakTime) {
-          // 쉬는 시간 아닐 때만
+        console.log(type, isBreakTime);
+        if (type !== PhoneUsageRecord.TYPE.DEFAULT && isBreakTime) {
+          // 쉬는 시간일 때만
           const missionRecord = realm
             .objects('MissionRecord')
             .sorted('startTime', true)[0];
 
           const startTimeInt = parseInt(
-              moment().diff(curState.startAppTime) / 1000,
-            ),
-            endTimeInt = parseInt(moment().diff(curState.endAppTime) / 1000);
+            moment(curState.startAppTime).diff(missionRecord.startTime) / 1000,
+          );
+          const endTimeInt = parseInt(
+            moment(curState.endAppTime).diff(missionRecord.startTime) / 1000,
+          );
+
+          console.log(
+            missionRecord.startTime,
+            curState.startAppTime,
+            curState.endAppTime,
+            startTimeInt,
+            endTimeInt,
+          );
 
           missionRecord.prohibitedAppUsages.push({
             name: prevAppName,
@@ -467,6 +480,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
           });
           missionRecord.totalProhibitedAppUsageSec += endTimeInt - startTimeInt;
           console.log(JSON.parse(JSON.stringify(missionRecord)));
+        } else {
+          // cnt만 ++
         }
 
         console.log('4. MissionRecord 금지 앱 기록');

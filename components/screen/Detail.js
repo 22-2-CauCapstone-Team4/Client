@@ -28,6 +28,7 @@ import {
   readTodayMissionsInRealm,
   mkMissionRealmObjToObj,
   mkTodayMissionRealmObjToObj,
+  readMissionRecordsInRealm,
 } from '../../functions';
 import {
   addApps,
@@ -37,11 +38,23 @@ import {
   initMission,
   initPlace,
   initTodayMission,
+  initRecord,
 } from '../../store/action';
 import Realm from 'realm';
 import {mkConfig} from '../../functions/mkConfig';
 import {composeEventHandlers} from 'native-base';
-import {ProhibitedApp, Goal, Place, Mission, TodayMission} from '../../schema';
+import {
+  ProhibitedApp,
+  Goal,
+  Place,
+  Mission,
+  TodayMission,
+  AppUsageEmbedded,
+  GiveUpAppEmbedded,
+  MissionRecord,
+  UserInfo,
+} from '../../schema';
+import moment from 'moment';
 
 const Tab = createBottomTabNavigator();
 
@@ -79,6 +92,10 @@ function Detail({navigation}) {
           Place.schema,
           Mission.schema,
           TodayMission.schema,
+          MissionRecord.schema,
+          GiveUpAppEmbedded.schema,
+          AppUsageEmbedded.schema,
+          UserInfo.schema,
         ]),
       );
 
@@ -101,12 +118,14 @@ function Detail({navigation}) {
         tempPlaces,
         tempMissions,
         tempTodayMissions,
+        tempRecords,
       ] = await Promise.all([
         readProhibitedAppsInRealm(user, realm),
         readGoalsInRealm(user, realm),
         readPlacesInRealm(user, realm),
         readMissionsInRealm(user, realm),
         readTodayMissionsInRealm(user, realm),
+        readMissionRecordsInRealm(user, realm),
       ]);
 
       realm.close();
@@ -124,7 +143,6 @@ function Detail({navigation}) {
           tempMissions.map(mission => mkMissionRealmObjToObj(mission)),
         ),
       );
-
       dispatch(
         initTodayMission(
           tempTodayMissions.map(mission =>
@@ -132,6 +150,7 @@ function Detail({navigation}) {
           ),
         ),
       );
+      dispatch(initRecord(tempRecords));
 
       const {friendInfo, friendCurStates} = await user.callFunction(
         'friend/readFriends',

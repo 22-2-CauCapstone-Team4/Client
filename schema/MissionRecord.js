@@ -6,13 +6,14 @@ class MissionRecord {
     this.mission = mission;
     this.owner_id = owner_id;
     this.startTime = startTime;
+    this.breakTimes = [];
   }
 
   static schema = {
     name: 'MissionRecord',
     properties: {
       _id: 'objectId',
-      breakTimes: 'date[]',
+      breakTimes: 'int[]',
       comment: 'string?',
       endTime: 'int?',
       giveUpApp: 'GiveUpAppEmbedded',

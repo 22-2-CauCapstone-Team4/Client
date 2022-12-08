@@ -1,5 +1,15 @@
 import {mkConfig, takeBreakTime} from '..';
-import {CurState, Mission, Goal, Place, ProhibitedApp} from '../../schema';
+import {
+  CurState,
+  Mission,
+  Goal,
+  Place,
+  ProhibitedApp,
+  AppUsageEmbedded,
+  GiveUpAppEmbedded,
+  MissionRecord,
+  UserInfo,
+} from '../../schema';
 import Realm from 'realm';
 
 const btnClickTask = async (user, taskData) => {
@@ -16,6 +26,10 @@ const btnClickTask = async (user, taskData) => {
         Goal.schema,
         Place.schema,
         ProhibitedApp.schema,
+        MissionRecord.schema,
+        GiveUpAppEmbedded.schema,
+        AppUsageEmbedded.schema,
+        UserInfo.schema,
       ]),
     );
     await takeBreakTime(realm);

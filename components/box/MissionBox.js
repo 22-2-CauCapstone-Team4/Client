@@ -426,6 +426,10 @@ function MissionBox(props) {
                             Mission.schema,
                             Goal.schema,
                             Place.schema,
+                            MissionRecord.schema,
+                            GiveUpAppEmbedded.schema,
+                            AppUsageEmbedded.schema,
+                            UserInfo.schema,
                             ProhibitedApp.schema,
                           ]),
                         );

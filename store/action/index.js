@@ -171,6 +171,13 @@ export const addBlockedApps = items => {
   };
 };
 
+export const initRecord = items => {
+  return {
+    type: 'INIT_RECORD',
+    payload: items,
+  };
+};
+
 export const updateComment = items => {
   return {
     type: 'UPDATE_COMMENT',

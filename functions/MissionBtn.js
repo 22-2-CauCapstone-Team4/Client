@@ -13,6 +13,9 @@ const takeBreakTime = async realm => {
       const mission = realm
         .objects('Mission')
         .filtered(`_id == oid(${curState.mission._id})`)[0];
+      const missionRecord = realm
+        .objects('MissionRecord')
+        .sorted('startTime', true);
       const prohibitedApps = JSON.parse(
         JSON.stringify(realm.objects('ProhibitedApp')),
       ).map(app => {
@@ -44,6 +47,15 @@ const takeBreakTime = async realm => {
       ) {
         // 현재 진행 중 미션이 있고 쉬는시간 사용 가능한 경우
         curState.lastBreakTime = now;
+        if (missionRecord.breakTimes) {
+          missionRecord.breakTimes.push(
+            parseInt(moment(now).diff(missionRecord.startTime) / 1000),
+          );
+        } else {
+          missionRecord.breakTimes = [
+            parseInt(moment(now).diff(missionRecord.startTime) / 1000),
+          ];
+        }
 
         // 시간 계산
         const breakEndTime = moment().add(10, 'm');

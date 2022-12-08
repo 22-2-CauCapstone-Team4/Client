@@ -106,6 +106,8 @@ const INITIAL_STATE = {
 
 const recordReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case 'INIT_RECORD':
+      return {...state, data: action.payload};
     case 'UPDATE_COMMENT':
       const oldComment = state.data.filter(
         item => item._id != action.payload._id,
