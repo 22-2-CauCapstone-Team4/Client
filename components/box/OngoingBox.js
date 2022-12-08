@@ -35,7 +35,9 @@ const OngoingBox = () => {
   // 경과 시간: 미션 시작 시간(hh:mm) -> 약간 부정확한 형식 (hh:mm:ss)여야 정확
   // 경과 시간은 휴식 시간을 제외한 상태이기 때문에 time.js에서 getActualMissionTime(startTime,endTime,null,breakTimes)를 이용하면 정확한 경과 시간을 얻을 것이라 예상
   const [elapsedTime, setElapsedTime] = useState(
-    Time.getElapsedTime(doingMission.time.startTime),
+    doingMission !== undefined
+      ? Time.getElapsedTime(doingMission.time.startTime)
+      : null,
   );
 
   // 금지 앱 시간: 저장된 금지 앱 사용 시간

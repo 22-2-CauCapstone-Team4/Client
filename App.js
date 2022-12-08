@@ -14,6 +14,7 @@ import FriendScreen from './components/screen/FriendScreen';
 import DirectCreateMissionScreen from './components/screen/DirectCreateMissionScreen';
 import CreateMissionScreen from './components/screen/CreateMissionScreen';
 import CreateSpaceScreen from './components/screen/CreateSpaceScreen';
+import WatchLocationScreen from './components/screen/WatchLocationScreen';
 
 const Stack = createStackNavigator();
 const store = createStore(rootReducer);
@@ -68,8 +69,8 @@ function App() {
               options={{headerShown: false}}
             />
             <Stack.Screen
-              name="Friend"
-              component={FriendScreen}
+              name="WatchLocation"
+              component={WatchLocationScreen}
               options={{headerShown: false}}
             />
           </Stack.Navigator>
