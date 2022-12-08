@@ -101,7 +101,20 @@ const acceptMissionTriggerTask = async (user, taskData) => {
 
           ForegroundServiceModule.startService(prohibitedApps, {
             title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
-            content: '당신의 목표를 응원합니다!',
+            content:
+              mission.type === Mission.TYPE.TIME
+                ? `${
+                    parseInt(mission.endTime / 60) < 10
+                      ? '0' + parseInt(mission.endTime / 60)
+                      : parseInt(mission.endTime / 60)
+                  }:${
+                    mission.endTime % 60 < 10
+                      ? '0' + (mission.endTime % 60)
+                      : mission.endTime % 60
+                  }에 미션이 종료됩니다. `
+                : mission.type === Mission.TYPE.IN_PLACE
+                ? `${mission.place.name} 공간 안에서 미션을 수행해 주세요.  `
+                : `${mission.place.name} 공간을 향해 출발해 봅시다! `,
           });
 
           // console.log(
@@ -183,6 +196,12 @@ const acceptMissionTriggerTask = async (user, taskData) => {
               mission._id.toString(),
               parseInt(Math.random() * 10000000),
             );
+
+            ForegroundServiceModule.startService(prohibitedApps, {
+              title: `[ ${mission.goal.name} - ${mission.name} ] 미션 진행 중`,
+              content: '공간 이동 완료! 공간 안에서 미션을 수행해 주세요. ',
+            });
+
             break;
           case Mission.TYPE.IN_PLACE:
             delete todayMission.extraState;
@@ -224,7 +243,7 @@ const acceptMissionTriggerTask = async (user, taskData) => {
       } else if (todayMission.state === TodayMission.STATE.QUIT) {
         console.log(mission.name, '포기한 미션 실제 종료');
 
-        if (curState.mission._id.toString() === id) {
+        if (mission._id.toString() === id) {
           // 다른 미션 진행 중이지 않은 경우, 예전 내용 초기화 및 다시 알림 주기 필요
           curState.isNowDoingMission = false;
           curState.isNowGivingUp = false;

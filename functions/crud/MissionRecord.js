@@ -30,6 +30,14 @@ const readMissionRecords = async (user, realm) => {
           : endTimeStr.minutes()
       }`;
 
+      const date = `${el.startTime.getYears()}-${
+        el.startTime.getMonths() + 1
+      }-${
+        el.startTime.getDates() < 10
+          ? '0' + el.startTime.getDates()
+          : el.startTime.getDates()
+      }`;
+
       // console.log('????????????????', startTime, el.endTime);
       const mission = mkMissionRealmObjToObj(el.mission);
       const prohibitedAppUsages = JSON.parse(
@@ -39,6 +47,7 @@ const readMissionRecords = async (user, realm) => {
 
       return {
         ...JSON.parse(JSON.stringify(el)),
+        date,
         startTime,
         endTimeStr,
         mission,

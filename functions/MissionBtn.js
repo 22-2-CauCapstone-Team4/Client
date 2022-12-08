@@ -107,12 +107,15 @@ const giveUp = async realm => {
         return {name: app.name, packageName: app.packageName};
       });
 
+      // console.log(curState, curState.mission);
+
       const now = new Date();
       // const canUsingBreakTime =
       //   moment(now).diff(curState.lastBreakTIme) / 1000 >= 60 * 60
       //     ? true
       //     : false;
 
+      console.log('?');
       if (
         curState.isNowDoingMission &&
         !curState.isNowGivingUp
@@ -123,6 +126,7 @@ const giveUp = async realm => {
           moment(now).diff(missionRecord.startTime) / 1000,
         );
 
+        console.log('?');
         if (
           curState.appName &&
           moment(curState.startAppTime).isAfter(missionRecord.startTime)
@@ -130,11 +134,13 @@ const giveUp = async realm => {
           const icon = prohibitedApps.filter(
             el => el.name === curState.appName,
           );
-          missionRecord.giveUpApp(
-            new GiveUpAppEmbedded({name: curState.appName, icon}),
-          );
+          missionRecord.giveUpApp = new GiveUpAppEmbedded({
+            name: curState.appName,
+            icon,
+          });
         }
 
+        console.log('?');
         todayMission.state = TodayMission.STATE.QUIT;
 
         curState.isNowDoingMission = false;
@@ -142,10 +148,12 @@ const giveUp = async realm => {
         curState.lastBreakTime = null;
         curState.mission = null;
 
+        console.log('?');
         // 다시 알림 주기
         ForegroundServiceModule.startService(prohibitedApps, {
-          title: '감지 중',
-          content: '금지 앱 사용을 감지 중입니다. ',
+          title: `[ ${todayMission.mission.goal.name} - ${todayMission.mission.name} ] 포기 중`,
+          content:
+            '미션 종료 조건 전까지 금지 앱 사용 내역을 기록하는 중입니다. ',
         });
 
         console.log('포기');
