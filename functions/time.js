@@ -52,7 +52,7 @@ export function getElapsedTime(startTime) {
   if (startTime !== undefined) {
     let date = new Date();
     date.setHours(date.getHours() + 9);
-    value = timeToInteger(
+    let value = timeToInteger(
       date.toISOString().replace('T', ' ').substring(11, 16),
     );
 

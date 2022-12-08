@@ -33,7 +33,7 @@ const RecordTab = () => {
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
 
-  console.log(recordList);
+  //console.log(recordList);
   const newRecord = recordList.sort(sortRecord).reverse();
   const dispatch = useDispatch();
 
@@ -59,7 +59,7 @@ const RecordTab = () => {
     let BLUE = [0, props.timeData.endTime];
     let YELLOW = props.timeData.prohibitedAppUsages.map(el => el.startTime);
     let RED = props.timeData.giveUpTime ? [props.timeData.giveUpTime] : [];
-    console.log(BLUE, YELLOW, RED);
+    //console.log(BLUE, YELLOW, RED);
     let endAppTimes = props.timeData.prohibitedAppUsages.map(el => {
       return {startTime: el.startTime, endTime: el.endTime};
     });
@@ -67,7 +67,7 @@ const RecordTab = () => {
     if (endAppTimes.length > 0) {
       for (var i = 0; i < endAppTimes.length - 1; i++) {
         BLUE.push(endAppTimes[i].endTime);
-        console.log(endAppTimes[i]);
+        //console.log(endAppTimes[i]);
       }
 
       // 마지막 휴식 종료 시간 처리
@@ -82,11 +82,16 @@ const RecordTab = () => {
     let times = [];
     if (RED[0] !== null) times = BLUE.concat(YELLOW, RED); //null처리
     else times = BLUE.concat(YELLOW);
-    times.sort();
-
+    times.sort(function (a, b) {
+      return a - b;
+    });
+    // console.log('시간정보', times);
+    // console.log('BLUE', BLUE);
+    // console.log('YELLOW', YELLOW);
+    // console.log('RED', RED);
     let bars = [];
     for (var i = 0; i < times.length - 1; i++) {
-      console.log('log', times[i + 1], times[i]);
+      //console.log('log', times[i + 1], times[i]);
       if (times[i + 1] - times[i] !== 0) {
         bars.push({
           progress: times[i + 1] - times[i],
