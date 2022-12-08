@@ -66,7 +66,9 @@ export default function PlaceListModal({
                         key={item._id}
                         style={style.place}
                         onPress={() => {
-                          navigation.navigate('WatchLocation');
+                          navigation.navigate('WatchLocation', {
+                            location: item,
+                          });
                           setModalVisible(!modalVisible);
                         }}
                         onLongPress={async () => {
