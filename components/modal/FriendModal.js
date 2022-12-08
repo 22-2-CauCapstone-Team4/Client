@@ -31,7 +31,6 @@ export default function FriendModal({
 
   React.useEffect(() => {}, [result, friendList]);
   // console.log(userList);
-  // console.log(friendList);
 
   return (
     <>
@@ -42,6 +41,7 @@ export default function FriendModal({
           visible={modalVisible}
           onRequestClose={() => {
             setModalVisible(!modalVisible);
+            setResult('');
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
@@ -66,14 +66,14 @@ export default function FriendModal({
                           nickname: searchText,
                         },
                       );
-                      // console.log(userInfos);
+                      console.log('사용자', userInfos);
                       setResult(userInfos);
                     }}>
                     <Icon name={'search'} size={20} color={'black'}></Icon>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.lineStyle}></View>
-                <ScrollView>
+                <ScrollView style={{width: '100%'}}>
                   {result.length > 0 ? (
                     result.map(data => (
                       <View
@@ -94,7 +94,7 @@ export default function FriendModal({
                         </View>
                         {friendList
                           .map(f => f.nickname)
-                          .indexOf(data.nickname) == -1 ? (
+                          .indexOf(data.nickname) === -1 ? (
                           <TouchableOpacity
                             style={styles.followButton}
                             onPress={async () => {
