@@ -15,8 +15,8 @@ import {
   isTodayMission,
 } from './Mission';
 import {readMissionRecords, updateComment} from './MissionRecord';
-
 import {readUsage, readAppSec, readAppCnt} from './UsageRecord';
+import {mkStaticStr} from './Statics';
 
 module.exports = {
   readProhibitedAppsInRealm: readProhibitedApps,
@@ -45,4 +45,5 @@ module.exports = {
   readAppCntInRealm: readAppCnt,
   readMissionRecordsInRealm: readMissionRecords,
   updateCommentInRealm: updateComment,
+  mkStaticStr,
 };

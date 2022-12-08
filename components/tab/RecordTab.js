@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, View, Switch, Image} from 'react-native';
 import {StyleSheet} from 'react-native';
@@ -8,7 +8,7 @@ import {ProgressBar} from 'rn-multi-progress-bar';
 import {useSelector, useDispatch} from 'react-redux';
 import {styles} from '../../utils/styles';
 import {updateComment} from '../../store/action';
-import {updateCommentInRealm} from '../../functions';
+import {updateCommentInRealm, readMissionRecordsInRealm} from '../../functions';
 import * as Time from '../../functions/time.js';
 import {mkConfig} from '../../functions/mkConfig';
 import Realm from 'realm';
@@ -22,6 +22,7 @@ import {
   MissionRecord,
   UserInfo,
 } from '../../schema';
+import {initRecord} from '../../store/action';
 
 const RecordTab = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -30,12 +31,52 @@ const RecordTab = () => {
   const [dateMessage, setDateMessage] = useState('');
   const {user} = useAuth();
 
+  // useEffect(() => {
+  //   try {
+  //     Realm.open(
+  //       mkConfig(user, [
+  //         Goal.schema,
+  //         Place.schema,
+  //         Mission.schema,
+  //         MissionRecord.schema,
+  //         GiveUpAppEmbedded.schema,
+  //         AppUsageEmbedded.schema,
+  //         UserInfo.schema,
+  //       ]),
+  //     ).then(realm => {
+  //       realm.addListener('change', onRealmChange);
+  //       realm.close();
+  //     });
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // });
+
+  // const onRealmChange = async () => {
+  //   const realm = await Realm.open(
+  //     mkConfig(user, [
+  //       Goal.schema,
+  //       Place.schema,
+  //       Mission.schema,
+  //       MissionRecord.schema,
+  //       GiveUpAppEmbedded.schema,
+  //       AppUsageEmbedded.schema,
+  //       UserInfo.schema,
+  //     ]),
+  //   );
+  //   let tempRecords = await readMissionRecordsInRealm(user, realm);
+  //   dispatch(initRecord(tempRecords));
+
+  //   realm.close();
+  // };
+
   // redux 적용
   const recordList = useSelector(store => store.recordReducer.data);
   const appList = useSelector(store => store.appReducer.data); // 가장 많이 사용한 금지 앱 이미지 뽑기
 
   const newRecord =
     recordList !== null ? recordList.sort(sortRecord).reverse() : null;
+
   const dispatch = useDispatch();
   const arr =
     newRecord !== null
@@ -79,7 +120,6 @@ const RecordTab = () => {
     let BLUE = [0, props.timeData.endTime];
     let YELLOW = props.timeData.prohibitedAppUsages.map(el => el.startTime);
     let RED = props.timeData.giveUpTime ? [props.timeData.giveUpTime] : [];
-    //console.log(BLUE, YELLOW, RED);
     let endAppTimes = props.timeData.prohibitedAppUsages.map(el => {
       return {startTime: el.startTime, endTime: el.endTime};
     });

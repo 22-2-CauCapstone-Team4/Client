@@ -10,7 +10,7 @@ const readMissionRecords = async (user, realm) => {
     list = list.filter(el => el.endTime);
     // tempRecords = JSON.parse(JSON.stringify(tempRecords));
     list = list.map(el => {
-      console.log('????????????????', el.startTime, el.endTime);
+      // console.log('????????????????', el.startTime, el.endTime);
       const startTime = `${
         el.startTime.getHours() < 10
           ? '0' + el.startTime.getHours()
@@ -30,12 +30,12 @@ const readMissionRecords = async (user, realm) => {
           : endTimeStr.minutes()
       }`;
 
-      console.log('????????????????', startTime, el.endTime);
+      // console.log('????????????????', startTime, el.endTime);
       const mission = mkMissionRealmObjToObj(el.mission);
       const prohibitedAppUsages = JSON.parse(
         JSON.stringify(el.prohibitedAppUsages),
       );
-      console.log(prohibitedAppUsages);
+      // console.log(prohibitedAppUsages);
 
       return {
         ...JSON.parse(JSON.stringify(el)),

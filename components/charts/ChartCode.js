@@ -1,5 +1,19 @@
-let chartcode = `
-
+const mkChartCode = ({
+  nonProhibitedAppMins,
+  prohibitedAppMins,
+  ctx2_label,
+  prohibitedAppClickCnts,
+  breakTimeOrGiveUpCnt,
+  ctx3_label,
+  giveUpPer,
+  ctx4_label,
+  giveUpAppPer,
+  ctx5_label,
+  giveUpAppClickCnt,
+  ctx6_label,
+  giveUpAppUsages,
+}) => {
+  return `
 <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
@@ -77,25 +91,23 @@ const ctx6 = document.getElementById('myChart6');
 Chart.defaults.font.size = 30;
 Chart.defaults.font.weight = 'bold';
 
-
 // ★1. 미션 중/포기 중/평소 전체 시간 대비 금지 앱 사용 시간
 
 new Chart(ctx1, {
-  
   type: 'bar',
   data: {
     labels: ['미션 중', '포기 중', '평소'],
     datasets: [
       {
-        label: '금지 X 앱 사용시간',
-        data: [18, 12, 10],
+        label: '일반 앱 사용시간',
+        data: ${'[' + nonProhibitedAppMins + ']'},
         backgroundColor: ['rgba(54, 162, 235, 0.7)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
         borderWidth: 1,
       },
       {
         label: '금지 앱 사용시간',
-        data: [18, 12, 10],
+        data: ${'[' + prohibitedAppMins + ']'},
         backgroundColor: ['rgba(255, 26, 104, 0.7)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
         borderWidth: 1,
@@ -137,8 +149,7 @@ new Chart(ctx1, {
             bottom: 20
           }
         }
-        
-      },
+             },
     },
   },
 });
@@ -151,20 +162,20 @@ new Chart(ctx2, {
       {
         type: 'bar',
         label: '금지 앱 클릭 횟수',
-        data: [10, 20, 30, 10, 20, 1, 2],
+        data: ${'[' + prohibitedAppClickCnts + ']'},
         backgroundColor: ['rgba(255, 26, 104, 0.2)'],
         borderColor: ['rgba(255, 26, 104, 0.2)'],
       },
       {
         type: 'line',
         label: '휴식/포기로 이어진 횟수',
-        data: [40, 10, 30, 20, 20, 2, 4],
+        data: ${'[' + breakTimeOrGiveUpCnt + ']'},
         backgroundColor: ['rgba(48,128,208, 0.5)'],
         borderColor: ['rgba(48,128,208, 0.5)'],
         
       },
     ],
-    labels: ['January', 'February', 'March', 'April','a', 's'],
+    labels: ${'["' + ctx2_label.join('","') + '"]'},
   },
   options: {
     responsive: false,
@@ -214,11 +225,11 @@ new Chart(ctx2, {
 new Chart(ctx3, {
   type: 'line',
   data: {
-    labels: ['일', '월', '화', '수', '목', '금', '토'],
+    labels: ${'["' + ctx3_label.join('","') + '"]'},
     datasets: [
       {
         label: '포기 상태일 확률',
-        data: [12, 19, 3, 5, 2, 3, 1],
+        data: ${'[' + giveUpPer + ']'},
         borderWidth: 1,
       },
     ],
@@ -271,11 +282,11 @@ new Chart(ctx3, {
 new Chart(ctx4, {
   type: 'doughnut',
   data: {
-    labels: ['유튜브', '인스타그램', '페이스북'],
+    labels: ${'["' + ctx4_label.join('","') + '"]'},
     datasets: [
       {
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: ${'[' + giveUpAppPer + ']'},
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
@@ -315,11 +326,11 @@ new Chart(ctx4, {
 new Chart(ctx5, {
   type: 'bar',
   data: {
-    labels: ['일', '월', '화', '수', '목', '금', '토'],
+    labels: ${'["' + ctx5_label.join('","') + '"]'},
     datasets: [
       {
         label: '클릭 횟수',
-        data: [65, 59, 80, 81, 56, 55, 40],
+        data: ${'[' + giveUpAppClickCnt + ']'},
         borderWidth: 1,
       },
     ],
@@ -391,11 +402,11 @@ new Chart(ctx5, {
 new Chart(ctx6, {
   type: 'bar',
   data: {
-    labels: ['일', '월', '화', '수', '목', '금', '토'],
+    labels: ${'["' + ctx6_label.join('","') + '"]'},
     datasets: [
       {
         label: '사용 시간',
-        data: [65, 59, 80, 81, 56, 55, 40],
+        data: ${'[' + giveUpAppUsages + ']'},
         borderWidth: 1,
       },
     ],
@@ -466,7 +477,9 @@ new Chart(ctx6, {
 
 </script>
 `;
-export default chartcode;
+};
+
+export default mkChartCode;
 
 {
   /* <h1 id="title1">1.</h1>
