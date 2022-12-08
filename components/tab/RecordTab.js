@@ -34,9 +34,13 @@ const RecordTab = () => {
   const recordList = useSelector(store => store.recordReducer.data);
   const appList = useSelector(store => store.appReducer.data); // 가장 많이 사용한 금지 앱 이미지 뽑기
 
-  const newRecord = recordList.sort(sortRecord).reverse();
+  const newRecord =
+    recordList !== null ? recordList.sort(sortRecord).reverse() : null;
   const dispatch = useDispatch();
-  const arr = Array.from(new Set(newRecord.map(item => item.mission.date)));
+  const arr =
+    newRecord !== null
+      ? Array.from(new Set(newRecord.map(item => item.mission.date)))
+      : null;
 
   function sortRecord(a, b) {
     let aDate = a.mission.date.split('-').join('');
@@ -134,214 +138,222 @@ const RecordTab = () => {
       <View style={recordStyle.lineStyle}></View>
       <ScrollView>
         {/* 날짜 선 */}
-        {arr.map(item => (
-          <View key={item} style={{alignItems: 'center'}}>
-            {isEnabled ? (
-              newRecord.filter(
-                record => record.mission.date === item && !record.giveUpTime,
-              ).length > 0 ? (
-                <View style={{flexDirection: 'row', marginVertical: 10}}>
-                  <View style={recordStyle.dateLineStyle}></View>
-                  <Text style={recordStyle.dateHeader} key={item}>
-                    {item}
-                  </Text>
-                  <View style={recordStyle.dateLineStyle}></View>
-                </View>
-              ) : null
-            ) : (
-              <View style={{flexDirection: 'row', marginVertical: 10}}>
-                <View style={recordStyle.dateLineStyle}></View>
-                <Text style={recordStyle.dateHeader} key={item}>
-                  {item}
-                </Text>
-                <View style={recordStyle.dateLineStyle}></View>
-              </View>
-            )}
-            {/* 최신순 기록 컴포넌트 표시 */}
-            {newRecord
-              .filter(record => record.mission.date === item)
-              .map(item => {
-                if (isEnabled === true && item.giveUpTime) {
-                  return;
-                }
-                return (
-                  <View
-                    key={item._id}
-                    style={{alignItems: 'center', padding: 5}}>
-                    <View style={recordStyle.info}>
-                      <View style={recordStyle.timeRecord}>
-                        {/* 가장 많이 사용한 금지 앱 */}
-                        {item.prohibitedAppUsages.length == 0 ? null : (
-                          <View
-                            style={{
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}>
-                            <Text style={recordStyle.mostUsedApp}>
-                              가장 많이 사용한
-                            </Text>
-                            <Text style={recordStyle.mostUsedApp}>
-                              제한 어플
-                            </Text>
-                            <Image
-                              source={{
-                                uri: getMostUsedProhibitedAppIcon(
-                                  item.prohibitedAppUsages,
-                                ),
-                              }}
-                              style={{width: 60, height: 60}}
-                              color={Colors.MAIN_COLOR}
-                            />
-                          </View>
-                        )}
-
-                        <View style={{flexDirection: 'row', marginVertical: 3}}>
-                          <Text style={recordStyle.lockTime}>
-                            🔒
-                            {Time.getActualMissionTime(
-                              item.startTime,
-                              item.endTime,
-                              item.giveUpTime,
-                              item.breakTimes,
-                            )}
-                          </Text>
-                          {/* ★ 잠금 시간 */}
-                        </View>
-                        {!item.totalProhibitedAppUsageSec ? null : (
-                          <View style={{flexDirection: 'row', marginBottom: 3}}>
-                            <Text style={recordStyle.useTime}>
-                              📵
-                              {Time.integerToTime(
-                                item.totalProhibitedAppUsageSec,
-                              )}
-                            </Text>
-                            {/* ★ 금지앱 사용 시간 */}
-                          </View>
-                        )}
-
-                        {/* 미션 성공시 포기 시간 표시 안함 */}
-                        {!item.giveUpTime ? null : (
-                          <View style={{flexDirection: 'row'}}>
-                            <Text style={recordStyle.quitTime}>
-                              ❌
-                              {Time.getGiveUpTime(
-                                item.endTime,
-                                item.giveUpTime,
-                              )}
-                            </Text>
-                            {/* ★ 금지앱 사용 시간 */}
-                          </View>
-                        )}
-                      </View>
-                      <View
-                        style={{
-                          border: 1,
-                          borderWidth: 1,
-                          borderRadius: 25,
-                          padding: '4%',
-                          width: '80%',
-                          borderColor: !item.giveUpTime
-                            ? Colors.MAIN_COLOR
-                            : '#f5a6a3',
-                          // ★ 실패 or 성공 전체적인 테두리
-                        }}>
-                        <View style={[recordStyle.main]}>
-                          <View>
-                            <View style={recordStyle.missionInfo}>
-                              <Text style={recordStyle.category}>
-                                {item.mission.category}
-                              </Text>
-                              {/* ★ 카테고리 */}
-                              <Text style={recordStyle.bar}> | </Text>
-                              <Text style={recordStyle.missionName}>
-                                {item.mission.name}
-                              </Text>
-                              {/* ★ 미션 이름 */}
-                            </View>
-                          </View>
-                          <View
-                            style={
-                              ([recordStyle.missionStatus],
-                              {
-                                justifyContent: 'center',
-                                borderRadius: 10,
-                              })
-                            }>
-                            <Text
-                              style={{
-                                color: 'black',
-                                fontSize: 10,
-                                backgroundColor: !item.giveUpTime
-                                  ? '#e1f0fb'
-                                  : '#fae4e1',
-                              }}>
-                              {!item.giveUpTime ? '성공' : '실패'}
-                              {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
-                            </Text>
-                            {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
-                          </View>
-                        </View>
-                        <View style={recordStyle.progressBar}>
-                          <View
-                            style={{
-                              width: '100%',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <CustomProgressBar
-                              timeData={item}></CustomProgressBar>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                              }}>
-                              <Text style={recordStyle.timeText}>
-                                {item.startTime}
-                              </Text>
-                              <View style={recordStyle.timeLineStyle}></View>
-                              <Text style={recordStyle.timeText}>
-                                {item.endTimeStr}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                        <View>
-                          <TextInput
-                            style={recordStyle.inputText}
-                            defaultValue={item.comment}
-                            placeholder="한 줄 평가"
-                            placeholderTextColor={Colors.GREY}
-                            onChangeText={event => setText(event)}
-                            onSubmitEditing={() => {
-                              Realm.open(
-                                mkConfig(user, [
-                                  Goal.schema,
-                                  Place.schema,
-                                  Mission.schema,
-                                  MissionRecord.schema,
-                                  GiveUpAppEmbedded.schema,
-                                  AppUsageEmbedded.schema,
-                                  UserInfo.schema,
-                                ]),
-                              ).then(realm => {
-                                updateCommentInRealm(user, realm, {
-                                  ...item,
-                                  comment: text,
-                                });
-                                realm.close();
-                              });
-                              dispatch(updateComment({...item, comment: text}));
-                            }}
-                          />
-                          {/* ★ 상태 메시지 남기는 곳 */}
-                        </View>
-                      </View>
+        {arr !== null
+          ? arr.map(item => (
+              <View key={item} style={{alignItems: 'center'}}>
+                {isEnabled ? (
+                  newRecord.filter(
+                    record =>
+                      record.mission.date === item && !record.giveUpTime,
+                  ).length > 0 ? (
+                    <View style={{flexDirection: 'row', marginVertical: 10}}>
+                      <View style={recordStyle.dateLineStyle}></View>
+                      <Text style={recordStyle.dateHeader} key={item}>
+                        {item}
+                      </Text>
+                      <View style={recordStyle.dateLineStyle}></View>
                     </View>
+                  ) : null
+                ) : (
+                  <View style={{flexDirection: 'row', marginVertical: 10}}>
+                    <View style={recordStyle.dateLineStyle}></View>
+                    <Text style={recordStyle.dateHeader} key={item}>
+                      {item}
+                    </Text>
+                    <View style={recordStyle.dateLineStyle}></View>
                   </View>
-                );
-              })}
-          </View>
-        ))}
+                )}
+                {/* 최신순 기록 컴포넌트 표시 */}
+                {newRecord
+                  .filter(record => record.mission.date === item)
+                  .map(item => {
+                    if (isEnabled === true && item.giveUpTime) {
+                      return;
+                    }
+                    return (
+                      <View
+                        key={item._id}
+                        style={{alignItems: 'center', padding: 5}}>
+                        <View style={recordStyle.info}>
+                          <View style={recordStyle.timeRecord}>
+                            {/* 가장 많이 사용한 금지 앱 */}
+                            {item.prohibitedAppUsages.length == 0 ? null : (
+                              <View
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}>
+                                <Text style={recordStyle.mostUsedApp}>
+                                  가장 많이 사용한
+                                </Text>
+                                <Text style={recordStyle.mostUsedApp}>
+                                  제한 어플
+                                </Text>
+                                <Image
+                                  source={{
+                                    uri: getMostUsedProhibitedAppIcon(
+                                      item.prohibitedAppUsages,
+                                    ),
+                                  }}
+                                  style={{width: 60, height: 60}}
+                                  color={Colors.MAIN_COLOR}
+                                />
+                              </View>
+                            )}
+
+                            <View
+                              style={{flexDirection: 'row', marginVertical: 3}}>
+                              <Text style={recordStyle.lockTime}>
+                                🔒
+                                {Time.getActualMissionTime(
+                                  item.startTime,
+                                  item.endTime,
+                                  item.giveUpTime,
+                                  item.breakTimes,
+                                )}
+                              </Text>
+                              {/* ★ 잠금 시간 */}
+                            </View>
+                            {!item.totalProhibitedAppUsageSec ? null : (
+                              <View
+                                style={{flexDirection: 'row', marginBottom: 3}}>
+                                <Text style={recordStyle.useTime}>
+                                  📵
+                                  {Time.integerToTime(
+                                    item.totalProhibitedAppUsageSec,
+                                  )}
+                                </Text>
+                                {/* ★ 금지앱 사용 시간 */}
+                              </View>
+                            )}
+
+                            {/* 미션 성공시 포기 시간 표시 안함 */}
+                            {!item.giveUpTime ? null : (
+                              <View style={{flexDirection: 'row'}}>
+                                <Text style={recordStyle.quitTime}>
+                                  ❌
+                                  {Time.getGiveUpTime(
+                                    item.endTime,
+                                    item.giveUpTime,
+                                  )}
+                                </Text>
+                                {/* ★ 금지앱 사용 시간 */}
+                              </View>
+                            )}
+                          </View>
+                          <View
+                            style={{
+                              border: 1,
+                              borderWidth: 1,
+                              borderRadius: 25,
+                              padding: '4%',
+                              width: '80%',
+                              borderColor: !item.giveUpTime
+                                ? Colors.MAIN_COLOR
+                                : '#f5a6a3',
+                              // ★ 실패 or 성공 전체적인 테두리
+                            }}>
+                            <View style={[recordStyle.main]}>
+                              <View>
+                                <View style={recordStyle.missionInfo}>
+                                  <Text style={recordStyle.category}>
+                                    {item.mission.category}
+                                  </Text>
+                                  {/* ★ 카테고리 */}
+                                  <Text style={recordStyle.bar}> | </Text>
+                                  <Text style={recordStyle.missionName}>
+                                    {item.mission.name}
+                                  </Text>
+                                  {/* ★ 미션 이름 */}
+                                </View>
+                              </View>
+                              <View
+                                style={
+                                  ([recordStyle.missionStatus],
+                                  {
+                                    justifyContent: 'center',
+                                    borderRadius: 10,
+                                  })
+                                }>
+                                <Text
+                                  style={{
+                                    color: 'black',
+                                    fontSize: 10,
+                                    backgroundColor: !item.giveUpTime
+                                      ? '#e1f0fb'
+                                      : '#fae4e1',
+                                  }}>
+                                  {!item.giveUpTime ? '성공' : '실패'}
+                                  {/* ★ 성공 or 실패 -> true or false 값 넣어줘야 함 */}
+                                </Text>
+                                {/* ★ 성공 or 실패에 따라 성공, 실패가 보이는 곳 */}
+                              </View>
+                            </View>
+                            <View style={recordStyle.progressBar}>
+                              <View
+                                style={{
+                                  width: '100%',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                }}>
+                                <CustomProgressBar
+                                  timeData={item}></CustomProgressBar>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                  }}>
+                                  <Text style={recordStyle.timeText}>
+                                    {item.startTime}
+                                  </Text>
+                                  <View
+                                    style={recordStyle.timeLineStyle}></View>
+                                  <Text style={recordStyle.timeText}>
+                                    {item.endTimeStr}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                            <View>
+                              <TextInput
+                                style={recordStyle.inputText}
+                                defaultValue={item.comment}
+                                placeholder="한 줄 평가"
+                                placeholderTextColor={Colors.GREY}
+                                onChangeText={event => setText(event)}
+                                onSubmitEditing={() => {
+                                  Realm.open(
+                                    mkConfig(user, [
+                                      Goal.schema,
+                                      Place.schema,
+                                      Mission.schema,
+                                      MissionRecord.schema,
+                                      GiveUpAppEmbedded.schema,
+                                      AppUsageEmbedded.schema,
+                                      UserInfo.schema,
+                                    ]),
+                                  ).then(realm => {
+                                    updateCommentInRealm(user, realm, {
+                                      ...item,
+                                      comment: text,
+                                    });
+                                    realm.close();
+                                  });
+                                  dispatch(
+                                    updateComment({...item, comment: text}),
+                                  );
+                                }}
+                              />
+                              {/* ★ 상태 메시지 남기는 곳 */}
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  })}
+              </View>
+            ))
+          : null}
       </ScrollView>
     </View>
   );
