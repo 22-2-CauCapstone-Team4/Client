@@ -80,7 +80,7 @@ const RecordTab = () => {
   const dispatch = useDispatch();
   const arr =
     newRecord !== null
-      ? Array.from(new Set(newRecord.map(item => item.mission.date)))
+      ? Array.from(new Set(newRecord.map(item => item.date)))
       : null;
   function sortRecord(a, b) {
     let aDate = a.mission.date.split('-').join('');
@@ -182,8 +182,7 @@ const RecordTab = () => {
               <View key={item} style={{alignItems: 'center'}}>
                 {isEnabled ? (
                   newRecord.filter(
-                    record =>
-                      record.mission.date === item && !record.giveUpTime,
+                    record => record.date === item && !record.giveUpTime,
                   ).length > 0 ? (
                     <View style={{flexDirection: 'row', marginVertical: 10}}>
                       <View style={recordStyle.dateLineStyle}></View>
@@ -204,7 +203,7 @@ const RecordTab = () => {
                 )}
                 {/* 최신순 기록 컴포넌트 표시 */}
                 {newRecord
-                  .filter(record => record.mission.date === item)
+                  .filter(record => record.date === item)
                   .map(item => {
                     if (isEnabled === true && item.giveUpTime) {
                       return;
