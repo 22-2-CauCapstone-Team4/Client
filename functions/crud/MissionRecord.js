@@ -73,58 +73,49 @@ const nowRecord = async (user, realm) => {
   let result = null;
 
   try {
-    let obj = realm.objects('MissionRecord').sorted('startTime', true);
-    obj = obj.filter(el => !el.endTime)[0];
+    let obj = realm.objects('MissionRecord').sorted('startTime', true)[0];
+
     // tempRecords = JSON.parse(JSON.stringify(tempRecords));
     // console.log(obj);
     // console.log('????????????????', el.startTime, el.endTime);
-    const startTime = `${
-      obj.startTime.getHours() < 10
-        ? '0' + obj.startTime.getHours()
-        : obj.startTime.getHours()
-    }:${
-      obj.startTime.getMinutes() < 10
-        ? '0' + obj.startTime.getMinutes()
-        : obj.startTime.getMinutes()
-    }`;
-    // console.log(startTime);
-    let endTimeStr = moment(obj.startTime).add(obj.endTime, 's');
-    endTimeStr = `${
-      endTimeStr.hours() < 10 ? '0' + endTimeStr.hours() : endTimeStr.hours()
-    }:${
-      endTimeStr.minutes() < 10
-        ? '0' + endTimeStr.minutes()
-        : endTimeStr.minutes()
-    }`;
+    console.log(obj.endTime);
+    if (obj.endTime) {
+      console.log('현재 미션 진행 중 아님, 결과 없음');
+      return false;
+    } else {
+      const startTime =
+        obj.startTime.getHours() * 60 * 60 +
+        obj.startTime.getMinutes() * 60 +
+        obj.startTime.getSeconds();
 
-    const date = `${obj.startTime.getFullYear()}-${
-      obj.startTime.getMonth() + 1 < 10
-        ? '0' + obj.startTime.getMonth() + 1
-        : obj.startTime.getMonth() + 1
-    }-${
-      obj.startTime.getDate() < 10
-        ? '0' + obj.startTime.getDate()
-        : obj.startTime.getDate()
-    }`;
+      const date = `${obj.startTime.getFullYear()}-${
+        obj.startTime.getMonth() + 1 < 10
+          ? '0' + obj.startTime.getMonth() + 1
+          : obj.startTime.getMonth() + 1
+      }-${
+        obj.startTime.getDate() < 10
+          ? '0' + obj.startTime.getDate()
+          : obj.startTime.getDate()
+      }`;
 
-    // const mission = mkMissionRealmObjToObj(obj.mission);
-    // const prohibitedAppUsages = JSON.parse(
-    //   JSON.stringify(obj.prohibitedAppUsages),
-    // );
-    // // console.log(prohibitedAppUsages);
+      // const mission = mkMissionRealmObjToObj(obj.mission);
+      // const prohibitedAppUsages = JSON.parse(
+      //   JSON.stringify(obj.prohibitedAppUsages),
+      // );
+      // // console.log(prohibitedAppUsages);
 
-    result = {
-      ...JSON.parse(JSON.stringify(obj)),
-      date,
-      startTime,
-      endTimeStr,
-      // mission,
-      // prohibitedAppUsages,
-      // comment: obj.comment ? obj.comment : '',
-    };
+      result = {
+        ...JSON.parse(JSON.stringify(obj)),
+        date,
+        startTime,
+        // mission,
+        // prohibitedAppUsages,
+        // comment: obj.comment ? obj.comment : '',
+      };
 
-    // result = obj.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
-    console.log('읽기 결과', result);
+      // result = obj.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+      console.log('읽기 결과', result);
+    }
   } catch (err) {
     console.log(err.message);
 

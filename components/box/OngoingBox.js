@@ -31,18 +31,23 @@ const OngoingBox = () => {
     store => store.todayMissionReducer.todayMissionData,
   );
   const doingMission = missionData.filter(item => item.state == 'start')[0];
-  // const record = useSelector(store => store.recordReducer.data2)[0];
+  const record = useSelector(store => store.recordReducer.data2);
   // console.log('기록을 봐보자', record);
   // console.log(doingMission);
+  const now = new Date();
+  const nowSec =
+    now.getHours() * 60 * 60 + now.getMinutes() * 60 + now.getSeconds();
 
   // 경과 시간: 미션 시작 시간(hh:mm) -> 약간 부정확한 형식 (hh:mm:ss)여야 정확
   // 경과 시간은 휴식 시간을 제외한 상태이기 때문에 time.js에서 getActualMissionTime(startTime,endTime,null,breakTimes)를 이용하면 정확한 경과 시간을 얻을 것이라 예상
   const [elapsedTime, setElapsedTime] = useState(
-    doingMission !== undefined ? 15 : null,
+    !record ? 0 : nowSec - record.startTime,
   );
 
   // 금지 앱 시간: 저장된 금지 앱 사용 시간
-  const [pauseTime, setPauseTime] = useState(0); //0 대신에 DB에 저장된 금지 앱 사용시간을 넣어줘야겠다
+  const [pauseTime, setPauseTime] = useState(
+    !record ? 0 : record.totalProhibitedAppUsageSec,
+  ); //0 대신에 DB에 저장된 금지 앱 사용시간을 넣어줘야겠다
 
   // 경과시간 실시간 측정
   useEffect(() => {

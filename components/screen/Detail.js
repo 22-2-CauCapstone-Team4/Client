@@ -161,6 +161,7 @@ function Detail({navigation}) {
         ),
       );
       dispatch(initRecord({data: tempRecords, data2: tempRecord}));
+      // console.log('잘 나오나?', tempRecord);
       dispatch(initStatics(tempStatics));
 
       const {friendInfo, friendCurStates} = await user.callFunction(
