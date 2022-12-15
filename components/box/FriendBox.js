@@ -23,7 +23,7 @@ function FriendBox(props) {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Icon name="person" color="green" size={40}></Icon>
+          <Icon name="person" color={Colors.MAIN_COLOR} size={30}></Icon>
         </TouchableOpacity>
         <Text style={{color: 'black'}}>{props.name}</Text>
       </FriendContainer>

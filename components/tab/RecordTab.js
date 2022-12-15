@@ -31,6 +31,8 @@ const RecordTab = () => {
   const [dateMessage, setDateMessage] = useState('');
   const {user} = useAuth();
 
+  useEffect(() => {});
+
   // useEffect(() => {
   //   try {
   //     Realm.open(
@@ -246,7 +248,7 @@ const RecordTab = () => {
                                 {Time.getActualMissionTime(
                                   item.endTime,
                                   item.giveUpTime,
-                                  item.totalProhibitedAppUsageSec,
+                                  0,
                                 )}
                               </Text>
                               {/* ★ 잠금 시간 */}

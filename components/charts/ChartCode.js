@@ -143,7 +143,7 @@ new Chart(ctx1, {
         stacked: true,
         title:{  
           display: true,
-          text: '사용시간(분)',
+          text: '사용 시간 (분)',
           color: 'black',
           padding:{
             bottom: 20
@@ -315,11 +315,6 @@ new Chart(ctx4, {
         bottom: 10,
       },
     },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
   },
 });
 // ★ 3-b 금지 앱 클릭
@@ -374,16 +369,16 @@ new Chart(ctx5, {
       },
     },
     scales: {
-      x:{
-        title:{
-          display: true,
-          text:'금지 앱 이름',
-          color: 'black',
-          padding:{
-            bottom: 20
-          }
-        }
-      },
+      // x:{
+      //   title:{
+      //     display: true,
+      //     text:'금지 앱 이름',
+      //     color: 'black',
+      //     padding:{
+      //       bottom: 20
+      //     }
+      //   }
+      // },
       y: {
         beginAtZero: true,
         title:{
@@ -450,21 +445,21 @@ new Chart(ctx6, {
       },
     },
     scales: {
-      x:{
-        title:{
-          display: true,
-          text:'금지 앱 이름',
-          color: 'black',
-          padding:{
-            bottom: 20
-          }
-        }
-      },
+      // x:{
+      //   title:{
+      //     display: true,
+      //     text:'금지 앱 이름',
+      //     color: 'black',
+      //     padding:{
+      //       bottom: 20
+      //     }
+      //   }
+      // },
       y: {
         beginAtZero: true,
         title:{
           display: true,
-          text:'사용시간(분)',
+          text:'사용 시간 (분)',
           color: 'black',
           padding:{
             bottom: 20

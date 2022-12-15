@@ -1,4 +1,4 @@
-import React, {useMemo, useState, useCallback, useRef} from 'react';
+import React, {useMemo, useState, useCallback, useRef, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Text, ScrollView, TouchableOpacity, View, Alert} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
@@ -19,6 +19,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {WebView} from 'react-native-webview';
 
 const StatisticsTab = () => {
+  useEffect(() => {});
+
   let html = useSelector(store => store.staticsReducer.data);
   // console.log(html);
   const webviewRef = useRef();

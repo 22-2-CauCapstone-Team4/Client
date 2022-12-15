@@ -2,7 +2,7 @@ import mkChartCode from '../../components/charts/ChartCode';
 import {AppUsageRecord, PhoneUsageRecord} from '../../schema';
 
 const mkStaticStr = async (user, realm) => {
-  console.log('통계 결과 읽기 시작');
+  console.log('read statics');
   let temp = {};
   try {
     const appUsageRecord = realm.objects('AppUsageRecord');
@@ -154,22 +154,26 @@ const mkStaticStr = async (user, realm) => {
 
       if (acc[giveUpApp]) acc[giveUpApp].push(curr);
       else acc[giveUpApp] = [curr];
+
       return acc;
     }, {});
 
     temp.ctx4_label = Object.keys(missionRecordByGroupingApp);
+    let length = temp.ctx4_label.length;
 
     let totalGiveUpAppNum = 0;
     temp.giveUpAppPer = [];
     for (let i = 0; i < length; i++) {
       const key = temp.ctx4_label[i];
       // console.log(key);
+      // console.log(missionRecordByGroupingApp[key].length);
       temp.giveUpAppPer.push(missionRecordByGroupingApp[key].length);
-      totalGiveUpAppNum += temp.giveUpAppPer[temp.giveUpAppPer.length - 1];
+      totalGiveUpAppNum += missionRecordByGroupingApp[key].length;
     }
-    temp.giveUpAppPer = temp.giveUpAppPer.map(
-      num => (num / totalGiveUpAppNum) * 100,
-    );
+    // console.log(totalGiveUpAppNum);
+    // temp.giveUpAppPer = temp.giveUpAppPer.map(
+    //   num => (num / totalGiveUpAppNum) * 100,
+    // );
 
     // 그래프 5
     const appUsageGroupByApp = appUsageRecord.reduce((acc, curr) => {
@@ -187,7 +191,7 @@ const mkStaticStr = async (user, realm) => {
     temp.giveUpAppClickCnt = [];
     temp.giveUpAppUsages = [];
 
-    const length = temp.ctx5_label.length;
+    length = temp.ctx5_label.length;
     for (let i = 0; i < length; i++) {
       const key = temp.ctx5_label[i];
       //   console.log(key);

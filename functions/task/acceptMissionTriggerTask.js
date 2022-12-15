@@ -242,13 +242,17 @@ const acceptMissionTriggerTask = async (user, taskData) => {
         }
       } else if (todayMission.state === TodayMission.STATE.QUIT) {
         console.log(mission.name, '포기한 미션 실제 종료');
+        console.log(curState);
 
-        if (mission._id.toString() === id) {
+        if (curState.isNowGivingUp) {
           // 다른 미션 진행 중이지 않은 경우, 예전 내용 초기화 및 다시 알림 주기 필요
           curState.isNowDoingMission = false;
           curState.isNowGivingUp = false;
           curState.lastBreakTime = null;
           curState.mission = null;
+
+          isRecordResetNeeded = true;
+          curType = PhoneUsageRecord.TYPE.DEFAULT;
 
           ForegroundServiceModule.startService(prohibitedApps, {
             title: `감지 중`,
@@ -271,23 +275,43 @@ const acceptMissionTriggerTask = async (user, taskData) => {
 
     // 기존의 금지 앱 기록 끝내기
     if (isRecordResetNeeded) {
-      await appCheckHeadlessTask(user, {
-        appPackageName: '',
-        appName: '',
-        isProhibitedApp: false,
-        // isPhoneOn,
-        isPhoneOff: true,
-        type: prevType,
-      });
+      if (prevType === PhoneUsageRecord.TYPE.MISSION) {
+        await appCheckHeadlessTask(user, {
+          appPackageName: '',
+          appName: '',
+          isProhibitedApp: false,
+          // isPhoneOn,
+          isPhoneOff: true,
+          type: prevType,
+        });
 
-      await appCheckHeadlessTask(user, {
-        appPackageName: isProhibitedApp ? appPackageName : '',
-        appName: isProhibitedApp ? appName : '',
-        isProhibitedApp,
-        isPhoneOn: true,
-        // isPhoneOff,
-        type: curType,
-      });
+        await appCheckHeadlessTask(user, {
+          appPackageName: isProhibitedApp ? appPackageName : '',
+          appName: isProhibitedApp ? appName : '',
+          isProhibitedApp,
+          isPhoneOn: true,
+          // isPhoneOff,
+          type: curType,
+        });
+      } else {
+        await appCheckHeadlessTask(user, {
+          appPackageName: isProhibitedApp ? appPackageName : '',
+          appName: isProhibitedApp ? appName : '',
+          isProhibitedApp,
+          isPhoneOff: true,
+          // isPhoneOff,
+          type: curType,
+        });
+
+        await appCheckHeadlessTask(user, {
+          appPackageName: '',
+          appName: '',
+          isProhibitedApp: false,
+          // isPhoneOn,
+          isPhoneOn: true,
+          type: prevType,
+        });
+      }
     }
   } catch (err) {
     console.log(err.message);

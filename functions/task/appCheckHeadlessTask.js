@@ -57,6 +57,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
       prevAppName,
       leftTime,
       isBreakTime = false,
+      isNowGivingUp = false,
       prevStartTime = null;
     realm.write(() => {
       // 상태 데이터 없으면 err
@@ -85,6 +86,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
         if (leftTime < 0) leftTime = 0;
       }
 
+      isNowGivingUp = curState.isNowGivingUp;
+
       console.log(
         '마지막 쉬는 시간',
         curState.lastBreakTime,
@@ -92,6 +95,8 @@ const appCheckHeadlessTask = async (user, taskData) => {
         leftTime,
         '현재 쉬는 시간',
         isBreakTime ? 'O' : 'X',
+        '현재 포기 중',
+        isNowGivingUp ? 'O' : 'X',
       );
 
       // 금지 앱 화면 실행
@@ -101,7 +106,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
           .objects('MissionRecord')
           .sorted('startTime', true)[0];
 
-        if (!isBreakTime) {
+        if (!isBreakTime && !isNowGivingUp) {
           LockAppModule.viewLockScreen(
             curState.mission.goal.name,
             curState.mission.name,
@@ -451,8 +456,12 @@ const appCheckHeadlessTask = async (user, taskData) => {
         console.log('3. AppUsageRecord 종료 기록');
 
         // missionRecord update
-        console.log(type, isBreakTime);
-        if (type !== PhoneUsageRecord.TYPE.DEFAULT && isBreakTime) {
+        console.log(type, isBreakTime, isNowGivingUp);
+        if (
+          type !== PhoneUsageRecord.TYPE.DEFAULT &&
+          (isBreakTime || isNowGivingUp)
+        ) {
+          console.log('포기 시에도 기록해야 합니다');
           // 쉬는 시간일 때만
           const missionRecord = realm
             .objects('MissionRecord')

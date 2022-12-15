@@ -103,7 +103,8 @@ const giveUp = async realm => {
         .filtered(`mission._id == oid(${curState.mission._id})`)[0];
       const prohibitedApps = JSON.parse(
         JSON.stringify(realm.objects('ProhibitedApp')),
-      ).map(app => {
+      );
+      const prohibitedAppsForAnd = prohibitedApps.map(app => {
         return {name: app.name, packageName: app.packageName};
       });
 
@@ -120,7 +121,6 @@ const giveUp = async realm => {
         !curState.isNowGivingUp
         // && !canUsingBreakTime
       ) {
-        curState.isNowGivingUp = true;
         missionRecord.giveUpTime = parseInt(
           moment(now).diff(missionRecord.startTime) / 1000,
         );
@@ -129,10 +129,11 @@ const giveUp = async realm => {
           curState.appName &&
           moment(curState.startAppTime).isAfter(missionRecord.startTime)
         ) {
-          const icon = prohibitedApps.filter(
+          let icon = prohibitedApps.filter(
             el => el.name === curState.appName,
           )[0];
-          console.log(icon);
+          icon = icon.icon;
+
           missionRecord.giveUpApp = new GiveUpAppEmbedded({
             name: curState.appName,
             icon,
@@ -142,14 +143,13 @@ const giveUp = async realm => {
         // console.log('?');
         todayMission.state = TodayMission.STATE.QUIT;
 
-        curState.isNowDoingMission = false;
-        curState.isNowGivingUp = false;
+        // curState.isNowDoingMission = false;
+        curState.isNowGivingUp = true;
         curState.lastBreakTime = null;
-        curState.mission = null;
 
         // console.log('?');
         // 다시 알림 주기
-        ForegroundServiceModule.startService(prohibitedApps, {
+        ForegroundServiceModule.startService(prohibitedAppsForAnd, {
           title: `[ ${todayMission.mission.goal.name} - ${todayMission.mission.name} ] 포기 중`,
           content:
             '미션 종료 조건 전까지 금지 앱 사용 내역을 기록하는 중입니다. ',

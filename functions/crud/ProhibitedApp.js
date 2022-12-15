@@ -11,6 +11,7 @@ const readProhibitedApps = async (user, realm) => {
       .filtered(`owner_id == "${user.id}"`);
 
     result = list.map(realmObj => JSON.parse(JSON.stringify(realmObj)));
+    // console.log(result);
     console.log(
       '읽기 결과',
       result.map(app => app.packageName),
