@@ -126,17 +126,25 @@ const RecordTab = () => {
     });
     // 휴식 종료 시간 BLUE에 append (마지막 휴식 종료 시간 제외)
     if (endAppTimes.length > 0) {
-      for (var i = 0; i < endAppTimes.length - 1; i++) {
-        BLUE.push(endAppTimes[i].endTime);
+      for (var i = 0; i < endAppTimes.length; i++) {
+        if (endAppTimes[i].endTime > props.timeData.giveUpTime) {
+          RED.push(endAppTimes[i].endTime);
+        } else BLUE.push(endAppTimes[i].endTime);
       }
 
       // 마지막 휴식 종료 시간 처리
       // 휴식 중에 포기했거나 미션 종료됐다면 마지막 휴식 종료 시간은 포기 시간 or 미션 종료 시간이 된다. 즉, push 안함
       let lastAppTime = endAppTimes[endAppTimes.length - 1].endTime;
       if (!lastAppTime || lastAppTime > props.timeData.endTime) {
-        BLUE.push(props.timeData.endTime);
+        if (props.timeData.endTime > props.timeData.giveUpTime) {
+          RED.push(endAppTimes[i].endTime);
+        } else {
+          BLUE.push(props.timeData.endTime);
+        }
       } else {
-        BLUE.push(lastAppTime);
+        if (lastAppTime > props.timeData.giveUpTime) {
+          RED.push(lastAppTime);
+        } else BLUE.push(lastAppTime);
       }
     }
     let times = [];

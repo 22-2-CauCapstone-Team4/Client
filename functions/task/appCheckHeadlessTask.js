@@ -29,6 +29,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
       isProhibitedApp = false,
       isPhoneOn,
       isPhoneOff,
+      lastRecord = false,
     } = taskData;
     let {type} = taskData;
 
@@ -71,6 +72,7 @@ const appCheckHeadlessTask = async (user, taskData) => {
       // 문제 없는 경우
       curState = curState[0];
       isPrevUsedProhibitedApp = curState.isNowUsingProhibitedApp;
+      isNowGivingUp = curState.isNowGivingUp;
       prevAppPackageName = curState.appPackageName;
       prevAppName = curState.appName;
 
@@ -85,8 +87,6 @@ const appCheckHeadlessTask = async (user, taskData) => {
         leftTime = 60 * 60 - leftTime;
         if (leftTime < 0) leftTime = 0;
       }
-
-      isNowGivingUp = curState.isNowGivingUp;
 
       console.log(
         '마지막 쉬는 시간',
@@ -300,7 +300,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
       // 2. 금지 앱 사용 종료 case
       if (
         (!isProhibitedApp && isPrevUsedProhibitedApp) ||
-        (isProhibitedApp && isPrevUsedProhibitedApp) // 연속해서 바로 금지 앱 사용하는 경우, 이전 금지 앱 사용은 끝난 것
+        (isProhibitedApp &&
+          isPrevUsedProhibitedApp &&
+          prevAppPackageName !== curState.appPackageName) // 연속해서 바로 금지 앱 사용하는 경우, 이전 금지 앱 사용은 끝난 것
       ) {
         // 이전 앱의 사용 종료인지에 따라 startAppTime으로 사용할 값 바뀜
         // 현재 앱이 금지 앱이 아닌지에 따라 앱 이름으로 사용할 값 바뀜
@@ -459,9 +461,9 @@ const appCheckHeadlessTask = async (user, taskData) => {
         console.log(type, isBreakTime, isNowGivingUp);
         if (
           type !== PhoneUsageRecord.TYPE.DEFAULT &&
-          (isBreakTime || isNowGivingUp)
+          (isBreakTime || isNowGivingUp || lastRecord)
         ) {
-          console.log('포기 시에도 기록해야 합니다');
+          // console.log('포기 시에도 기록해야 합니다');
           // 쉬는 시간일 때만
           const missionRecord = realm
             .objects('MissionRecord')
@@ -489,11 +491,11 @@ const appCheckHeadlessTask = async (user, taskData) => {
           });
           missionRecord.totalProhibitedAppUsageSec += endTimeInt - startTimeInt;
           console.log(JSON.parse(JSON.stringify(missionRecord)));
+
+          console.log('4. MissionRecord 금지 앱 기록');
         } else {
           // cnt만 ++
         }
-
-        console.log('4. MissionRecord 금지 앱 기록');
       }
     });
 

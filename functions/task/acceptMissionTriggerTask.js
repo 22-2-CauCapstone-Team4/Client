@@ -275,43 +275,24 @@ const acceptMissionTriggerTask = async (user, taskData) => {
 
     // 기존의 금지 앱 기록 끝내기
     if (isRecordResetNeeded) {
-      if (prevType === PhoneUsageRecord.TYPE.MISSION) {
-        await appCheckHeadlessTask(user, {
-          appPackageName: '',
-          appName: '',
-          isProhibitedApp: false,
-          // isPhoneOn,
-          isPhoneOff: true,
-          type: prevType,
-        });
+      await appCheckHeadlessTask(user, {
+        appPackageName: '',
+        appName: '',
+        isProhibitedApp: false,
+        // isPhoneOn,
+        isPhoneOff: true,
+        type: prevType,
+        lastRecord: prevType !== PhoneUsageRecord.TYPE.DEFAULT ? true : false,
+      });
 
-        await appCheckHeadlessTask(user, {
-          appPackageName: isProhibitedApp ? appPackageName : '',
-          appName: isProhibitedApp ? appName : '',
-          isProhibitedApp,
-          isPhoneOn: true,
-          // isPhoneOff,
-          type: curType,
-        });
-      } else {
-        await appCheckHeadlessTask(user, {
-          appPackageName: isProhibitedApp ? appPackageName : '',
-          appName: isProhibitedApp ? appName : '',
-          isProhibitedApp,
-          isPhoneOff: true,
-          // isPhoneOff,
-          type: curType,
-        });
-
-        await appCheckHeadlessTask(user, {
-          appPackageName: '',
-          appName: '',
-          isProhibitedApp: false,
-          // isPhoneOn,
-          isPhoneOn: true,
-          type: prevType,
-        });
-      }
+      await appCheckHeadlessTask(user, {
+        appPackageName: isProhibitedApp ? appPackageName : '',
+        appName: isProhibitedApp ? appName : '',
+        isProhibitedApp,
+        isPhoneOn: true,
+        // isPhoneOff,
+        type: curType,
+      });
     }
   } catch (err) {
     console.log(err.message);
