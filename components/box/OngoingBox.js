@@ -34,11 +34,13 @@ const OngoingBox = () => {
   // const record = useSelector(store => store.recordReducer.data2)[0];
   // console.log('기록을 봐보자', record);
   // console.log(doingMission);
-
+  // console.log(doingMission);
   // 경과 시간: 미션 시작 시간(hh:mm) -> 약간 부정확한 형식 (hh:mm:ss)여야 정확
   // 경과 시간은 휴식 시간을 제외한 상태이기 때문에 time.js에서 getActualMissionTime(startTime,endTime,null,breakTimes)를 이용하면 정확한 경과 시간을 얻을 것이라 예상
   const [elapsedTime, setElapsedTime] = useState(
-    doingMission !== undefined ? 15 : null,
+    doingMission !== undefined
+      ? Time.getElapsedTime(doingMission.time.startTime)
+      : null,
   );
 
   // 금지 앱 시간: 저장된 금지 앱 사용 시간
@@ -71,8 +73,8 @@ const OngoingBox = () => {
           <Text style={styles.info2}>
             🔒{' '}
             <Text style={{fontWeight: '500'}}>
-              {Time.integerToTime(elapsedTime)}
-            </Text>{' '}
+              {Time.integerToTime(elapsedTime).substring(0, 5)}
+            </Text>
             <Text style={{fontSize: 20}}>경과</Text>
           </Text>
           <Text style={styles.info3}>
