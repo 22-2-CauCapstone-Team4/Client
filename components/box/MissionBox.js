@@ -326,7 +326,7 @@ function MissionBox(props) {
             );
           case 'over':
             return (
-              <LeftCondition style={{color: 'red'}}>미션 종료</LeftCondition>
+              <LeftCondition style={{color: 'green'}}>미션 완료!</LeftCondition>
             );
           case 'quit':
             return (
