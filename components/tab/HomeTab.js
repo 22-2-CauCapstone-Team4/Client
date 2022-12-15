@@ -10,6 +10,7 @@ import CreateMissionModal from '../modal/CreateMissionModal';
 import {useSelector, useDispatch} from 'react-redux';
 import {compareToday} from '../../functions/time';
 import Colors from '../../utils/Colors';
+import Geolocation from 'react-native-geolocation-service';
 
 // 미션 더미 데이터에 있는 날짜와 현재 날짜 비교하는 함수
 const HomeTab = ({navigation}) => {
@@ -17,8 +18,9 @@ const HomeTab = ({navigation}) => {
   const missionData = useSelector(
     store => store.todayMissionReducer.todayMissionData,
   );
-  const place = useSelector(store => store.placeReducer.data);
-  const today = new Date();
+
+  const [myLocation, setMyLocation] = useState({});
+
   // 오늘 미션
   let todayMission = missionData;
   const todayTimeMission = todayMission.filter(el => el.type === 'TIME');
@@ -32,6 +34,25 @@ const HomeTab = ({navigation}) => {
   const clickMission2 = () => setMission(true);
   //console.log('홈탭만 바뀌나요?', doingMission);
   useEffect(() => {}, [doingMission]);
+
+  useEffect(() => {
+    const timeOutId = setInterval(() => {
+      Geolocation.getCurrentPosition(
+        position => {
+          const {latitude, longitude} = position.coords;
+          // 현재위치 좌표뽑기
+          //console.log(position.coords);
+          setMyLocation({latitude: latitude, longitude: longitude});
+        },
+        error => {
+          console.log(error.message);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    }, 1000);
+    return () => clearInterval(timeOutId);
+  }, []);
+
   return (
     <View style={styles.tabContainer}>
       <AboutMission>
@@ -66,13 +87,15 @@ const HomeTab = ({navigation}) => {
         <ScrollViews>
           <MissionList>
             <View style={styles.missionTypeView}>
-              <Ionicons
-                name={'timer-sharp'}
-                style={{color: Colors.MAIN_COLOR}}
-                size={24}></Ionicons>
-              <Text style={styles.missionTypeText}>
-                시간 미션 | {todayTimeMission.length}
-              </Text>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons
+                  name={'timer-sharp'}
+                  style={{color: Colors.MAIN_COLOR}}
+                  size={24}></Ionicons>
+                <Text style={styles.missionTypeText}>
+                  시간 미션 | {todayTimeMission.length}
+                </Text>
+              </View>
             </View>
 
             {todayTimeMission.map(mission => {
@@ -83,13 +106,27 @@ const HomeTab = ({navigation}) => {
             })}
             <View style={styles.lineStyle}></View>
             <View style={styles.missionTypeView}>
-              <Ionicons
-                name={'trail-sign-sharp'}
-                style={{color: Colors.MAIN_COLOR}}
-                size={24}></Ionicons>
-              <Text style={styles.missionTypeText}>
-                공간 미션 | {todaySpaceMission.length}
-              </Text>
+              <View style={{flexDirection: 'row'}}>
+                <Ionicons
+                  name={'trail-sign-sharp'}
+                  style={{color: Colors.MAIN_COLOR}}
+                  size={24}></Ionicons>
+                <Text style={styles.missionTypeText}>
+                  공간 미션 | {todaySpaceMission.length}
+                </Text>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('WatchMyLocation', {data: myLocation});
+                  }}>
+                  <Ionicons
+                    name={'navigate-circle'}
+                    size={20}
+                    color={Colors.MAIN_COLOR}></Ionicons>
+                </TouchableOpacity>
+                <Text style={{color: Colors.MAIN_COLOR}}>위치확인</Text>
+              </View>
             </View>
 
             {todaySpaceMission.map(mission => {
@@ -154,6 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 3,
+    justifyContent: 'space-between',
   },
   tabContainer: {
     height: '100%',

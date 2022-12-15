@@ -15,6 +15,7 @@ import DirectCreateMissionScreen from './components/screen/DirectCreateMissionSc
 import CreateMissionScreen from './components/screen/CreateMissionScreen';
 import CreateSpaceScreen from './components/screen/CreateSpaceScreen';
 import WatchLocationScreen from './components/screen/WatchLocationScreen';
+import WatchMyLocationScreen from './components/screen/WatchMyLocationScreen';
 
 const Stack = createStackNavigator();
 const store = createStore(rootReducer);
@@ -71,6 +72,11 @@ function App() {
             <Stack.Screen
               name="WatchLocation"
               component={WatchLocationScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="WatchMyLocation"
+              component={WatchMyLocationScreen}
               options={{headerShown: false}}
             />
           </Stack.Navigator>
