@@ -115,7 +115,6 @@ const giveUp = async realm => {
       //     ? true
       //     : false;
 
-      console.log('?');
       if (
         curState.isNowDoingMission &&
         !curState.isNowGivingUp
@@ -126,21 +125,21 @@ const giveUp = async realm => {
           moment(now).diff(missionRecord.startTime) / 1000,
         );
 
-        console.log('?');
         if (
           curState.appName &&
           moment(curState.startAppTime).isAfter(missionRecord.startTime)
         ) {
           const icon = prohibitedApps.filter(
             el => el.name === curState.appName,
-          );
+          )[0];
+          console.log(icon);
           missionRecord.giveUpApp = new GiveUpAppEmbedded({
             name: curState.appName,
             icon,
           });
         }
 
-        console.log('?');
+        // console.log('?');
         todayMission.state = TodayMission.STATE.QUIT;
 
         curState.isNowDoingMission = false;
@@ -148,7 +147,7 @@ const giveUp = async realm => {
         curState.lastBreakTime = null;
         curState.mission = null;
 
-        console.log('?');
+        // console.log('?');
         // 다시 알림 주기
         ForegroundServiceModule.startService(prohibitedApps, {
           title: `[ ${todayMission.mission.goal.name} - ${todayMission.mission.name} ] 포기 중`,

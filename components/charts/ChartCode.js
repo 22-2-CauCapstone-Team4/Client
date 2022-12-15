@@ -47,7 +47,7 @@ const mkChartCode = ({
       <canvas id="myChart2" width ="970vh" height = "700vh"></canvas>  
     </div>
     <div class="swiper-slide second">
-      <h1 id="title3">시간 경과에 따른 포기 상태일 확률</h1>
+      <h1 id="title3">시간 경과에 따른 포기 상태일 횟수</h1>
       <canvas id="myChart3" width ="970vh" height = "700vh"></canvas>  
     </div>
   </div>
@@ -200,7 +200,7 @@ new Chart(ctx2, {
       x:{
         title:{
           display: true,
-          text:'미션 시작으로부터 시간 경과',
+          text:'미션 시작으로부터 시간 경과 (분)',
           color: 'black',
           padding:{
             bottom: 20
@@ -257,7 +257,7 @@ new Chart(ctx3, {
       x:{
         title:{
           display: true,
-          text:'미션 시작으로부터 시간 경과',
+          text:'미션 시작으로부터 시간 경과 (분)',
           color: 'black',
           padding:{
             bottom: 20
@@ -268,7 +268,7 @@ new Chart(ctx3, {
         beginAtZero: true,
         title:{
           display: true,
-          text:'포기 중일 확률(%)',
+          text:'횟수',
           color: 'black',
           padding:{
             bottom: 20

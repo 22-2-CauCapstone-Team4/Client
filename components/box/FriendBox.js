@@ -5,7 +5,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Colors from '../../utils/Colors';
 
 function FriendBox(props) {
-  console.log(props);
+  // const [mission, setMission] = useState();
+  // console.log(props);
+  // if (props.state !== 'none') {
+  // }
+
   return (
     <Container>
       <FriendContainer>
@@ -27,17 +31,17 @@ function FriendBox(props) {
       <MissionContainer>
         <ContentContainer>
           <View>
-            <ContentView>
-              {/* {props.state !== 'none' ? (
+            {/* <ContentView>
+              {props.state !== 'none' ? (
                 <>
-                  <Category>props.mission.name</Category>
+                  <Category>✏️ 공부</Category>
                   <Category>|</Category>
-                  <MissionName>props.mission.goal</MissionName>
+                  <MissionName>컴통</MissionName>
                 </>
               ) : (
                 <MissionName>미션 수행 전</MissionName>
-              )} */}
-            </ContentView>
+              )}
+            </ContentView> */}
           </View>
         </ContentContainer>
         <ConditionView>
