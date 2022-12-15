@@ -62,7 +62,7 @@ export default function WatchMyLocationScreen({route}) {
               longitudeDelta: 0.005,
             }}
             showsUserLocation={true}
-            zoomEnabled={false}
+            zoomEnabled={true}
             style={styles.map}
             provider="google">
             {data.map(place => {

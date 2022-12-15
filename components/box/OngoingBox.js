@@ -77,7 +77,7 @@ const OngoingBox = () => {
             🔒{' '}
             <Text style={{fontWeight: '500'}}>
               {Time.integerToTime(elapsedTime)}
-            </Text>{' '}
+            </Text>
             <Text style={{fontSize: 20}}>경과</Text>
           </Text>
           <Text style={styles.info3}>
