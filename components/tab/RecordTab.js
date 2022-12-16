@@ -482,12 +482,12 @@ const recordStyle = StyleSheet.create({
   useTime: {
     color: 'black',
     fontSize: 10,
-    backgroundColor: Colors.PROGRESS_PAUSE_COLOR,
+    backgroundColor: Colors.USAGE_COLOR,
   },
   quitTime: {
     color: 'black',
     fontSize: 10,
-    backgroundColor: Colors.PROGRESS_FAIL_COLOR,
+    backgroundColor: Colors.FAIL_COLOR,
   },
   timeRecord: {
     width: '20%',

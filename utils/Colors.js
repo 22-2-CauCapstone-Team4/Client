@@ -7,7 +7,10 @@ const Colors = {
 
   MAIN_PROGRESS_COLOR: 'rgb(8,145,178)',
   PROGRESS_PAUSE_COLOR: 'rgb(255, 193, 2)',
-  PROGRESS_FAIL_COLOR: 'rgb(245,166,163)',
+  PROGRESS_FAIL_COLOR: '#F43F5E',
+
+  USAGE_COLOR: '#FFEDD5',
+  FAIL_COLOR: '#FEE2E2',
 };
 
 export default Colors;
