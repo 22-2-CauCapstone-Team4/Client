@@ -168,11 +168,10 @@ new Chart(ctx2, {
       },
       {
         type: 'line',
-        label: '휴식 및 포기 횟수',
+        label: '포기 횟수',
         data: ${'[' + breakTimeOrGiveUpCnt + ']'},
         backgroundColor: ['rgba(48,128,208, 0.5)'],
         borderColor: ['rgba(48,128,208, 0.5)'],
-        
       },
     ],
     labels: ${'["' + ctx2_label.join('","') + '"]'},
@@ -285,7 +284,7 @@ new Chart(ctx4, {
     labels: ${'["' + ctx4_label.join('","') + '"]'},
     datasets: [
       {
-        label: 'My First Dataset',
+        label: '앱 이름',
         data: ${'[' + giveUpAppPer + ']'},
         backgroundColor: [
           'rgb(255, 99, 132)',
@@ -314,7 +313,7 @@ new Chart(ctx4, {
         right: 10,
         bottom: 10,
       },
-    },
+    }, 
   },
 });
 // ★ 3-b 금지 앱 클릭

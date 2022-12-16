@@ -93,10 +93,11 @@ const mkStaticStr = async (user, realm) => {
       // 2. 금지 앱 클릭 횟수 시간대별로 더해주기
       let indCnt = 1;
       let missionCnt = [0, 0, 0, 0, 0, 0, 0, 0];
-      temp.prohibitedAppClickCnts = [0, 0, 0, 0, 0, 0, 0, 0];
-      temp.breakTimeOrGiveUpCnt = [0, 0, 0, 0, 0, 0, 0, 0];
+      const prohibitedAppClickCnts = [0, 0, 0, 0, 0, 0, 0, 0];
+      const breakTimeOrGiveUpCnt = [0, 0, 0, 0, 0, 0, 0, 0];
       const giveUpPer = [0, 0, 0, 0, 0, 0, 0, 0];
       missionRecords.forEach(element => {
+        console.log('!');
         const endTime = parseInt(element.endTime / 60);
 
         // 개수 cnt
@@ -106,28 +107,34 @@ const mkStaticStr = async (user, realm) => {
         //   }
         // }
 
+        // console.log(element.prohibitedAppUsages);
+
+        indCnt = 1;
         element.prohibitedAppUsages.forEach(el => {
-          if (el.startTime > temp.ctx2_label[indCnt]) {
+          while (parseInt(el.startTime / 60) >= temp.ctx2_label[indCnt]) {
+            // console.log(el.startTime, temp.ctx2_label[indCnt]);
             indCnt++;
-          } else {
-            temp.prohibitedAppClickCnts[indCnt] += 1;
           }
+
+          prohibitedAppClickCnts[indCnt - 1] += 1;
         });
 
         indCnt = 1;
-        element.breakTimes.forEach(el => {
-          if (el.startTime > temp.ctx2_label[indCnt]) {
-            indCnt++;
-          } else {
-            temp.breakTimeOrGiveUpCnt[indCnt]++;
-          }
-        });
+        // element.breakTimes.forEach(el => {
+        //   if (el.startTime > temp.ctx2_label[indCnt]) {
+        //     indCnt++;
+        //   } else {
+        //     temp.breakTimeOrGiveUpCnt[indCnt]++;
+        //   }
+        // });
 
         if (element.giveUpTime) {
+          console.log('?');
           const giveUpTime = parseInt(element.giveUpTime / 60);
           let flag = false;
 
           for (let i = 0; i < 8; i++) {
+            console.log(flag, giveUpTime, temp.ctx2_label[i]);
             if (flag) {
               if (endTime < temp.ctx2_label[i]) {
                 break;
@@ -137,14 +144,24 @@ const mkStaticStr = async (user, realm) => {
             }
 
             if (giveUpTime < temp.ctx2_label[i]) {
-              temp.breakTimeOrGiveUpCnt[i] += 1;
-              flag = true;
+              if (!flag) {
+                console.log('??');
+                breakTimeOrGiveUpCnt[i] += 1;
+                giveUpPer[i] += 1;
+                flag = true;
+              }
             }
           }
         }
 
-        temp.giveUpPer = giveUpPer;
+        // for (let i = 1; i < 8; i++) {
+        //   giveUpPer[i] += giveUpPer[i - 1];
+        // }
       });
+
+      temp.breakTimeOrGiveUpCnt = breakTimeOrGiveUpCnt;
+      temp.prohibitedAppClickCnts = prohibitedAppClickCnts;
+      temp.giveUpPer = giveUpPer;
     }
     // console.log(temp.giveUpPer);
     // 그래프 4

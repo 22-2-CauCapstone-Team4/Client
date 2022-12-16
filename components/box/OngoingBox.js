@@ -186,7 +186,7 @@ const OngoingBox = () => {
   } else {
     return (
       <Container>
-        <Text style={styles.type1}>현재 진행 중인 미션이 없습니다.</Text>
+        <Text style={styles.type1}>현재 진행 중인 미션이 없습니다</Text>
       </Container>
     );
   }
