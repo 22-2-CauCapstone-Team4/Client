@@ -115,6 +115,11 @@ export default function FriendTab({navigation}) {
             ).length}
       </StateText>
       <ScrollView>
+        {friends.length === 0 ? (
+          <View style={{alignItems: 'center', marginVertical: 20}}>
+            <Text style={styles.defaultText}>친구를 추가해보세요</Text>
+          </View>
+        ) : null}
         {friendState === 'whole'
           ? friends.map(item => (
               <FriendBox
@@ -208,6 +213,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 25,
+  },
+  defaultText: {
+    fontSize: 24,
+    color: Colors.MAIN_COLOR,
   },
   headerInfo: {
     flexDirection: 'row',

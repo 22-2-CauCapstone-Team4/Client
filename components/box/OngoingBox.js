@@ -5,6 +5,7 @@ import {StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import * as Time from '../../functions/time';
+import Colors from '../../utils/Colors';
 import {updateMission, updateTodayMission} from '../../store/action';
 import {mkConfig, giveUp, takeBreakTime} from '../../functions';
 
@@ -193,8 +194,8 @@ const OngoingBox = () => {
 
 const styles = StyleSheet.create({
   type1: {
-    fontSize: 30,
-    color: 'black',
+    fontSize: 24,
+    color: Colors.MAIN_COLOR,
     fontWeight: 'bold',
   },
   type2: {
@@ -251,6 +252,7 @@ const Container = styled.View`
   height: 100%;
   background-color: white;
   padding: 20px;
+  align-items: center;
 `;
 const Info1 = styled.View`
   align-items: center;

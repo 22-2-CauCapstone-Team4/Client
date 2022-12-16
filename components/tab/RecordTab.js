@@ -183,8 +183,12 @@ const RecordTab = () => {
 
         {/* ★ 성공 기록만 보기 유무 */}
       </View>
-
       <View style={recordStyle.lineStyle}></View>
+      {newRecord.length === 0 ? (
+        <View style={{alignItems: 'center', marginVertical: 20}}>
+          <Text style={recordStyle.defaultText}>기록이 없습니다</Text>
+        </View>
+      ) : null}
       <ScrollView>
         {/* 날짜 선 */}
         {arr !== null
@@ -419,6 +423,10 @@ const recordStyle = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  defaultText: {
+    fontSize: 24,
+    color: Colors.MAIN_COLOR,
   },
   inputText: {
     border: 1,

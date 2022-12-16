@@ -18,7 +18,6 @@ const HomeTab = ({navigation}) => {
   const missionData = useSelector(
     store => store.todayMissionReducer.todayMissionData,
   );
-
   const [myLocation, setMyLocation] = useState({});
 
   // 오늘 미션
