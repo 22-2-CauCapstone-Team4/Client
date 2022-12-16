@@ -36,4 +36,4 @@ Run the codes below in terminal.
 
 ---
 
-[Manual](https://github.com/22-2-CauCapstone-Team4/Client/blob/develop/doc/savetime_manual(eng)%20(1).pdf)
+[Manual](<https://github.com/22-2-CauCapstone-Team4/Client/blob/develop/doc/savetime_manual(eng).pdf>)
